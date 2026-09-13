@@ -4,7 +4,8 @@ export const MASCOT_CONFIG = {
   id: 'sigap-ai-bot',
   name: 'Si SIGAP',
   title: 'Asisten AI Keselamatan Korlantas Polri',
-  avatarUrl: '/mascot/mascot.svg',
+  avatarUrl: '/mascot/mascot.png',
+  fallbackAvatarUrl: '/mascot/mascot.svg',
   welcomeGreeting: 'Halo Sahabat SIGAP! Saya Si SIGAP, asisten cerdas lalu lintas Anda. Ada info rute Banyuwangi, aturan SIM, atau edukasi lantas yang ingin ditanyakan?',
   shortGreeting: 'Siap membantu perjalanan amanmu!',
   quickSuggestions: [

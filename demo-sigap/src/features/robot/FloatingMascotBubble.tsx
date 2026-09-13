@@ -32,6 +32,12 @@ export const FloatingMascotBubble: React.FC<FloatingMascotBubbleProps> = ({ onCl
             src={MASCOT_CONFIG.avatarUrl}
             alt={MASCOT_CONFIG.name}
             className="w-full h-full object-contain"
+            onError={(e) => {
+              const target = e.currentTarget;
+              if (target.src.endsWith('.png')) {
+                target.src = MASCOT_CONFIG.fallbackAvatarUrl;
+              }
+            }}
           />
         </div>
 
