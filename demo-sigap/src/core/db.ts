@@ -350,7 +350,8 @@ export const MockDB = {
     const users = this.getAllUsers();
     
     // Find child with matching pairing code
-    const child = Object.values(users).find(u => u.pairing_code.toUpperCase() === pairingCode.toUpperCase().trim());
+    const childList = Object.values(users) as UserProfile[];
+    const child = childList.find(u => (u.pairing_code || '').toUpperCase() === pairingCode.toUpperCase().trim());
     if (!child) {
       return { success: false, message: 'Kode pairing tidak ditemukan. Pastikan memasukkan 6-digit kode yang tertera di aplikasi Anak/Pelajar.' };
     }
