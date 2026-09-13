@@ -1,0 +1,11 @@
+{
+  "name": "sigap-korlantas-lkti",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Prototipe Web SIGAP (Sistem Inovasi Generasi Aman berlalu lintas dan Peduli) untuk LKTI Korlantas POLRI 2026",
+  "scripts": {
+    "dev": "npm --prefix demo-sigap run dev",
+    "build": "npm --prefix demo-sigap run build",
+    "preview": "npm --prefix demo-sigap run preview"
+  }
+}

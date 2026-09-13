@@ -1,0 +1,43 @@
+import { AccidentReport } from '../core/types';
+
+export const SIMULATED_ACCIDENT_REPORTS: AccidentReport[] = [
+  {
+    id: 'laka_bwi_101',
+    nomor_laporan: 'LK/084/II/2026/LANTAS-BWI',
+    lokasi: 'Jl. Gajah Mada (Depan Toko Buah Asri, Banyuwangi Kota)',
+    koordinat: [-8.2288, 114.3565],
+    waktu_kejadian: 'Hari ini, 07:15 WIB (Simulasi Edukasi)',
+    kategori_kendaraan: 'Sepeda Motor Matic vs Sepeda Motor Bebek',
+    tingkat_keparahan: 'Ringan',
+    kronologi_singkat: 'Pengendara motor matic hendak mendahului angkot dari sebelah kiri tanpa menyalakan sein dan ruang jalan menyempit, sehingga bersenggolan dengan pengendara lain.',
+    faktor_penyebab: 'Menyalip dari sisi kiri dan tidak menjaga jarak aman pandang (Blind spot).',
+    edukasi_pencegahan: 'Selalu mendahului dari sisi kanan sesuai Pasal 112 UU 22/2009 dan berikan isyarat lampu sein minimal 30 meter sebelumnya.',
+    label: 'SIMULASI KORLANTAS POLRI',
+  },
+  {
+    id: 'laka_bwi_102',
+    nomor_laporan: 'LK/085/II/2026/LANTAS-BWI',
+    lokasi: 'Simpang Empat Taman Sritanjung (Jl. PB Sudirman)',
+    koordinat: [-8.2175, 114.3712],
+    waktu_kejadian: 'Kemarin, 16:40 WIB (Simulasi Edukasi)',
+    kategori_kendaraan: 'Sepeda Motor vs Mobil Pribadi',
+    tingkat_keparahan: 'Sedang',
+    kronologi_singkat: 'Pengendara roda dua menerobos lampu kuning yang telah berganti merah dengan kecepatan tinggi sehingga menabrak bagian samping mobil yang bergerak dari arah barat.',
+    faktor_penyebab: 'Pelanggaran Alat Pemberi Isyarat Lalu Lintas (APILL / Lampu Merah).',
+    edukasi_pencegahan: 'Lampu kuning adalah isyarat bersiap untuk berhenti, bukan memacu kecepatan gas. Patuhi APILL demi keselamatan bersama.',
+    label: 'SIMULASI KORLANTAS POLRI',
+  },
+  {
+    id: 'laka_bwi_103',
+    nomor_laporan: 'LK/086/II/2026/LANTAS-BWI',
+    lokasi: 'Jalur Menurun Licin — Jl. Raya Ijen Km 12',
+    koordinat: [-8.2090, 114.3180],
+    waktu_kejadian: '3 hari yang lalu, 18:20 WIB (Simulasi Edukasi)',
+    kategori_kendaraan: 'Kecelakaan Tunggal Roda Dua',
+    tingkat_keparahan: 'Sedang',
+    kronologi_singkat: 'Sepeda motor matic mengalami kegagalan pengereman (*vapor lock* / rem blong akibat panas berlebih) di turunan curam saat hujan gerimis.',
+    faktor_penyebab: 'Pengereman terus-menerus pada transmisi matic di jalan menurun curam.',
+    edukasi_pencegahan: 'Kocok rem secara bergantian, jangan menekan tuas rem terus-menerus, dan manfaatkan perlambatan alami bodi motor.',
+    label: 'SIMULASI KORLANTAS POLRI',
+  },
+];
