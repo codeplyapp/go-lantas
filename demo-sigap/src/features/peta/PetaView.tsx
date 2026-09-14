@@ -2,17 +2,15 @@ import React, { useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, CircleMarker, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import { 
-  MapPin, Clock, AlertTriangle, Compass, ShieldCheck, 
-  Layers, WifiOff, Eye, Navigation 
+  MapPin, ShieldCheck, WifiOff 
 } from 'lucide-react';
 import { 
   BANYUWANGI_CENTER, BANYUWANGI_HOTSPOTS, 
   BANYUWANGI_INCIDENTS, BANYUWANGI_SAFE_ROUTES 
 } from '../../data/banyuwangi_traffic';
-import { TimeSlot, TrafficHotspot } from '../../core/types';
+import { TimeSlot } from '../../core/types';
 import { sound } from '../../shared/services/sound';
 
-// Custom Leaflet Icons using SVG Data URIs
 const createCustomIcon = (color: string, iconSymbol: string) => {
   return L.divIcon({
     className: 'custom-map-marker',
@@ -21,7 +19,7 @@ const createCustomIcon = (color: string, iconSymbol: string) => {
         background: ${color};
         width: 32px;
         height: 32px;
-        border-radius: 12px;
+        border-radius: 9999px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -29,7 +27,7 @@ const createCustomIcon = (color: string, iconSymbol: string) => {
         font-weight: 800;
         font-size: 14px;
         border: 2px solid white;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        box-shadow: 0 4px 14px rgba(0,0,0,0.45);
       ">
         ${iconSymbol}
       </div>
@@ -47,16 +45,14 @@ export const PetaView: React.FC = () => {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot>('pagi');
   const [activeLayer, setActiveLayer] = useState<'semua' | 'macet' | 'rute_aman' | 'insiden'>('semua');
   const [isOfflineSimulation, setIsOfflineSimulation] = useState<boolean>(false);
-  const [selectedHotspot, setSelectedHotspot] = useState<TrafficHotspot | null>(null);
 
   const timeSlots: { id: TimeSlot; label: string; time: string }[] = [
-    { id: 'pagi', label: 'Pagi', time: '07:00 (Sekolah)' },
-    { id: 'siang', label: 'Siang', time: '13:00 (Makan)' },
-    { id: 'sore', label: 'Sore', time: '17:30 (Pulang)' },
-    { id: 'malam', label: 'Malam', time: '21:00 (Santai)' },
+    { id: 'pagi', label: 'Pagi', time: '07:00' },
+    { id: 'siang', label: 'Siang', time: '13:00' },
+    { id: 'sore', label: 'Sore', time: '17:30' },
+    { id: 'malam', label: 'Malam', time: '21:00' },
   ];
 
-  // Filter hotspots active in selected time slot
   const currentHotspots = BANYUWANGI_HOTSPOTS.filter(spot => 
     spot.time_slots.includes(selectedTimeSlot)
   );
@@ -64,14 +60,13 @@ export const PetaView: React.FC = () => {
   const getHotspotColor = (level: string) => {
     switch (level) {
       case 'lancar': return '#10b981';
-      case 'ramai_lancar': return '#3b82f6';
+      case 'ramai_lancar': return '#0066cc';
       case 'padat_merayap': return '#f59e0b';
       case 'macet_total': return '#ef4444';
-      default: return '#3b82f6';
+      default: return '#0066cc';
     }
   };
 
-  // Coordinates for the safe student route (Taman Blambangan -> SMAN 1 Giri)
   const safeRouteCoords: [number, number][] = [
     [-8.2185, 114.3685], // Taman Blambangan
     [-8.2160, 114.3675], // Jl. Veteran
@@ -81,15 +76,15 @@ export const PetaView: React.FC = () => {
 
   return (
     <div className="space-y-3 pb-20 animate-fadeIn">
-      {/* 1. Header & Time Slot Bar */}
-      <div className="p-3.5 rounded-2xl glass-card border border-blue-500/30 space-y-3">
+      {/* 1. Header & Segmented Time Slot Bar */}
+      <div className="p-4.5 rounded-[18px] apple-card space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-sm font-heading font-extrabold text-white flex items-center gap-1.5">
+            <h2 className="text-sm font-heading font-bold text-white tracking-apple-tight flex items-center gap-1.5">
               <MapPin className="w-4 h-4 text-blue-400" />
               Peta Kemacetan Banyuwangi
             </h2>
-            <p className="text-[10px] text-slate-300">
+            <p className="text-[11px] text-slate-400 mt-0.5">
               Data terintegrasi ruas jalan, titik rawan laka & rute aman pelajar
             </p>
           </div>
@@ -99,19 +94,19 @@ export const PetaView: React.FC = () => {
               sound.playClick();
               setIsOfflineSimulation(prev => !prev);
             }}
-            className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all flex items-center gap-1 ${
+            className={`px-3 py-1 rounded-full text-[11px] font-semibold border transition-all btn-press flex items-center gap-1 ${
               isOfflineSimulation 
                 ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' 
-                : 'bg-slate-800 text-slate-400 border-slate-700'
+                : 'bg-white/5 text-slate-400 border-white/10'
             }`}
           >
             <WifiOff className="w-3 h-3" />
-            {isOfflineSimulation ? 'Mode Offline' : 'Online'}
+            {isOfflineSimulation ? 'Offline' : 'Online'}
           </button>
         </div>
 
-        {/* Time Slot Presets */}
-        <div className="grid grid-cols-4 gap-1.5">
+        {/* Time Slot Segmented Pills */}
+        <div className="grid grid-cols-4 gap-1.5 bg-white/5 p-1 rounded-full border border-white/10">
           {timeSlots.map(slot => (
             <button
               key={slot.id}
@@ -119,34 +114,33 @@ export const PetaView: React.FC = () => {
                 sound.playClick();
                 setSelectedTimeSlot(slot.id);
               }}
-              className={`p-1.5 rounded-xl text-center border transition-all ${
+              className={`py-1.5 rounded-full text-center transition-all btn-press ${
                 selectedTimeSlot === slot.id
-                  ? 'bg-blue-600 border-blue-400 text-white shadow-md font-bold'
-                  : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:text-slate-200'
+                  ? 'bg-[#0066cc] text-white shadow font-semibold'
+                  : 'text-slate-400 hover:text-slate-200 font-medium'
               }`}
             >
-              <span className="block text-[11px] font-bold">{slot.label}</span>
-              <span className="block text-[9px] opacity-80">{slot.time.split(' ')[0]}</span>
+              <span className="block text-xs">{slot.label}</span>
+              <span className="block text-[9px] opacity-75">{slot.time}</span>
             </button>
           ))}
         </div>
       </div>
 
-      {/* 2. Interactive Leaflet Map Container */}
-      <div className="relative w-full h-80 rounded-2xl overflow-hidden border border-blue-500/30 shadow-2xl">
+      {/* 2. Leaflet Map Container */}
+      <div className="relative w-full h-80 rounded-[20px] overflow-hidden apple-card shadow-2xl border border-white/10">
         <MapContainer
           center={BANYUWANGI_CENTER}
           zoom={13}
           scrollWheelZoom={false}
           className="w-full h-full"
         >
-          {/* CartoDB Voyager / OpenStreetMap Clean Tiles */}
           <TileLayer
             attribution='&copy; <a href="https://carto.com/">CARTO</a> | Korlantas Polri'
             url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           />
 
-          {/* Traffic Hotspots as Pulse Circles */}
+          {/* Traffic Hotspots Circles */}
           {(activeLayer === 'semua' || activeLayer === 'macet') &&
             currentHotspots.map(spot => (
               <React.Fragment key={spot.id}>
@@ -158,9 +152,6 @@ export const PetaView: React.FC = () => {
                     fillColor: getHotspotColor(spot.level_kemacetan),
                     fillOpacity: 0.35,
                     weight: 2,
-                  }}
-                  eventHandlers={{
-                    click: () => setSelectedHotspot(spot),
                   }}
                 >
                   <Popup>
@@ -202,7 +193,7 @@ export const PetaView: React.FC = () => {
               </Marker>
             ))}
 
-          {/* Safe Route Polyline (Green Highway) */}
+          {/* Safe Route Polyline */}
           {(activeLayer === 'semua' || activeLayer === 'rute_aman') && (
             <>
               <Polyline
@@ -229,38 +220,36 @@ export const PetaView: React.FC = () => {
           )}
         </MapContainer>
 
-        {/* Offline Cache Overlay Banner if active */}
+        {/* Offline Cache Overlay */}
         {isOfflineSimulation && (
-          <div className="absolute top-2 left-2 right-2 z-[400] p-2 rounded-xl bg-slate-900/90 border border-amber-500/40 text-amber-300 text-[11px] font-bold flex items-center justify-between backdrop-blur-md">
-            <span className="flex items-center gap-1">
-              <WifiOff className="w-3.5 h-3.5" />
-              Menampilkan data kemacetan dari cache lokal (Offline-Ready)
-            </span>
+          <div className="absolute top-3 left-3 right-3 z-[400] p-2.5 rounded-full bg-[#060b18]/90 border border-amber-500/40 text-amber-300 text-xs font-semibold flex items-center justify-center gap-1.5 backdrop-blur-md">
+            <WifiOff className="w-3.5 h-3.5" />
+            <span>Menampilkan data kemacetan dari cache lokal (Offline-Ready)</span>
           </div>
         )}
 
-        {/* Layer Filter Floating Buttons */}
-        <div className="absolute bottom-3 left-3 z-[400] flex gap-1.5 bg-slate-950/80 p-1 rounded-xl border border-slate-800 backdrop-blur-md">
+        {/* Layer Filter Floating Bar */}
+        <div className="absolute bottom-3 left-3 z-[400] flex gap-1.5 bg-[#060b18]/90 p-1 rounded-full border border-white/10 backdrop-blur-md">
           <button
             onClick={() => setActiveLayer('semua')}
-            className={`px-2 py-1 rounded-lg text-[10px] font-bold ${
-              activeLayer === 'semua' ? 'bg-blue-600 text-white' : 'text-slate-400'
+            className={`px-3 py-1 rounded-full text-xs font-semibold btn-press ${
+              activeLayer === 'semua' ? 'bg-[#0066cc] text-white' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
             Semua
           </button>
           <button
             onClick={() => setActiveLayer('macet')}
-            className={`px-2 py-1 rounded-lg text-[10px] font-bold ${
-              activeLayer === 'macet' ? 'bg-amber-500 text-slate-950' : 'text-slate-400'
+            className={`px-3 py-1 rounded-full text-xs font-semibold btn-press ${
+              activeLayer === 'macet' ? 'bg-amber-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
             Macet
           </button>
           <button
             onClick={() => setActiveLayer('rute_aman')}
-            className={`px-2 py-1 rounded-lg text-[10px] font-bold ${
-              activeLayer === 'rute_aman' ? 'bg-emerald-600 text-white' : 'text-slate-400'
+            className={`px-3 py-1 rounded-full text-xs font-semibold btn-press ${
+              activeLayer === 'rute_aman' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
             Rute Aman
@@ -268,16 +257,16 @@ export const PetaView: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. Safe Route Spotlight Details */}
-      <div className="p-3.5 rounded-2xl glass-card border border-emerald-500/30 space-y-2">
+      {/* 3. Safe Route Details Card */}
+      <div className="p-4.5 rounded-[18px] apple-card border-emerald-500/30 space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-emerald-400">
-            <ShieldCheck className="w-4 h-4" />
-            <h3 className="text-xs font-bold text-white">
+            <ShieldCheck className="w-4.5 h-4.5" />
+            <h3 className="text-xs font-bold text-white tracking-apple-tight">
               Rute Aman Pelajar (Zona Selamat Sekolah)
             </h3>
           </div>
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+          <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
             3.4 KM • 8 Mnt
           </span>
         </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   HeartHandshake, ShieldCheck, KeyRound, CheckCircle2, 
-  XCircle, MapPin, History, AlertTriangle, Eye, UserX, Copy, Check 
+  MapPin, History, Eye, UserX, Copy, Check 
 } from 'lucide-react';
 import { MockDB } from '../../core/db';
 import { FamilyLink, FamilyAccessLog, UserProfile } from '../../core/types';
@@ -28,7 +28,6 @@ export const KeluargaView: React.FC = () => {
   const isParent = currentUser.role === 'orang_tua';
   const isStudent = currentUser.role === 'pelajar';
 
-  // Handle Parent submitting pairing code
   const handlePairingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputPairingCode.trim()) return;
@@ -43,7 +42,6 @@ export const KeluargaView: React.FC = () => {
     }
   };
 
-  // Handle Child approving pairing request
   const handleApproveLink = (linkId: string) => {
     sound.playCorrect();
     MockDB.updateFamilyLinkStatus(linkId, 'disetujui');
@@ -54,7 +52,6 @@ export const KeluargaView: React.FC = () => {
     );
   };
 
-  // Handle Child or Parent revoking link (UU PDP)
   const handleRevokeLink = (linkId: string) => {
     sound.playWrong();
     MockDB.updateFamilyLinkStatus(linkId, 'dicabut');
@@ -65,7 +62,6 @@ export const KeluargaView: React.FC = () => {
     );
   };
 
-  // Handle Parent checking live location
   const handleInspectChildLocation = (link: FamilyLink) => {
     sound.playClick();
     MockDB.recordFamilyAccessLog(
@@ -89,11 +85,11 @@ export const KeluargaView: React.FC = () => {
 
   return (
     <div className="space-y-4 pb-20 animate-fadeIn">
-      {/* 1. Privacy Banner (UU PDP Compliance) */}
-      <div className="p-4 rounded-2xl glass-card border border-emerald-500/30 space-y-2">
+      {/* 1. Privacy Banner */}
+      <div className="p-4.5 rounded-[18px] apple-card border-emerald-500/30 space-y-2">
         <div className="flex items-center gap-2.5 text-emerald-400">
           <ShieldCheck className="w-5 h-5 shrink-0" />
-          <h2 className="text-sm font-heading font-extrabold text-white">
+          <h2 className="text-sm font-heading font-bold text-white tracking-apple-tight">
             Pemantauan Keluarga Berbasis Persetujuan (Consent-First)
           </h2>
         </div>
@@ -106,28 +102,28 @@ export const KeluargaView: React.FC = () => {
       {isStudent && (
         <div className="space-y-4">
           {/* Pairing Code Generator Box */}
-          <div className="p-4.5 rounded-2xl glass-card border border-blue-500/30 text-center space-y-3">
-            <span className="text-[10px] font-bold text-blue-300 uppercase tracking-wider">
+          <div className="p-5 rounded-[20px] apple-card text-center space-y-3">
+            <span className="text-xs font-semibold text-blue-300 uppercase tracking-wider">
               Kode Pairing Unik Anda
             </span>
             <div className="flex items-center justify-center gap-2">
-              <span className="text-2xl font-heading font-black tracking-widest text-amber-400 bg-slate-900/80 px-4 py-2 rounded-xl border border-amber-500/30">
+              <span className="text-2xl font-heading font-black tracking-widest text-amber-400 bg-black/30 px-5 py-2.5 rounded-[16px] border border-amber-500/30">
                 {currentUser.pairing_code}
               </span>
               <button
                 onClick={handleCopyCode}
-                className="p-2.5 rounded-xl bg-blue-600/30 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/40 transition-all"
+                className="p-3 rounded-2xl bg-white/10 hover:bg-white/15 text-blue-300 hover:text-white border border-white/10 transition-all btn-press"
                 title="Salin Kode"
               >
                 {copiedCode ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
               </button>
             </div>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-xs text-slate-400">
               Berikan kode 6-digit ini kepada orang tua Anda untuk menautkan akun.
             </p>
           </div>
 
-          {/* Active Family Links for Student */}
+          {/* Active Family Links */}
           <div className="space-y-2.5">
             <h3 className="text-xs font-bold text-white flex items-center gap-1.5">
               <HeartHandshake className="w-3.5 h-3.5 text-blue-400" />
@@ -137,14 +133,14 @@ export const KeluargaView: React.FC = () => {
             {familyLinks.map((link) => (
               <div
                 key={link.id}
-                className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-3"
+                className="p-4.5 rounded-[18px] apple-card space-y-3"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="text-xs font-bold text-white">{link.parent_nama}</h4>
-                    <p className="text-[10px] text-slate-400">Wali Murid / Orang Tua</p>
+                    <h4 className="text-xs font-bold text-white tracking-apple-tight">{link.parent_nama}</h4>
+                    <p className="text-[11px] text-slate-400 mt-0.5">Wali Murid / Orang Tua</p>
                   </div>
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border capitalize ${
+                  <span className={`text-[10px] font-semibold px-2.5 py-0.5 rounded-full border capitalize ${
                     link.status === 'disetujui'
                       ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
                       : link.status === 'pending'
@@ -156,13 +152,13 @@ export const KeluargaView: React.FC = () => {
                 </div>
 
                 {link.status === 'pending' && (
-                  <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-500/30 flex items-center justify-between gap-2">
-                    <span className="text-[11px] text-amber-200">
+                  <div className="p-3.5 rounded-[14px] bg-amber-950/30 border border-amber-500/30 flex items-center justify-between gap-2">
+                    <span className="text-xs text-amber-200">
                       Orang tua meminta izin melihat lokasi Anda.
                     </span>
                     <button
                       onClick={() => handleApproveLink(link.id)}
-                      className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold shrink-0"
+                      className="px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shrink-0 btn-press"
                     >
                       Setujui
                     </button>
@@ -170,29 +166,29 @@ export const KeluargaView: React.FC = () => {
                 )}
 
                 {link.status === 'disetujui' && (
-                  <div className="flex items-center justify-between pt-1 border-t border-slate-800 text-xs">
-                    <span className="text-[11px] text-emerald-400 flex items-center gap-1">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
+                  <div className="flex items-center justify-between pt-2 border-t border-white/10 text-xs">
+                    <span className="text-xs text-emerald-400 flex items-center gap-1.5 font-medium">
+                      <CheckCircle2 className="w-4 h-4" />
                       Lokasi aktif dibagikan
                     </span>
                     <button
                       onClick={() => handleRevokeLink(link.id)}
-                      className="px-2.5 py-1 rounded-lg bg-rose-950/50 hover:bg-rose-900 border border-rose-500/30 text-rose-300 text-[10px] font-bold flex items-center gap-1 transition-colors"
+                      className="px-3.5 py-1.5 rounded-full bg-rose-950/60 hover:bg-rose-900 border border-rose-500/40 text-rose-300 text-xs font-semibold flex items-center gap-1 transition-colors btn-press"
                     >
-                      <UserX className="w-3 h-3" />
+                      <UserX className="w-3.5 h-3.5" />
                       Cabut Izin Akses
                     </button>
                   </div>
                 )}
 
                 {link.status === 'dicabut' && (
-                  <div className="flex items-center justify-between pt-1 border-t border-slate-800 text-xs">
-                    <span className="text-[11px] text-rose-400">
+                  <div className="flex items-center justify-between pt-2 border-t border-white/10 text-xs">
+                    <span className="text-xs text-rose-400">
                       Izin dicabut. Orang tua tidak dapat melihat lokasi.
                     </span>
                     <button
                       onClick={() => handleApproveLink(link.id)}
-                      className="text-[10px] font-bold text-blue-400 underline"
+                      className="text-xs font-semibold text-blue-400 underline btn-press"
                     >
                       Aktifkan Lagi
                     </button>
@@ -207,11 +203,10 @@ export const KeluargaView: React.FC = () => {
       {/* 3. Orang Tua Persona: Input Pairing & Map View */}
       {isParent && (
         <div className="space-y-4">
-          {/* Pairing Code Input Form */}
-          <form onSubmit={handlePairingSubmit} className="p-4.5 rounded-2xl glass-card border border-blue-500/30 space-y-3">
+          <form onSubmit={handlePairingSubmit} className="p-5 rounded-[20px] apple-card space-y-3">
             <div className="flex items-center gap-2">
               <KeyRound className="w-4 h-4 text-blue-400" />
-              <h3 className="text-xs font-bold text-white">
+              <h3 className="text-xs font-bold text-white tracking-apple-tight">
                 Tautkan Akun Anak (Pairing 6-Digit)
               </h3>
             </div>
@@ -221,21 +216,21 @@ export const KeluargaView: React.FC = () => {
                 placeholder="Contoh: SGP-8821"
                 value={inputPairingCode}
                 onChange={(e) => setInputPairingCode(e.target.value.toUpperCase())}
-                className="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs font-bold uppercase tracking-wider text-white focus:outline-none focus:border-blue-500"
+                className="flex-1 px-4 py-2.5 rounded-full bg-black/30 border border-white/10 text-xs font-bold uppercase tracking-wider text-white focus:outline-none focus:border-[#0066cc]"
               />
               <button
                 type="submit"
-                className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow transition-all active:scale-95"
+                className="apple-button-primary text-xs px-5 py-2.5"
               >
                 Kirim
               </button>
             </div>
-            <p className="text-[10px] text-slate-400">
+            <p className="text-[11px] text-slate-400">
               *Masukkan kode yang ditampilkan di layar smartphone anak Anda.
             </p>
           </form>
 
-          {/* Child Location Monitor Cards */}
+          {/* Child Location Cards */}
           <div className="space-y-3">
             <h3 className="text-xs font-bold text-white flex items-center gap-1.5">
               <MapPin className="w-3.5 h-3.5 text-emerald-400" />
@@ -245,14 +240,14 @@ export const KeluargaView: React.FC = () => {
             {familyLinks.map((link) => (
               <div
                 key={link.id}
-                className="p-4 rounded-2xl glass-card border border-slate-800 space-y-3"
+                className="p-4.5 rounded-[18px] apple-card space-y-3"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="text-xs font-bold text-white">{link.child_nama}</h4>
-                    <p className="text-[10px] text-slate-400">{link.child_sekolah}</p>
+                    <h4 className="text-xs font-bold text-white tracking-apple-tight">{link.child_nama}</h4>
+                    <p className="text-[11px] text-slate-400 mt-0.5">{link.child_sekolah}</p>
                   </div>
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border capitalize ${
+                  <span className={`text-[10px] font-semibold px-2.5 py-0.5 rounded-full border capitalize ${
                     link.status === 'disetujui'
                       ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
                       : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
@@ -262,27 +257,27 @@ export const KeluargaView: React.FC = () => {
                 </div>
 
                 {link.status === 'disetujui' && link.last_location ? (
-                  <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2 text-xs">
+                  <div className="p-3.5 rounded-[14px] bg-black/30 border border-white/10 space-y-2.5 text-xs">
                     <div className="flex items-center justify-between text-emerald-400 font-semibold">
-                      <span className="flex items-center gap-1">
+                      <span className="flex items-center gap-1.5">
                         <MapPin className="w-3.5 h-3.5" />
                         {link.last_location.alamat_perkiraan}
                       </span>
-                      <span className="text-[10px] text-slate-400">
+                      <span className="text-[10px] text-slate-400 font-normal">
                         {link.last_location.updated_at}
                       </span>
                     </div>
 
                     <button
                       onClick={() => handleInspectChildLocation(link)}
-                      className="w-full py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow flex items-center justify-center gap-1.5 transition-all"
+                      className="w-full py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow flex items-center justify-center gap-1.5 transition-all btn-press"
                     >
                       <Eye className="w-3.5 h-3.5" />
                       Periksa Lokasi Terkini
                     </button>
                   </div>
                 ) : (
-                  <div className="p-3 rounded-xl bg-slate-900/60 text-center text-xs text-slate-400">
+                  <div className="p-3.5 rounded-[14px] bg-black/20 text-center text-xs text-slate-400">
                     {link.status === 'pending'
                       ? 'Menunggu persetujuan dari aplikasi anak.'
                       : 'Izin akses lokasi sedang dicabut oleh anak.'}
@@ -301,7 +296,7 @@ export const KeluargaView: React.FC = () => {
             <History className="w-3.5 h-3.5 text-blue-400" />
             Transparansi Log Akses (Audit Trail)
           </h3>
-          <span className="text-[10px] text-slate-400">
+          <span className="text-[11px] text-slate-400">
             {familyLogs.length} Catatan
           </span>
         </div>
@@ -310,7 +305,7 @@ export const KeluargaView: React.FC = () => {
           {familyLogs.map((log) => (
             <div
               key={log.id}
-              className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1 text-xs"
+              className="p-3.5 rounded-[18px] apple-card space-y-1 text-xs"
             >
               <div className="flex items-center justify-between">
                 <span className="font-bold text-slate-200">{log.accessor_nama}</span>

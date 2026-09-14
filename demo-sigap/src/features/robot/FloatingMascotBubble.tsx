@@ -17,17 +17,18 @@ export const FloatingMascotBubble: React.FC<FloatingMascotBubbleProps> = ({ onCl
   };
 
   return (
-    <div className="fixed bottom-20 right-4 z-40 animate-float-mascot">
+    <div className="fixed bottom-22 right-4 z-40 animate-float-mascot-smooth">
       <button
         onClick={handleClick}
-        className="relative group focus:outline-none"
-        title="Tanya Si SIGAP (AI Korlantas)"
+        className="relative group focus:outline-none min-w-[52px] min-h-[52px] btn-press"
+        title="Tanya Si SIGAP (AI Korlantas Banyuwangi)"
+        aria-label="Tanya Robot AI Si SIGAP"
       >
-        {/* Glow Halo */}
-        <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-amber-400 rounded-2xl blur-md opacity-75 group-hover:opacity-100 transition duration-300 animate-tilt" />
+        {/* Apple subtle glow halo */}
+        <div className="absolute -inset-1 bg-gradient-to-tr from-[#0066cc] via-indigo-500 to-amber-400 rounded-2xl blur-md opacity-70 group-hover:opacity-100 transition-opacity duration-300" />
 
         {/* Mascot Face Bubble */}
-        <div className="relative w-14 h-14 rounded-2xl bg-slate-950 p-1 border-2 border-cyan-400/80 shadow-2xl flex items-center justify-center overflow-hidden transform group-hover:scale-110 group-active:scale-95 transition-all">
+        <div className="relative w-14 h-14 rounded-2xl bg-[#060b18] p-1 border-2 border-blue-400/80 apple-product-shadow flex items-center justify-center overflow-hidden transition-all group-hover:border-amber-400">
           <img
             src={MASCOT_CONFIG.avatarUrl}
             alt={MASCOT_CONFIG.name}
@@ -41,9 +42,9 @@ export const FloatingMascotBubble: React.FC<FloatingMascotBubbleProps> = ({ onCl
           />
         </div>
 
-        {/* Mini Pulsing AI Badge */}
-        <div className="absolute -top-1.5 -right-1.5 px-1.5 py-0.5 rounded-full bg-cyan-500 text-slate-950 font-black text-[9px] border-2 border-slate-950 shadow-md flex items-center gap-0.5 animate-pulse">
-          <Sparkles className="w-2.5 h-2.5" />
+        {/* Mini Apple Pill AI Badge */}
+        <div className="absolute -top-1.5 -right-1.5 px-1.5 py-0.5 rounded-full bg-[#0066cc] text-white font-bold text-[9px] border-2 border-[#060b18] shadow-md flex items-center gap-0.5">
+          <Sparkles className="w-2.5 h-2.5 text-amber-300" />
           <span>AI</span>
         </div>
       </button>

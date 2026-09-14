@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { MockDB } from '../../core/db';
-import { QuizQuestion, QuizLevelInfo, LeaderboardEntry, UserProfile } from '../../core/types';
+import { QuizQuestion, LeaderboardEntry, UserProfile } from '../../core/types';
 import { QUIZ_LEVELS } from '../../data/quiz_questions';
 import { sound } from '../../shared/services/sound';
 import { NotificationService } from '../../shared/services/notification';
@@ -52,12 +52,11 @@ export const GameKuisView: React.FC = () => {
       sound.playCorrect();
       setSessionScore(prev => prev + currentQuestion.poin);
       
-      // Trigger mini confetti
       confetti({
         particleCount: 40,
         spread: 60,
         origin: { y: 0.7 },
-        colors: ['#3b82f6', '#f59e0b', '#10b981']
+        colors: ['#0066cc', '#f59e0b', '#10b981']
       });
 
       NotificationService.showInAppToast(
@@ -74,7 +73,6 @@ export const GameKuisView: React.FC = () => {
       );
     }
 
-    // Save attempt to mock db
     MockDB.recordQuizAttempt({
       uid: currentUser.uid,
       question_id: currentQuestion.id,
@@ -92,7 +90,6 @@ export const GameKuisView: React.FC = () => {
       setSelectedOption(null);
       setIsAnswered(false);
     } else {
-      // Complete level / session
       setQuizCompleted(true);
       sound.playLevelUp();
       confetti({
@@ -116,13 +113,13 @@ export const GameKuisView: React.FC = () => {
 
   return (
     <div className="space-y-4 pb-20 animate-fadeIn">
-      {/* Sub-navigation Tabs */}
-      <div className="flex rounded-xl p-1 bg-slate-900/80 border border-blue-900/40">
+      {/* Apple-style Segmented Pill Navigation */}
+      <div className="flex rounded-full p-1 bg-white/5 border border-white/10 backdrop-blur-md">
         <button
           onClick={() => { sound.playClick(); setSubTab('harian'); }}
-          className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+          className={`flex-1 py-2 rounded-full text-xs font-semibold transition-all flex items-center justify-center gap-1.5 btn-press ${
             subTab === 'harian'
-              ? 'bg-blue-600 text-white shadow'
+              ? 'bg-[#0066cc] text-white shadow-md'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
@@ -132,9 +129,9 @@ export const GameKuisView: React.FC = () => {
 
         <button
           onClick={() => { sound.playClick(); setSubTab('jalur'); }}
-          className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+          className={`flex-1 py-2 rounded-full text-xs font-semibold transition-all flex items-center justify-center gap-1.5 btn-press ${
             subTab === 'jalur'
-              ? 'bg-blue-600 text-white shadow'
+              ? 'bg-[#0066cc] text-white shadow-md'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
@@ -144,9 +141,9 @@ export const GameKuisView: React.FC = () => {
 
         <button
           onClick={() => { sound.playClick(); setSubTab('leaderboard'); }}
-          className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+          className={`flex-1 py-2 rounded-full text-xs font-semibold transition-all flex items-center justify-center gap-1.5 btn-press ${
             subTab === 'leaderboard'
-              ? 'bg-amber-500 text-slate-950 font-extrabold shadow'
+              ? 'bg-amber-500 text-slate-950 font-bold shadow-md'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
@@ -160,11 +157,11 @@ export const GameKuisView: React.FC = () => {
         <div className="space-y-4">
           {!quizCompleted ? (
             currentQuestion ? (
-              <div className="glass-card rounded-2xl p-4.5 border border-blue-500/30 space-y-4">
+              <div className="apple-card p-5 space-y-4">
                 {/* Header Progress */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-500/20 text-blue-300 border border-blue-500/30 uppercase">
+                    <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/15 text-blue-300 border border-blue-500/25 uppercase">
                       Level {currentQuestion.level}: {currentQuestion.kategori}
                     </span>
                     <span className="text-xs text-slate-400 font-medium">
@@ -177,17 +174,17 @@ export const GameKuisView: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Progress Bar */}
-                <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                {/* Progress Bar Pill */}
+                <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
                   <div 
-                    className="bg-gradient-to-r from-blue-500 to-amber-400 h-full rounded-full transition-all duration-300"
+                    className="bg-[#0066cc] h-full rounded-full transition-all duration-300"
                     style={{ width: `${((currentQuestionIndex + 1) / filteredQuestions.length) * 100}%` }}
                   />
                 </div>
 
                 {/* Question Text */}
                 <div className="py-2">
-                  <h2 className="text-sm sm:text-base font-bold text-white leading-relaxed">
+                  <h2 className="text-base sm:text-lg font-heading font-bold text-white tracking-apple-tight leading-relaxed">
                     {currentQuestion.pertanyaan}
                   </h2>
                 </div>
@@ -198,14 +195,14 @@ export const GameKuisView: React.FC = () => {
                     const isChosen = selectedOption === idx;
                     const isCorrect = idx === currentQuestion.jawaban_benar;
                     
-                    let btnStyle = 'border-slate-800 bg-slate-900/70 hover:bg-slate-800/80 text-slate-200';
+                    let btnStyle = 'border-white/10 bg-white/5 hover:bg-white/10 text-slate-200';
                     if (isAnswered) {
                       if (isCorrect) {
                         btnStyle = 'border-emerald-500 bg-emerald-950/70 text-emerald-200 ring-2 ring-emerald-500/30';
                       } else if (isChosen && !isCorrect) {
                         btnStyle = 'border-rose-500 bg-rose-950/70 text-rose-200 ring-2 ring-rose-500/30';
                       } else {
-                        btnStyle = 'border-slate-850 bg-slate-900/30 text-slate-500 opacity-60';
+                        btnStyle = 'border-white/5 bg-black/20 text-slate-500 opacity-50';
                       }
                     }
 
@@ -214,28 +211,28 @@ export const GameKuisView: React.FC = () => {
                         key={idx}
                         disabled={isAnswered}
                         onClick={() => handleSelectOption(idx)}
-                        className={`w-full p-3 rounded-xl border text-left text-xs sm:text-sm font-medium transition-all duration-200 flex items-center justify-between gap-3 ${btnStyle}`}
+                        className={`w-full p-3.5 rounded-[16px] border text-left text-xs sm:text-sm font-medium transition-all duration-150 flex items-center justify-between gap-3 btn-press ${btnStyle}`}
                       >
                         <div className="flex items-center gap-3">
-                          <span className="w-6 h-6 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold shrink-0 text-slate-300">
+                          <span className="w-7 h-7 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-xs font-bold shrink-0 text-slate-200">
                             {String.fromCharCode(65 + idx)}
                           </span>
-                          <span>{option}</span>
+                          <span className="leading-relaxed">{option}</span>
                         </div>
                         {isAnswered && isCorrect && (
-                          <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
+                          <CheckCircle className="w-4.5 h-4.5 text-emerald-400 shrink-0" />
                         )}
                         {isAnswered && isChosen && !isCorrect && (
-                          <XCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                          <XCircle className="w-4.5 h-4.5 text-rose-400 shrink-0" />
                         )}
                       </button>
                     );
                   })}
                 </div>
 
-                {/* Explanation Card after answered */}
+                {/* Explanation Card */}
                 {isAnswered && (
-                  <div className="p-3.5 rounded-xl bg-blue-950/50 border border-blue-500/30 space-y-2 animate-fadeIn">
+                  <div className="p-4 rounded-[18px] bg-[#151f38] border border-blue-500/30 space-y-2 animate-fadeIn">
                     <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300">
                       <BookOpen className="w-4 h-4" />
                       <span>Penjelasan Edukasi Korlantas:</span>
@@ -244,14 +241,14 @@ export const GameKuisView: React.FC = () => {
                       {currentQuestion.penjelasan}
                     </p>
                     {currentQuestion.pasal_hukum && (
-                      <div className="pt-1 text-[11px] text-blue-300 font-semibold border-t border-blue-900/50">
+                      <div className="pt-1.5 text-[11px] text-blue-300 font-semibold border-t border-white/10">
                         ⚖️ Dasar Hukum: {currentQuestion.pasal_hukum}
                       </div>
                     )}
 
                     <button
                       onClick={handleNextQuestion}
-                      className="w-full mt-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold shadow-md flex items-center justify-center gap-1.5 transition-all"
+                      className="w-full mt-3 py-3 px-4 apple-button-primary text-xs font-bold flex items-center justify-center gap-1.5"
                     >
                       <span>
                         {currentQuestionIndex < filteredQuestions.length - 1 ? 'Soal Berikutnya' : 'Lihat Hasil Kuis'}
@@ -264,45 +261,45 @@ export const GameKuisView: React.FC = () => {
             ) : null
           ) : (
             // Quiz Complete Result Card
-            <div className="glass-card rounded-2xl p-6 border border-amber-500/40 text-center space-y-4 animate-scaleUp">
-              <div className="w-16 h-16 mx-auto rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center shadow-lg">
+            <div className="apple-card p-6 text-center space-y-4 animate-scaleUp">
+              <div className="w-16 h-16 mx-auto rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/25 flex items-center justify-center shadow-lg">
                 <Trophy className="w-8 h-8" />
               </div>
               <div>
-                <span className="text-xs font-bold text-amber-300 uppercase tracking-widest">
+                <span className="text-xs font-semibold text-amber-300 uppercase tracking-widest">
                   Level Selesai!
                 </span>
-                <h2 className="text-xl font-heading font-black text-white mt-1">
+                <h2 className="text-xl font-heading font-bold text-white mt-1 tracking-apple-tight">
                   Selamat, Sahabat SIGAP!
                 </h2>
-                <p className="text-xs text-slate-300 mt-1">
+                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
                   Kamu telah menyelesaikan tantangan Level {activeLevel}. Poin dan peringkatmu di leaderboard telah diperbarui!
                 </p>
               </div>
 
               {/* Score Recap */}
               <div className="grid grid-cols-2 gap-3 py-2">
-                <div className="p-3 rounded-xl bg-slate-900/70 border border-slate-800">
+                <div className="p-3.5 rounded-[16px] bg-black/20 border border-white/5">
                   <span className="text-xs text-slate-400">Poin Bertambah</span>
-                  <p className="text-lg font-extrabold text-amber-400">+{sessionScore} Pts</p>
+                  <p className="text-lg font-bold text-amber-400">+{sessionScore} Pts</p>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-900/70 border border-slate-800">
+                <div className="p-3.5 rounded-[16px] bg-black/20 border border-white/5">
                   <span className="text-xs text-slate-400">Total Poin Kamu</span>
-                  <p className="text-lg font-extrabold text-blue-400">{currentUser.poin_total} Pts</p>
+                  <p className="text-lg font-bold text-[#2997ff]">{currentUser.poin_total} Pts</p>
                 </div>
               </div>
 
               <div className="flex gap-2 pt-2">
                 <button
                   onClick={() => handleRestartQuiz(activeLevel)}
-                  className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                  className="flex-1 py-3 apple-button-secondary text-xs font-semibold flex items-center justify-center gap-1.5"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   Ulangi Level
                 </button>
                 <button
                   onClick={() => setSubTab('leaderboard')}
-                  className="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold shadow-md transition-all flex items-center justify-center gap-1.5"
+                  className="flex-1 py-3 apple-button-primary text-xs font-bold flex items-center justify-center gap-1.5"
                 >
                   <Trophy className="w-3.5 h-3.5" />
                   Cek Leaderboard
@@ -316,9 +313,9 @@ export const GameKuisView: React.FC = () => {
       {/* --- TAB 2: JALUR BELAJAR (LEVEL 1-4) --- */}
       {subTab === 'jalur' && (
         <div className="space-y-3">
-          <div className="p-3 rounded-xl bg-blue-950/40 border border-blue-500/30 text-xs text-slate-300 flex items-center gap-2">
+          <div className="p-4 rounded-[18px] apple-card text-xs text-slate-300 flex items-center gap-2.5">
             <ShieldCheck className="w-5 h-5 text-blue-400 shrink-0" />
-            <span>
+            <span className="leading-relaxed">
               Selesaikan tiap level untuk membuka materi SIM berikutnya dan raih gelar <strong>Pelopor Keselamatan</strong>!
             </span>
           </div>
@@ -331,22 +328,20 @@ export const GameKuisView: React.FC = () => {
               return (
                 <div
                   key={level.level}
-                  className={`p-4 rounded-2xl border transition-all ${
-                    isUnlocked
-                      ? 'glass-card border-blue-500/30 hover:border-blue-400'
-                      : 'bg-slate-900/40 border-slate-800 opacity-65'
+                  className={`p-4.5 rounded-[18px] apple-card transition-all ${
+                    !isUnlocked && 'opacity-60 bg-black/20'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-start gap-3">
-                      <div className={`p-2.5 rounded-xl border bg-gradient-to-br ${level.warna_tema}`}>
+                    <div className="flex items-start gap-3.5">
+                      <div className={`p-2.5 rounded-2xl border bg-gradient-to-br ${level.warna_tema}`}>
                         {isUnlocked ? <Unlock className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="text-sm font-bold text-white">{level.judul}</h3>
+                          <h3 className="text-sm font-bold text-white tracking-apple-tight">{level.judul}</h3>
                           {isCurrent && isUnlocked && (
-                            <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            <span className="text-[10px] font-semibold px-2 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                               Aktif
                             </span>
                           )}
@@ -354,7 +349,7 @@ export const GameKuisView: React.FC = () => {
                         <p className="text-xs text-slate-400 mt-1 leading-relaxed">
                           {level.deskripsi}
                         </p>
-                        <div className="flex items-center gap-3 mt-2 text-[11px] text-slate-400">
+                        <div className="flex items-center gap-3 mt-2.5 text-[11px] text-slate-400">
                           <span>📝 {level.total_soal} Soal</span>
                           <span>⭐ Min. {level.min_poin_unlock} Poin</span>
                         </div>
@@ -364,12 +359,12 @@ export const GameKuisView: React.FC = () => {
                     {isUnlocked ? (
                       <button
                         onClick={() => handleRestartQuiz(level.level)}
-                        className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shrink-0 shadow transition-all active:scale-95"
+                        className="apple-button-primary text-xs px-4 py-1.5 shrink-0"
                       >
                         Mainkan
                       </button>
                     ) : (
-                      <span className="text-[10px] text-slate-500 font-semibold px-2 py-1 rounded bg-slate-800">
+                      <span className="text-[10px] text-slate-500 font-semibold px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
                         Terkunci
                       </span>
                     )}
@@ -384,13 +379,13 @@ export const GameKuisView: React.FC = () => {
       {/* --- TAB 3: LEADERBOARD MINGGUAN --- */}
       {subTab === 'leaderboard' && (
         <div className="space-y-3">
-          {/* Scope Filters */}
-          <div className="flex rounded-xl p-1 bg-slate-900 border border-slate-800 text-xs">
+          {/* Scope Segmented Pill */}
+          <div className="flex rounded-full p-1 bg-white/5 border border-white/10 text-xs backdrop-blur-md">
             <button
               onClick={() => { sound.playClick(); setLeaderboardScope('sekolah'); }}
-              className={`flex-1 py-1.5 rounded-lg font-bold transition-all flex items-center justify-center gap-1 ${
+              className={`flex-1 py-1.5 rounded-full font-semibold transition-all flex items-center justify-center gap-1 btn-press ${
                 leaderboardScope === 'sekolah'
-                  ? 'bg-blue-600 text-white shadow'
+                  ? 'bg-[#0066cc] text-white shadow'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -399,9 +394,9 @@ export const GameKuisView: React.FC = () => {
             </button>
             <button
               onClick={() => { sound.playClick(); setLeaderboardScope('kampus'); }}
-              className={`flex-1 py-1.5 rounded-lg font-bold transition-all flex items-center justify-center gap-1 ${
+              className={`flex-1 py-1.5 rounded-full font-semibold transition-all flex items-center justify-center gap-1 btn-press ${
                 leaderboardScope === 'kampus'
-                  ? 'bg-indigo-600 text-white shadow'
+                  ? 'bg-[#0066cc] text-white shadow'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -410,9 +405,9 @@ export const GameKuisView: React.FC = () => {
             </button>
             <button
               onClick={() => { sound.playClick(); setLeaderboardScope('nasional'); }}
-              className={`flex-1 py-1.5 rounded-lg font-bold transition-all flex items-center justify-center gap-1 ${
+              className={`flex-1 py-1.5 rounded-full font-semibold transition-all flex items-center justify-center gap-1 btn-press ${
                 leaderboardScope === 'nasional'
-                  ? 'bg-amber-500 text-slate-950 font-extrabold shadow'
+                  ? 'bg-amber-500 text-slate-950 font-bold shadow'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -421,12 +416,12 @@ export const GameKuisView: React.FC = () => {
             </button>
           </div>
 
-          <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between text-xs">
+          <div className="p-3.5 rounded-[18px] apple-card flex items-center justify-between text-xs">
             <div className="flex items-center gap-2 text-amber-300">
               <Trophy className="w-4 h-4 text-amber-400" />
               <span>Reset otomatis setiap <strong>Senin 00:00 WIB</strong></span>
             </div>
-            <span className="text-[10px] text-slate-400">Minggu ke-2 Feb</span>
+            <span className="text-[11px] text-slate-400">Minggu ke-2 Feb</span>
           </div>
 
           {/* Leaderboard List */}
@@ -434,51 +429,51 @@ export const GameKuisView: React.FC = () => {
             {leaderboard.map((entry) => {
               const isMe = entry.is_current_user || entry.uid === currentUser.uid;
               let rankBadge = `${entry.peringkat}`;
-              let rankStyle = 'bg-slate-800 text-slate-400';
+              let rankStyle = 'bg-white/5 text-slate-400';
 
               if (entry.peringkat === 1) {
                 rankBadge = '🥇';
-                rankStyle = 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-extrabold';
+                rankStyle = 'bg-amber-500/20 text-amber-300 border border-amber-500/30';
               } else if (entry.peringkat === 2) {
                 rankBadge = '🥈';
-                rankStyle = 'bg-slate-300/20 text-slate-200 border border-slate-300/40 font-extrabold';
+                rankStyle = 'bg-slate-300/20 text-slate-200 border border-slate-300/30';
               } else if (entry.peringkat === 3) {
                 rankBadge = '🥉';
-                rankStyle = 'bg-amber-700/20 text-amber-400 border border-amber-700/40 font-extrabold';
+                rankStyle = 'bg-amber-700/20 text-amber-400 border border-amber-700/30';
               }
 
               return (
                 <div
                   key={entry.uid}
-                  className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition-all ${
+                  className={`p-3.5 rounded-[18px] border flex items-center justify-between gap-3 transition-all ${
                     isMe
-                      ? 'bg-blue-950/80 border-blue-400 shadow-lg ring-1 ring-blue-400/50'
-                      : 'bg-slate-900/60 border-slate-800'
+                      ? 'apple-card border-blue-500/60 shadow-lg ring-1 ring-blue-500/40 bg-[#151f38]'
+                      : 'apple-card'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${rankStyle}`}>
+                    <span className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${rankStyle}`}>
                       {rankBadge}
                     </span>
                     <div>
                       <div className="flex items-center gap-1.5">
-                        <h4 className="text-xs font-bold text-white">
+                        <h4 className="text-xs font-bold text-white tracking-apple-tight">
                           {entry.nama}
                         </h4>
                         {isMe && (
-                          <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-blue-500 text-white">
+                          <span className="text-[9px] font-bold px-2 py-0.2 rounded-full bg-[#0066cc] text-white">
                             Anda
                           </span>
                         )}
                       </div>
-                      <p className="text-[10px] text-slate-400 mt-0.5 truncate max-w-[180px]">
+                      <p className="text-[11px] text-slate-400 mt-0.5 truncate max-w-[180px]">
                         {entry.sekolah_kampus}
                       </p>
                     </div>
                   </div>
 
                   <div className="text-right shrink-0">
-                    <div className="flex items-center justify-end gap-1 text-xs font-extrabold text-amber-400">
+                    <div className="flex items-center justify-end gap-1 text-xs font-bold text-amber-400">
                       <Sparkles className="w-3 h-3" />
                       <span>{entry.poin_minggu_ini} Pts</span>
                     </div>

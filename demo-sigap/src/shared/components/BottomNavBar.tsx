@@ -25,8 +25,8 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeTab, onSelectT
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 w-full glass-nav pb-safe border-t border-blue-900/40 shadow-2xl">
-      <div className="max-w-md mx-auto px-2 py-1.5 flex items-center justify-around">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 w-full glass-bottom-bar pb-safe shadow-2xl">
+      <div className="max-w-md mx-auto px-2 py-1 flex items-center justify-around">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -36,18 +36,18 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeTab, onSelectT
               <button
                 key={item.id}
                 onClick={() => handleTabClick(item.id)}
-                className="relative -top-4 flex flex-col items-center group focus:outline-none"
+                className="relative -top-3.5 flex flex-col items-center group focus:outline-none min-w-[48px] min-h-[48px]"
                 aria-label="Darurat SOS 110"
               >
-                <div className={`w-13 h-13 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-lg ${
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg ${
                   isActive 
-                    ? 'bg-gradient-to-tr from-rose-600 to-red-500 text-white scale-110 ring-4 ring-rose-500/40 shadow-rose-600/50' 
-                    : 'bg-gradient-to-tr from-red-600 to-rose-700 text-white hover:scale-105 shadow-red-900/40 animate-pulse'
+                    ? 'bg-red-600 text-white scale-105 ring-4 ring-rose-500/40 shadow-rose-600/50' 
+                    : 'bg-red-600 text-white hover:bg-red-500 shadow-red-900/40 animate-pulse-sos-apple'
                 }`}>
-                  <Icon className="w-6 h-6 stroke-[2.5]" />
+                  <Icon className="w-5 h-5 stroke-[2.5]" />
                 </div>
                 <span className={`text-[10px] font-bold tracking-tight mt-1 ${
-                  isActive ? 'text-rose-400' : 'text-rose-300'
+                  isActive ? 'text-rose-400 font-extrabold' : 'text-rose-300 font-semibold'
                 }`}>
                   SOS 110
                 </span>
@@ -59,19 +59,19 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeTab, onSelectT
             <button
               key={item.id}
               onClick={() => handleTabClick(item.id)}
-              className={`flex flex-col items-center py-1 px-2 rounded-xl transition-all duration-200 ${
+              className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl min-w-[48px] min-h-[48px] transition-all duration-150 btn-press ${
                 isActive 
-                  ? 'text-blue-400 bg-blue-500/10 font-bold scale-105' 
+                  ? 'text-blue-400 font-semibold' 
                   : 'text-slate-400 hover:text-slate-200 font-medium'
               }`}
             >
-              <div className="relative">
-                <Icon className={`w-5 h-5 transition-transform ${isActive ? 'stroke-[2.5]' : 'stroke-2'}`} />
+              <div className="relative flex flex-col items-center">
+                <Icon className={`w-5 h-5 transition-transform ${isActive ? 'stroke-[2.3]' : 'stroke-2'}`} />
                 {isActive && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-400 rounded-full" />
+                  <span className="w-1 h-1 bg-blue-500 rounded-full mt-0.5" />
                 )}
               </div>
-              <span className="text-[10px] mt-1 tracking-tight">
+              <span className="text-[10px] mt-0.5 tracking-apple-tight">
                 {item.label}
               </span>
             </button>

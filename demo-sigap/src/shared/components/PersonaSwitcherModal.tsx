@@ -63,29 +63,29 @@ export const PersonaSwitcherModal: React.FC<PersonaSwitcherModalProps> = ({ isOp
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
-      <div className="w-full max-w-sm glass-card rounded-2xl p-5 border border-blue-500/30 shadow-2xl relative">
+      <div className="w-full max-w-sm bg-[#0c1322]/95 backdrop-blur-2xl rounded-[28px] p-5 border border-white/10 shadow-2xl relative">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+          className="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors btn-press"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4.5 h-4.5" />
         </button>
 
         <div className="text-center mb-5">
-          <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 uppercase tracking-wider">
+          <span className="text-[10px] font-semibold px-3 py-1 rounded-full bg-blue-500/15 text-blue-300 border border-blue-500/25 uppercase tracking-wider">
             Demo Persona Switcher
           </span>
-          <h2 className="text-lg font-heading font-extrabold text-white mt-2">
+          <h2 className="text-base font-heading font-bold text-white mt-2 tracking-apple-tight">
             Pilih Peran Pengguna
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Ganti sudut pandang untuk menguji fitur Pelajar, Mahasiswa, atau Pemantauan Orang Tua.
+          <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+            Uji fitur dari perspektif Pelajar, Mahasiswa, atau Pemantauan Orang Tua.
           </p>
         </div>
 
         {/* Persona Option Cards */}
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {personas.map((item) => {
             const Icon = item.icon;
             const isSelected = currentRole === item.role;
@@ -94,34 +94,34 @@ export const PersonaSwitcherModal: React.FC<PersonaSwitcherModalProps> = ({ isOp
               <div
                 key={item.role}
                 onClick={() => handleSelectRole(item.role)}
-                className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-start gap-3 relative ${
+                className={`p-3.5 rounded-[18px] border transition-all cursor-pointer flex items-start gap-3 relative btn-press ${
                   isSelected 
-                    ? 'ring-2 ring-blue-500 bg-blue-950/60 border-blue-400' 
-                    : 'border-slate-800 bg-slate-900/50 hover:bg-slate-800/70'
+                    ? 'ring-2 ring-[#0066cc] bg-[#151f38] border-blue-400/80 shadow-lg' 
+                    : 'border-white/10 bg-white/5 hover:bg-white/10'
                 }`}
               >
-                <div className={`p-2.5 rounded-xl border ${item.color}`}>
+                <div className={`p-2.5 rounded-2xl border ${item.color}`}>
                   <Icon className="w-5 h-5" />
                 </div>
                 <div className="flex-1 pr-5">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-white">{item.name}</h3>
+                    <h3 className="text-xs font-bold text-white tracking-apple-tight">{item.name}</h3>
                     {isSelected && (
                       <CheckCircle2 className="w-4 h-4 text-emerald-400 absolute top-3.5 right-3.5" />
                     )}
                   </div>
-                  <p className="text-xs font-medium text-amber-300/90">{item.title}</p>
+                  <p className="text-xs font-semibold text-amber-300 mt-0.5">{item.title}</p>
                   <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-1">{item.subtitle}</p>
-                  <p className="text-[11px] text-slate-300/80 mt-1.5 leading-relaxed">{item.desc}</p>
+                  <p className="text-[11px] text-slate-300 mt-1.5 leading-relaxed">{item.desc}</p>
                 </div>
               </div>
             );
           })}
         </div>
 
-        <div className="mt-5 pt-3 border-t border-slate-800 text-center">
+        <div className="mt-5 pt-3 border-t border-white/10 text-center">
           <p className="text-[10px] text-slate-400">
-            *Semua data disimpan di browser (localStorage) tanpa memerlukan login/akun.
+            *Semua data disimpan di browser (localStorage) tanpa akun/login.
           </p>
         </div>
       </div>

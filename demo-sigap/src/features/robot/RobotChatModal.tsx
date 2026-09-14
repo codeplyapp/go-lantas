@@ -115,12 +115,12 @@ export const RobotChatModal: React.FC<RobotChatModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/80 backdrop-blur-md animate-fadeIn">
-      <div className="w-full max-w-md h-[88vh] glass-card rounded-3xl border border-cyan-500/40 shadow-2xl flex flex-col overflow-hidden relative">
-        {/* Chat Header */}
-        <div className="p-3.5 bg-slate-950/90 border-b border-cyan-900/40 flex items-center justify-between">
+      <div className="w-full max-w-md h-[88vh] bg-[#0c1322]/95 backdrop-blur-2xl rounded-[28px] border border-blue-500/30 shadow-2xl flex flex-col overflow-hidden relative">
+        {/* Chat Frosted Header */}
+        <div className="p-3.5 bg-[#080e1e]/90 border-b border-white/10 flex items-center justify-between backdrop-blur-xl">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-600 via-blue-600 to-amber-500 p-0.5 shadow-md">
-              <div className="w-full h-full bg-slate-950 rounded-[14px] p-1 flex items-center justify-center">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#0066cc] via-indigo-600 to-amber-500 p-0.5 shadow-md">
+              <div className="w-full h-full bg-[#060b18] rounded-[14px] p-0.5 flex items-center justify-center overflow-hidden">
                 <img
                   src={MASCOT_CONFIG.avatarUrl}
                   alt={MASCOT_CONFIG.name}
@@ -136,10 +136,10 @@ export const RobotChatModal: React.FC<RobotChatModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <h3 className="text-sm font-heading font-extrabold text-white">
+                <h3 className="text-sm font-heading font-bold text-white tracking-apple-tight">
                   {MASCOT_CONFIG.name}
                 </h3>
-                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
                   {hasApiKey ? 'Gemini AI' : 'Rule-Based Engine'}
                 </span>
               </div>
@@ -149,25 +149,25 @@ export const RobotChatModal: React.FC<RobotChatModalProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={handleClearHistory}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+              className="p-2 rounded-full text-slate-400 hover:text-slate-200 hover:bg-white/10 transition-colors btn-press"
               title="Bersihkan Percakapan"
             >
               <RotateCcw className="w-4 h-4" />
             </button>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+              className="p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors btn-press"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4.5 h-4.5" />
             </button>
           </div>
         </div>
 
         {/* Messages Scroll Area */}
-        <div className="flex-1 p-3.5 overflow-y-auto space-y-3.5 text-xs">
+        <div className="flex-1 p-4 overflow-y-auto space-y-3.5 text-xs no-scrollbar">
           {messages.map((msg) => {
             const isBot = msg.sender === 'bot';
 
@@ -177,7 +177,7 @@ export const RobotChatModal: React.FC<RobotChatModalProps> = ({
                 className={`flex gap-2.5 ${isBot ? 'items-start' : 'items-end justify-end'}`}
               >
                 {isBot && (
-                  <div className="w-7 h-7 rounded-xl bg-cyan-950 border border-cyan-500/40 p-0.5 shrink-0 flex items-center justify-center">
+                  <div className="w-7 h-7 rounded-xl bg-slate-900 border border-white/10 p-0.5 shrink-0 flex items-center justify-center overflow-hidden">
                     <img
                       src={MASCOT_CONFIG.avatarUrl}
                       alt={MASCOT_CONFIG.name}
@@ -193,20 +193,20 @@ export const RobotChatModal: React.FC<RobotChatModalProps> = ({
                 )}
 
                 <div
-                  className={`max-w-[85%] rounded-2xl p-3 leading-relaxed shadow-md ${
+                  className={`max-w-[85%] rounded-[18px] p-3.5 leading-relaxed shadow-md ${
                     isBot
-                      ? 'bg-slate-900/90 border border-slate-800 text-slate-200 rounded-tl-none'
-                      : 'bg-blue-600 text-white rounded-br-none font-medium'
+                      ? 'bg-[#151f38]/90 border border-white/10 text-slate-200 rounded-tl-sm'
+                      : 'bg-[#0066cc] text-white rounded-br-sm font-medium shadow-blue-900/30'
                   }`}
                 >
                   <div className="whitespace-pre-line prose prose-invert prose-xs">
                     {msg.text}
                   </div>
-                  <div className="flex items-center justify-between gap-2 mt-1 pt-1 text-[9px] text-slate-400 border-t border-slate-800/40">
+                  <div className="flex items-center justify-between gap-2 mt-1.5 pt-1.5 text-[9px] text-slate-400 border-t border-white/10">
                     <span>{msg.timestamp}</span>
                     {isBot && (
-                      <span className="text-cyan-400 font-medium">
-                        {msg.is_fallback ? '⚡ Respon Cepat' : '✨ AI Studio'}
+                      <span className="text-blue-300 font-medium">
+                        {msg.is_fallback ? '⚡ Respon Cepat' : '✨ Gemini Pro'}
                       </span>
                     )}
                   </div>
@@ -216,21 +216,21 @@ export const RobotChatModal: React.FC<RobotChatModalProps> = ({
           })}
 
           {isLoading && (
-            <div className="flex items-center gap-2 text-cyan-400 text-xs italic p-2 bg-slate-900/50 rounded-xl border border-cyan-900/30 w-fit">
-              <Sparkles className="w-3.5 h-3.5 animate-spin" />
-              <span>Si SIGAP sedang menganalisis data lalu lintas...</span>
+            <div className="flex items-center gap-2 text-blue-300 text-xs italic p-2.5 bg-blue-950/40 rounded-2xl border border-blue-500/30 w-fit">
+              <Sparkles className="w-3.5 h-3.5 animate-spin text-blue-400" />
+              <span>Si SIGAP sedang menganalisis data lalu lintas Banyuwangi...</span>
             </div>
           )}
           <div ref={messagesEndRef} />
         </div>
 
         {/* Suggestion Chips Bar */}
-        <div className="px-3 py-2 bg-slate-950/70 border-t border-slate-800/80 overflow-x-auto no-scrollbar flex gap-1.5 shrink-0">
+        <div className="px-3.5 py-2 bg-[#080e1e]/80 border-t border-white/10 overflow-x-auto no-scrollbar flex gap-1.5 shrink-0">
           {MASCOT_CONFIG.quickSuggestions.map((chip, idx) => (
             <button
               key={idx}
               onClick={() => handleSendMessage(chip.prompt)}
-              className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-slate-900 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-950 whitespace-nowrap transition-colors flex items-center gap-1 shrink-0"
+              className="text-[10px] font-semibold px-3 py-1.5 rounded-full bg-white/5 border border-blue-500/25 text-blue-300 hover:bg-white/10 whitespace-nowrap transition-all btn-press flex items-center gap-1 shrink-0"
             >
               <span>{chip.label}</span>
             </button>
@@ -243,19 +243,19 @@ export const RobotChatModal: React.FC<RobotChatModalProps> = ({
             e.preventDefault();
             handleSendMessage();
           }}
-          className="p-3 bg-slate-950 border-t border-cyan-900/40 flex items-center gap-2 shrink-0"
+          className="p-3 bg-[#080e1e] border-t border-white/10 flex items-center gap-2 shrink-0"
         >
           <input
             type="text"
-            placeholder="Ketik pertanyaan seputar rute, pasal SIM..."
+            placeholder="Tanya seputar rute, kemacetan, pasal SIM..."
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            className="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-cyan-500"
+            className="flex-1 px-4 py-2.5 rounded-full bg-[#151f38]/90 border border-white/10 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:border-[#0066cc] min-h-[44px]"
           />
           <button
             type="submit"
             disabled={!inputText.trim() || isLoading}
-            className="p-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 disabled:opacity-40 text-white shadow-md transition-all active:scale-95"
+            className="w-11 h-11 rounded-full bg-[#0066cc] hover:bg-[#0071e3] disabled:opacity-40 text-white shadow-md transition-all flex items-center justify-center shrink-0 btn-press"
           >
             <Send className="w-4 h-4" />
           </button>
