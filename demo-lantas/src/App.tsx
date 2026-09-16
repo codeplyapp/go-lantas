@@ -32,7 +32,10 @@ type AppFlowState = 'splash' | 'onboarding' | 'auth' | 'email_verification' | 'r
 
 export const App: React.FC = () => {
   const [appState, setAppState] = useState<AppFlowState>('splash');
-  const [session, setSession] = useState<AuthSession | null>(null);
+  const [session, setSession] = useState<AuthSession | null>(() => authService.getCachedSession());
+  const sessionRef = useRef<AuthSession | null>(session);
+  sessionRef.current = session;
+
   const [verifyEmail, setVerifyEmail] = useState<string>('');
   const [reverifyEmail, setReverifyEmail] = useState<string>('');
   const [activeTab, setActiveTab] = useState<TabType>('beranda');
@@ -59,6 +62,16 @@ export const App: React.FC = () => {
     // Subscribe to Auth state changes
     const unsubAuth = authService.onAuthChange((authSession) => {
       setSession(authSession);
+      sessionRef.current = authSession;
+
+      // If auth session resolved with valid user, automatically route to app if stuck in auth screen
+      if (authSession?.user) {
+        if (!authSession.profile || !authSession.profile.role) {
+          setAppState('complete_profile');
+        } else {
+          setAppState((prev) => (prev === 'auth' ? 'app' : prev));
+        }
+      }
     });
 
     return () => unsubAuth();
@@ -67,14 +80,15 @@ export const App: React.FC = () => {
   // Handle Splash Screen Completion & Route to Destination
   const handleSplashFinish = () => {
     const onboardingDone = localStorage.getItem('sigap_onboarding_done');
+    const activeSession = sessionRef.current || authService.getCachedSession();
 
-    if (!onboardingDone) {
+    if (!onboardingDone && !activeSession?.user) {
       setAppState('onboarding');
       return;
     }
 
-    if (session?.user) {
-      if (!session.profile || !session.profile.role) {
+    if (activeSession?.user) {
+      if (!activeSession.profile || !activeSession.profile.role) {
         setAppState('complete_profile');
       } else {
         setAppState('app');
@@ -86,8 +100,10 @@ export const App: React.FC = () => {
 
   // Handle Onboarding Completion
   const handleOnboardingFinish = () => {
-    if (session?.user) {
-      if (!session.profile || !session.profile.role) {
+    const activeSession = sessionRef.current || authService.getCachedSession();
+
+    if (activeSession?.user) {
+      if (!activeSession.profile || !activeSession.profile.role) {
         setAppState('complete_profile');
       } else {
         setAppState('app');
@@ -100,6 +116,8 @@ export const App: React.FC = () => {
   // Handle Successful Sign In / Sign Up
   const handleAuthSuccess = (newSession: AuthSession, isNewProfile?: boolean) => {
     setSession(newSession);
+    sessionRef.current = newSession;
+    authService.setCachedSession(newSession);
 
     if (isNewProfile || !newSession.profile || !newSession.profile.role) {
       setAppState('complete_profile');

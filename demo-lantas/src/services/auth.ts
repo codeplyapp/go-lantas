@@ -17,6 +17,7 @@ import { UserProfile, UserRole } from '../core/types';
 
 const SIGNUP_DRAFT_KEY = 'sigap_signup_draft';
 const RATE_LIMIT_STORAGE_KEY = 'sigap_rate_limit_';
+const CACHED_SESSION_KEY = 'golantas_cached_auth_session';
 
 export interface SignupDraft {
   nama: string;
@@ -95,6 +96,29 @@ export const authService = {
     return auth?.currentUser || null;
   },
 
+  // ─── Local Session Cache (Instant Persistence across Refresh/Close) ────────
+  getCachedSession(): AuthSession | null {
+    try {
+      const raw = localStorage.getItem(CACHED_SESSION_KEY);
+      if (!raw) return null;
+      const data = JSON.parse(raw);
+      if (data && data.user && data.user.uid) {
+        return data as AuthSession;
+      }
+    } catch {}
+    return null;
+  },
+
+  setCachedSession(session: AuthSession | null): void {
+    try {
+      if (session && session.user) {
+        localStorage.setItem(CACHED_SESSION_KEY, JSON.stringify(session));
+      } else {
+        localStorage.removeItem(CACHED_SESSION_KEY);
+      }
+    } catch {}
+  },
+
   // ─── Rate Limiter (Brute-Force Protection) ──────────────────────────────────
   getRateLimitKey(email: string): string {
     return `${RATE_LIMIT_STORAGE_KEY}${email.trim().toLowerCase()}`;
@@ -145,26 +169,37 @@ export const authService = {
   },
 
   clearFailedAttempts(email: string): void {
-    localStorage.removeItem(this.getRateLimitKey(email));
+    try {
+      localStorage.removeItem(this.getRateLimitKey(email));
+    } catch {}
   },
 
-  // ─── Signup Draft Management ────────────────────────────────────────────────
+  // ─── Signup Draft ───────────────────────────────────────────────────────────
   saveSignupDraft(draft: SignupDraft): void {
-    sessionStorage.setItem(SIGNUP_DRAFT_KEY, JSON.stringify(draft));
+    try {
+      localStorage.setItem(SIGNUP_DRAFT_KEY, JSON.stringify(draft));
+    } catch {}
   },
 
   getSignupDraft(): SignupDraft | null {
-    const raw = sessionStorage.getItem(SIGNUP_DRAFT_KEY);
-    if (!raw) return null;
     try {
-      return JSON.parse(raw);
+      const raw = localStorage.getItem(SIGNUP_DRAFT_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (Date.now() - parsed.createdAt > 30 * 60 * 1000) {
+        this.clearSignupDraft();
+        return null;
+      }
+      return parsed;
     } catch {
       return null;
     }
   },
 
   clearSignupDraft(): void {
-    sessionStorage.removeItem(SIGNUP_DRAFT_KEY);
+    try {
+      localStorage.removeItem(SIGNUP_DRAFT_KEY);
+    } catch {}
   },
 
   // ─── Sign Up (Firebase Email Verification Flow) ─────────────────────────────
@@ -200,7 +235,7 @@ export const authService = {
     this.clearSignupDraft();
     this.clearFailedAttempts(email);
 
-    return {
+    const session: AuthSession = {
       user: {
         uid: cred.user.uid,
         email: cred.user.email,
@@ -210,6 +245,9 @@ export const authService = {
       },
       profile,
     };
+
+    this.setCachedSession(session);
+    return session;
   },
 
   /**
@@ -272,7 +310,7 @@ export const authService = {
 
       this.clearFailedAttempts(cleanEmail);
 
-      return {
+      const session: AuthSession = {
         user: {
           uid: cred.user.uid,
           email: cred.user.email,
@@ -282,6 +320,9 @@ export const authService = {
         },
         profile,
       };
+
+      this.setCachedSession(session);
+      return session;
     } catch (err: any) {
       if (err.code !== 'auth/email-not-verified') {
         this.recordFailedAttempt(cleanEmail);
@@ -301,27 +342,10 @@ export const authService = {
     }
 
     const cred = await signInWithPopup(auth, googleProvider);
-    const existingProfile = await firestoreService.getUserProfile(cred.user.uid);
+    let existingProfile = await firestoreService.getUserProfile(cred.user.uid);
 
     if (existingProfile) {
-      return {
-        session: {
-          user: {
-            uid: cred.user.uid,
-            email: cred.user.email,
-            displayName: cred.user.displayName,
-            photoURL: cred.user.photoURL,
-            emailVerified: cred.user.emailVerified,
-          },
-          profile: existingProfile,
-        },
-        isNewProfile: false,
-      };
-    }
-
-    // New Google user — needs role selection
-    return {
-      session: {
+      const session: AuthSession = {
         user: {
           uid: cred.user.uid,
           email: cred.user.email,
@@ -329,8 +353,30 @@ export const authService = {
           photoURL: cred.user.photoURL,
           emailVerified: cred.user.emailVerified,
         },
-        profile: null,
+        profile: existingProfile,
+      };
+      this.setCachedSession(session);
+      return {
+        session,
+        isNewProfile: false,
+      };
+    }
+
+    // New Google user — create session without profile yet (needs role selection)
+    const newSession: AuthSession = {
+      user: {
+        uid: cred.user.uid,
+        email: cred.user.email,
+        displayName: cred.user.displayName,
+        photoURL: cred.user.photoURL,
+        emailVerified: cred.user.emailVerified,
       },
+      profile: null,
+    };
+    this.setCachedSession(newSession);
+
+    return {
+      session: newSession,
       isNewProfile: true,
     };
   },
@@ -347,6 +393,7 @@ export const authService = {
   // ─── Sign Out ────────────────────────────────────────────────────────────────
 
   async signOutUser(): Promise<void> {
+    this.setCachedSession(null);
     if (isFirebaseConfigured() && auth) {
       try {
         await signOut(auth);
@@ -360,28 +407,48 @@ export const authService = {
   // ─── Auth State Listener ────────────────────────────────────────────────────
 
   /**
-   * Listen to Firebase Authentication state changes
+   * Listen to Firebase Authentication state changes with robust fallback and persistence
    */
   onAuthChange(callback: (session: AuthSession | null) => void): () => void {
     if (!isFirebaseConfigured() || !auth) {
-      callback(null);
+      const cached = this.getCachedSession();
+      callback(cached);
       return () => {};
     }
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: User | null) => {
       if (firebaseUser) {
-        const profile = await firestoreService.getUserProfile(firebaseUser.uid);
-        callback({
+        let profile = await firestoreService.getUserProfile(firebaseUser.uid);
+        
+        // If profile fetch fails or delayed, recover from cache or safe fallback
+        if (!profile) {
+          const cached = this.getCachedSession();
+          if (cached?.profile && cached.user?.uid === firebaseUser.uid) {
+            profile = cached.profile;
+          } else {
+            profile = await firestoreService.ensureUserProfile(firebaseUser.uid, {
+              email: firebaseUser.email || '',
+              nama: firebaseUser.displayName || 'Pengguna GO Lantas',
+              role: 'pelajar',
+            });
+          }
+        }
+
+        const sessionObj: AuthSession = {
           user: {
             uid: firebaseUser.uid,
             email: firebaseUser.email,
-            displayName: firebaseUser.displayName,
+            displayName: firebaseUser.displayName || profile.nama,
             photoURL: firebaseUser.photoURL,
             emailVerified: firebaseUser.emailVerified,
           },
           profile,
-        });
+        };
+
+        this.setCachedSession(sessionObj);
+        callback(sessionObj);
       } else {
+        this.setCachedSession(null);
         callback(null);
       }
     });
