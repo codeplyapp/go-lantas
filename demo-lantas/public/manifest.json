@@ -1,0 +1,29 @@
+{
+  "name": "GO Lantas — Solusi Cerdas Keselamatan Lalu Lintas (Korlantas POLRI)",
+  "short_name": "GO Lantas",
+  "description": "Aplikasi Edukasi, Keselamatan, dan Pemantauan Tertib Lalu Lintas Korlantas POLRI 2026.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAFAFA",
+  "theme_color": "#0077C0",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/mascot/logo.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

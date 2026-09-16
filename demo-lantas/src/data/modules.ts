@@ -1,0 +1,697 @@
+// Kurikulum 6 Modul Lengkap Pendidikan Keselamatan Lalu Lintas SIGAP Korlantas POLRI
+import { ModuleData } from '../core/types';
+
+export const CURRICULUM_MODULES: ModuleData[] = [
+  // MODUL 1
+  {
+    id: 'modul_01',
+    nomor: 1,
+    judul: 'Mengenal Rambu Lalu Lintas',
+    deskripsi: 'Memahami arti dan fungsi rambu peringatan, larangan, perintah, dan petunjuk untuk navigasi jalan yang aman.',
+    icon_name: 'AlertTriangle',
+    warna: '#F59E0B', // Amber
+    durasi_estimasi: '12 Menit',
+    lessons: [
+      {
+        id: 'lesson_1_1',
+        judul: 'Klasifikasi 4 Rambu Utama: Peringatan, Larangan, Perintah, & Petunjuk',
+        durasi_menit: 6,
+        youtubeId: 'W3_KjT7aP0M',
+        deskripsi: 'Mengenali warna dan bentuk geometris rambu standar nasional berdasarkan Permenhub RI No. 13 Tahun 2014.',
+        ringkasan: [
+          'Rambu Peringatan (Kuning/Belah Ketupat): Memberi peringatan adanya potensi bahaya (tikungan tajam, turunan, perlintasan KA).',
+          'Rambu Larangan (Merah-Putih/Lingkaran): Menyatakan perbuatan yang mutlak dilarang (Stop, Dilarang Masuk, Batas Kecepatan).',
+          'Rambu Perintah (Biru/Lingkaran): Menyatakan perintah wajib yang harus dipatuhi (Wajib Belok Kiri, Lajur Khusus Bus).',
+          'Rambu Petunjuk (Hijau/Cokelat/Biru Persegi): Menyatakan arah jalan, jurusan, fasilitas umum, dan objek wisata.',
+        ],
+        poinPenting: [
+          'Warna kuning = Waspada dan kurangi kecepatan.',
+          'Warna merah = Larangan keras dengan sanksi tilang.',
+          'Warna biru = Perintah wajib untuk keselamatan bersama.',
+          'Warna hijau/cokelat = Pemandu navigasi jarak jauh.',
+        ],
+        hukumTerkait: 'UU No. 22/2009 Pasal 106 Ayat 4 & Permenhub No. 13/2014',
+      },
+      {
+        id: 'lesson_1_2',
+        judul: 'Rambu Prioritas & Hak Utama di Persimpangan',
+        durasi_menit: 6,
+        youtubeId: 'b_fL8pLqGfA',
+        deskripsi: 'Mengetahui siapa yang berhak jalan lebih dulu di persimpangan sebidang dan bundaran tanpa lampu APILL.',
+        ringkasan: [
+          'Rambu STOP (Segi Delapan Merah): Pengemudi wajib berhenti total 3 detik sebelum garis henti dan memastikan situasi kosong.',
+          'Rambu YIELD / Beri Jalan (Segitiga Terbalik): Wajib melambatkan laju dan memberi kesempatan kendaraan lain di jalan utama.',
+          'Di bundaran (Roundabout): Kendaraan yang sudah berada di dalam bundaran memiliki hak utama dibandingkan yang baru masuk.',
+          'Kendaraan prioritas darurat (Ambulans sirine, Damkar, Iring-iringan Presiden) wajib diberi jalan mutlak.',
+        ],
+        poinPenting: [
+          'Jangan memaksakan masuk ke bundaran jika arus padat.',
+          'Kendaraan di jalan lurus/utama berhak lebih dulu daripada kendaraan yang baru berbelok.',
+          'Patuhi rambu STOP meskipun kondisi jalan tampak sepi.',
+        ],
+        hukumTerkait: 'UU No. 22/2009 Pasal 110 & Pasal 134',
+      },
+    ],
+    flashcards: [
+      {
+        id: 'fc_1_1',
+        judul: 'Rambu Dilarang Masuk',
+        kategori: 'larangan',
+        gambar_simbol: '⛔',
+        arti: 'Dilarang Masuk bagi Semua Kendaraan',
+        penjelasan: 'Rambu lingkaran merah dengan garis putih horizontal di tengah melarang semua kendaraan bermotor maupun tidak bermotor masuk ke ruas jalan tersebut.',
+        pasal_hukum: 'UU 22/2009 Pasal 287 Ayat 1',
+      },
+      {
+        id: 'fc_1_2',
+        judul: 'Rambu Tikungan Ganda',
+        kategori: 'peringatan',
+        gambar_simbol: '⚠️',
+        arti: 'Peringatan Tikungan Ganda (Pertama ke Kiri/Kanan)',
+        penjelasan: 'Menandakan adanya dua atau lebih tikungan berurutan dengan jarak dekat. Pengemudi wajib menurunkan gigi dan tidak mendahului.',
+        pasal_hukum: 'UU 22/2009 Pasal 106 Ayat 4',
+      },
+      {
+        id: 'fc_1_3',
+        judul: 'Rambu Wajib Mengikuti Bundaran',
+        kategori: 'perintah',
+        gambar_simbol: '🔄',
+        arti: 'Wajib Mengitari Bundaran Searah Jarum Jam',
+        penjelasan: 'Pengemudi wajib memutari bundaran dan mendahulukan kendaraan yang sudah berada di dalam jalur putar.',
+        pasal_hukum: 'UU 22/2009 Pasal 110',
+      },
+      {
+        id: 'fc_1_4',
+        judul: 'Rambu Rumah Sakit',
+        kategori: 'petunjuk',
+        gambar_simbol: '🏥',
+        arti: 'Petunjuk Fasilitas Kesehatan / RS IGD',
+        penjelasan: 'Menunjukkan lokasi fasilitas gawat darurat medis dan rumah sakit rujukan terdekat.',
+        pasal_hukum: 'Permenhub No. 13/2014',
+      },
+    ],
+    kasus: [
+      {
+        id: 'case_1_1',
+        judul: 'Persimpangan Tanpa Lampu: Siapa yang Didahulukan?',
+        skenario: 'Anda sedang mengendarai motor di jalan arteri sekunder menuju persimpangan tanpa lampu merah. Dari arah kanan, melaju mobil di jalan protokol utama dengan kecepatan sedang. Apa tindakan Anda?',
+        opsi: [
+          {
+            text: 'Tancap gas mendahului mobil karena jarak masih memungkinkan (~10 meter).',
+            skor_aman: 0,
+            feedback: 'Sangat berbahaya! Memotong laju kendaraan di jalan utama adalah pemicu kecelakaan tabrak samping terbesar di persimpangan.',
+          },
+          {
+            text: 'Melambat dan berhenti di garis henti, memberi hak jalan kepada mobil di jalan utama.',
+            skor_aman: 100,
+            feedback: 'Tepat sekali! Menurut Pasal 113 UU 22/2009, kendaraan dari jalan cabang/sekunder wajib mendahulukan kendaraan di jalan utama.',
+          },
+          {
+            text: 'Membunyikan klakson panjang sambil tetap melaju perlahan.',
+            skor_aman: 30,
+            feedback: 'Klakson tidak menggantikan kewajiban hukum untuk mengalah dan memprioritaskan arus jalan utama.',
+          },
+        ],
+        analisis_behavioral: 'Bias kognitif "Time-Savings Illusion" sering membuat pengendara merasa menghemat waktu dengan memotong persimpangan, padahal risiko kematian meningkat 400%.',
+        rekomendasi_korlantas: 'Terapkan konsep defensive driving: Selalu perlambat kendaraan di persimpangan (kecepatan <20 km/jam) dan siap menginjak rem.',
+      },
+    ],
+  },
+
+  // MODUL 2
+  {
+    id: 'modul_02',
+    nomor: 2,
+    judul: 'Marka Jalan & Fasilitas Pejalan',
+    deskripsi: 'Memahami garis marka aspal, Zona Selamat Sekolah (ZOSS), Yellow Box Junction, dan perlindungan pejalan kaki.',
+    icon_name: 'Layers',
+    warna: '#059669', // Emerald
+    durasi_estimasi: '10 Menit',
+    lessons: [
+      {
+        id: 'lesson_2_1',
+        judul: 'Arti Garis Putih & Kuning Utuh vs Putus-putus',
+        durasi_menit: 5,
+        youtubeId: 'k7fVj3Y7T0I',
+        deskripsi: 'Mengetahui kapan boleh menyalip dan kapan dilarang keras melintasi garis marka jalan.',
+        ringkasan: [
+          'Garis Utuh Tunggal: Dilarang keras melintasi atau menginjak garis ini (area titik buta, jembatan, tanjakan).',
+          'Garis Putus-putus: Boleh melintasi/berpindah lajur atau menyalip jika kondisi dari arah berlawanan benar-benar kosong.',
+          'Garis Ganda (Utuh & Putus): Kendaraan di sisi garis putus boleh mendahului; sisi garis utuh dilarang menyalip.',
+          'Garis Ganda Utuh: Kedua arah dilarang keras saling mendahului (zona rawan tabrakan adu banteng).',
+        ],
+        poinPenting: [
+          'Menyalip di atas garis utuh adalah pelanggaran tilang Pasal 287.',
+          'Pastikan lampu sein menyala sebelum berpindah lajur di marka putus-putus.',
+          'Marka serong (chevron) adalah pulau lalu lintas yang tidak boleh dilindas.',
+        ],
+        hukumTerkait: 'UU No. 22/2009 Pasal 106 & Pasal 287',
+      },
+      {
+        id: 'lesson_2_2',
+        judul: 'ZOSS (Zona Selamat Sekolah) & Yellow Box Junction',
+        durasi_menit: 5,
+        youtubeId: 'z1m8F3cWdQA',
+        deskripsi: 'Fasilitas keselamatan khusus untuk melindungi siswa dan mengurai simpul kemacetan persimpangan.',
+        ringkasan: [
+          'ZOSS (Karpet Merah Aspal): Kecepatan maksimal kendaraan dibatasi 30 km/jam saat jam antar-jemput siswa.',
+          'Zebra Cross: Pejalan kaki memiliki hak mutlak untuk menyeberang; pengemudi wajib berhenti total.',
+          'Yellow Box Junction: Kotak kuning bergaris silang di simpang lampu merah untuk mencegah "gridlock" (kemacetan terkunci).',
+          'Aturan Yellow Box: Dilarang masuk ke dalam kotak jika jalur keluar di depan belum kosong, meskipun lampu hijau menyala.',
+        ],
+        poinPenting: [
+          'Dilarang mendahului di kawasan ZOSS sekolah.',
+          'Wajib memberikan jalan bagi penyeberang di Zebra Cross.',
+          'Jangan berhenti di dalam Yellow Box Junction.',
+        ],
+        hukumTerkait: 'Permenhub No. 67/2018 tentang Marka Jalan',
+      },
+    ],
+    flashcards: [
+      {
+        id: 'fc_2_1',
+        judul: 'Marka Garis Putih Utuh',
+        kategori: 'marka',
+        gambar_simbol: '➖',
+        arti: 'Dilarang Melintasi / Menyalip',
+        penjelasan: 'Garis putih membujur tanpa putus menandakan larangan keras berpindah jalur atau mendahului kendaraan lain.',
+        pasal_hukum: 'UU 22/2009 Pasal 287',
+      },
+      {
+        id: 'fc_2_2',
+        judul: 'Yellow Box Junction (YBJ)',
+        kategori: 'marka',
+        gambar_simbol: '🟨',
+        arti: 'Kotak Kuning Bebas Rintangan',
+        penjelasan: 'Area persimpangan yang harus tetap steril dari kendaraan berhenti agar arus tegak lurus tidak terkunci.',
+        pasal_hukum: 'UU 22/2009 Pasal 287 Ayat 2',
+      },
+      {
+        id: 'fc_2_3',
+        judul: 'Marka ZOSS Sekolah',
+        kategori: 'marka',
+        gambar_simbol: '🎒',
+        arti: 'Zona Selamat Sekolah (Maks 30 km/jam)',
+        penjelasan: 'Marka karpet merah di depan gerbang sekolah untuk melindungi anak-anak menyeberang jalan.',
+        pasal_hukum: 'Permenhub No. 67/2018',
+      },
+      {
+        id: 'fc_2_4',
+        judul: 'Pita Penggaduh (Rumble Strip)',
+        kategori: 'marka',
+        gambar_simbol: '〰️',
+        arti: 'Peringatan Getar Kecepatan',
+        penjelasan: 'Kelompok garis tebal melintang jalan yang menimbulkan getaran dan suara untuk mengingatkan pengemudi mengantuk agar melambat.',
+        pasal_hukum: 'Permenhub No. 82/2018',
+      },
+    ],
+    kasus: [
+      {
+        id: 'case_2_1',
+        judul: 'Lampu Hijau tapi Yellow Box Masih Penuh',
+        skenario: 'Lampu lalu lintas menyala hijau di persimpangan, namun kendaraan di depan Anda macet dan ekor antrean masih berada di dalam kotak Yellow Box Junction. Apa yang harus Anda lakukan?',
+        opsi: [
+          {
+            text: 'Tetap maju masuk ke dalam Yellow Box karena lampu sedang hijau.',
+            skor_aman: 0,
+            feedback: 'Salah! Masuk ke Yellow Box saat jalur keluar macet akan mengunci arus dari arah melintang saat lampu mereka hijau (gridlock).',
+          },
+          {
+            text: 'Berhenti di belakang garis stop dan menunggu hingga kotak Yellow Box di depan benar-benar kosong.',
+            skor_aman: 100,
+            feedback: 'Luar biasa! Inilah fungsi Yellow Box Junction: menahan kendaraan agar tidak memblokir persimpangan.',
+          },
+          {
+            text: 'Maju perlahan sambil menyelip ke sisi trotoar.',
+            skor_aman: 10,
+            feedback: 'Menyelip ke bahu jalan melanggar hak pejalan kaki dan membahayakan keselamatan.',
+          },
+        ],
+        analisis_behavioral: 'Banyak pengendara memiliki dorongan "FOMO Green Light" (takut kehilangan lampu hijau), padahal terjebak di tengah simpang membuat macet berlipat ganda.',
+        rekomendasi_korlantas: 'Ingat prinsip: "Hijau bukan berarti jalan jika kotak persimpangan belum lapang."',
+      },
+    ],
+  },
+
+  // MODUL 3
+  {
+    id: 'modul_03',
+    nomor: 3,
+    judul: 'Etika & Budaya Tertib Berkendara',
+    deskripsi: 'Membangun disiplin lajur, prinsip jarak aman 3 detik, etika lampu sein, dan pengendalian emosi di jalan.',
+    icon_name: 'Compass',
+    warna: '#0077C0', // Bright Teal Blue
+    durasi_estimasi: '10 Menit',
+    lessons: [
+      {
+        id: 'lesson_3_1',
+        judul: 'Prinsip 3 Detik: Menjaga Jarak Aman Berhenti',
+        durasi_menit: 5,
+        youtubeId: 'QeQ1w0Q9f9k',
+        deskripsi: 'Teknik ilmiah mengukur jarak pengereman aman di berbagai kondisi kecepatan kendaraan.',
+        ringkasan: [
+          'Prinsip 3 Detik: Waktu reaksi otak manusia (1 detik) + waktu respons pengereman mekanis (2 detik).',
+          'Cara Mengukur: Pilih patokan tetap di jalan (tiang/pohon). Saat mobil depan melewati patokan, hitung "Satu-Satu-Ribu, Dua-Satu-Ribu, Tiga-Satu-Ribu".',
+          'Saat Hujan/Basah: Tingkatkan jarak aman menjadi 4-5 detik karena daya cengkeram ban berkurang dan jalan licin.',
+          'Tabrakan beruntun terjadi karena pengendara terlalu dekat (tailgating) sehingga tidak memiliki ruang menghindar.',
+        ],
+        poinPenting: [
+          'Jangan menempel di belakang kendaraan lain (tailgating).',
+          'Tingkatkan jarak saat mengemudi di malam hari atau hujan deras.',
+          'Jarak aman adalah jaminan keselamatan nyawa Anda.',
+        ],
+        hukumTerkait: 'UU No. 22/2009 Pasal 106 Ayat 4',
+      },
+      {
+        id: 'lesson_3_2',
+        judul: 'Etika Lampu Sein, Spion, & Kontrol Emosi',
+        durasi_menit: 5,
+        youtubeId: 'mN8zG5p9yY0',
+        deskripsi: 'Komunikasi antar-pengemudi yang santun dan mengendalikan perilaku road rage.',
+        ringkasan: [
+          'Lampu Sein: Nyalakan minimal 30 meter sebelum berbelok atau berpindah jalur, bukan saat setir sudah dibanting.',
+          'Shoulder Check: Menoleh sekilas ke arah bahu untuk mengecek blind spot yang tidak tercover oleh kaca spion.',
+          'Lajur Kanan: Khusus untuk mendahului kendaraan lain dengan batas kecepatan aman, bukan untuk berjalan santai (lane hogger).',
+          'Menghadapi Road Rage: Jangan terpancing provokasi, hindari kontak mata, dan tetap fokus pada rute perjalanan Anda.',
+        ],
+        poinPenting: [
+          'Lajur kanan hanya untuk mendahului.',
+          'Lampu hazard hanya untuk kondisi darurat berhenti, BUKAN saat konvoi atau hujan.',
+          'Klakson digunakan untuk peringatan keselamatan, bukan pelampiasan amarah.',
+        ],
+        hukumTerkait: 'UU No. 22/2009 Pasal 108 & Pasal 121',
+      },
+    ],
+    flashcards: [
+      {
+        id: 'fc_3_1',
+        judul: 'Prinsip 3 Detik',
+        kategori: 'aturan',
+        gambar_simbol: '⏱️',
+        arti: 'Jarak Aman Mengikuti Kendaraan',
+        penjelasan: 'Metode menghitung selisih waktu 3 detik dengan kendaraan depan untuk ruang pengereman darurat.',
+        pasal_hukum: 'UU 22/2009 Pasal 106',
+      },
+      {
+        id: 'fc_3_2',
+        judul: 'Blind Spot (Titik Buta)',
+        kategori: 'aturan',
+        gambar_simbol: '👁️',
+        arti: 'Area Tak Terlihat di Spion',
+        penjelasan: 'Area di sekitar kendaraan yang tidak tertangkap pantulan kaca spion, memerlukan tolehan bahu (shoulder check).',
+        pasal_hukum: 'Standard Defensive Driving',
+      },
+      {
+        id: 'fc_3_3',
+        judul: 'Etika Lampu Hazard',
+        kategori: 'aturan',
+        gambar_simbol: '🔺',
+        arti: 'Peringatan Kendaraan Darurat/Berhenti',
+        penjelasan: 'Hanya dinyalakan saat kendaraan mengalami mogok atau berhenti darurat di bahu jalan, bukan saat berjalan lurus di persimpangan.',
+        pasal_hukum: 'UU 22/2009 Pasal 121',
+      },
+      {
+        id: 'fc_3_4',
+        judul: 'Disiplin Lajur Kiri',
+        kategori: 'aturan',
+        gambar_simbol: '🛣️',
+        arti: 'Lajur Lambat & Kecepatan Stabil',
+        penjelasan: 'Lajur kiri digunakan untuk kecepatan normal dan kendaraan bermuatan besar, lajur kanan hanya untuk menyalip.',
+        pasal_hukum: 'UU 22/2009 Pasal 108',
+      },
+    ],
+    kasus: [
+      {
+        id: 'case_3_1',
+        judul: 'Dipotong Tiba-Tiba oleh Pengendara Lain',
+        skenario: 'Di jalan protokol yang ramai lancar, tiba-tiba seorang pengendara motor memotong lajur Anda dari kiri tanpa menyalakan lampu sein. Anda harus mengerem mendadak. Apa respons terbaik Anda?',
+        opsi: [
+          {
+            text: 'Mengejar pengendara tersebut, memotong balik, dan memakinya agar jera.',
+            skor_aman: 0,
+            feedback: 'Sangat berbahaya! Tindakan ini adalah eskalasi "Road Rage" yang berpotensi memicu perkelahian dan kecelakaan fatal beruntun.',
+          },
+          {
+            text: 'Tarik napas dalam, jaga kembali jarak aman 3 detik, dan lanjutkan perjalanan dengan tenang.',
+            skor_aman: 100,
+            feedback: 'Hebat! Pengendara beretika tinggi selalu mengutamakan keselamatan dan mengendalikan ego saat menghadapi kesalahan orang lain.',
+          },
+          {
+            text: 'Membunyikan klakson panjang tanpa henti di belakangnya sepanjang jalan.',
+            skor_aman: 20,
+            feedback: 'Klakson berlebihan justru mengganggu konsentrasi pengendara lain di sekitar Anda.',
+          },
+        ],
+        analisis_behavioral: 'Konsep emotional regulation dalam berkendara menunjukkan bahwa 80% konflik jalan raya dipicu oleh respon reaktif terhadap provokasi kecil.',
+        rekomendasi_korlantas: 'Ingat semboyan Korlantas: "Keluarga menanti Anda pulang dengan selamat di rumah, bukan membawa masalah hukum dari jalanan."',
+      },
+    ],
+  },
+
+  // MODUL 4
+  {
+    id: 'modul_04',
+    nomor: 4,
+    judul: 'Aturan & Regulasi (UU No. 22/2009)',
+    deskripsi: 'Memahami dasar hukum lalu lintas, syarat legal kepemilikan SIM, standar helm SNI, dan batas kecepatan resmi.',
+    icon_name: 'ShieldCheck',
+    warna: '#8B5CF6', // Purple
+    durasi_estimasi: '11 Menit',
+    lessons: [
+      {
+        id: 'lesson_4_1',
+        judul: 'Hak & Kewajiban Pengendara Menurut UU 22/2009',
+        durasi_menit: 6,
+        youtubeId: 'Yg4N3h7f9x4',
+        deskripsi: 'Bedah pasal-pasal penting undang-undang lalu lintas dan angkutan jalan di Indonesia.',
+        ringkasan: [
+          'Pasal 106: Setiap pengemudi wajib mengemudikan kendaraan dengan wajar dan konsentrasi penuh (dilarang main HP).',
+          'Pasal 77: Setiap orang yang mengemudikan kendaraan bermotor di jalan wajib memiliki Surat Izin Mengemudi (SIM) sah.',
+          'Pasal 281: Mengemudi tanpa memiliki SIM dapat dipidana kurungan paling lama 4 bulan atau denda paling banyak Rp 1.000.000.',
+          'Pasal 288: Tidak dapat menunjukkan STNK sah dapat dipidana kurungan 2 bulan atau denda Rp 500.000.',
+        ],
+        poinPenting: [
+          'Memiliki SIM bukan sekadar kartu izin, tetapi bukti kompetensi keterampilan dan pemahaman hukum.',
+          'Gunakan sabuk keselamatan 3 titik untuk semua penumpang mobil.',
+          'Patuhi batas kecepatan: 50 km/jam di kawasan perkotaan, 30 km/jam di kawasan pemukiman/sekolah.',
+        ],
+        hukumTerkait: 'UU No. 22 Tahun 2009 tentang LLAJ',
+      },
+      {
+        id: 'lesson_4_2',
+        judul: 'Standar Helm SNI & Kelengkapan Berkendara',
+        durasi_menit: 5,
+        youtubeId: 'vF1n2h3j4k5',
+        deskripsi: 'Spesifikasi helm standar nasional dan perlengkapan pelindung tubuh pengendara motor.',
+        ringkasan: [
+          'Helm Standar Nasional Indonesia (SNI): Memiliki tempurung luar kokoh, lapisan peredam benturan EPS, dan tali pengikat dengan sistem klik (microlock/double-D ring).',
+          'Pasal 106 Ayat 8: Pengendara dan penumpang sepeda motor wajib mengenakan helm yang memenuhi standar SNI.',
+          'Pasal 291: Mengendarai motor tanpa helm SNI didenda paling banyak Rp 250.000.',
+          'Kelengkapan Motor: Spion kiri-kanan, knalpot standar kebisingan, lampu utama menyala siang hari (Pasal 107).',
+        ],
+        poinPenting: [
+          'Pastikan helm terkunci bunyi "KLIK".',
+          'Helm tidak boleh longgar agar tidak terlepas saat terjadi benturan pertama.',
+          'Nyalakan lampu utama sepeda motor di siang hari untuk meningkatkan visibilitas (Daytime Running Light).',
+        ],
+        hukumTerkait: 'UU No. 22/2009 Pasal 107 & Pasal 291',
+      },
+    ],
+    flashcards: [
+      {
+        id: 'fc_4_1',
+        judul: 'Syarat Usia Minimal SIM C',
+        kategori: 'aturan',
+        gambar_simbol: '🪪',
+        arti: 'Usia Minimal 17 Tahun',
+        penjelasan: 'Calon pengemudi sepeda motor wajib berusia minimal 17 tahun dan telah memiliki KTP elektronik serta lulus ujian teori & praktik.',
+        pasal_hukum: 'UU 22/2009 Pasal 81',
+      },
+      {
+        id: 'fc_4_2',
+        judul: 'Batas Kecepatan Perkotaan',
+        kategori: 'aturan',
+        gambar_simbol: '5️⃣0️⃣',
+        arti: 'Maksimal 50 km/jam',
+        penjelasan: 'Batas kecepatan tertinggi di kawasan perkotaan menurut Permenhub No. 111 Tahun 2015.',
+        pasal_hukum: 'Permenhub No. 111/2015',
+      },
+      {
+        id: 'fc_4_3',
+        judul: 'Helm Standar SNI',
+        kategori: 'aturan',
+        gambar_simbol: '⛑️',
+        arti: 'Helm Kancing Klik SNI Wajib',
+        penjelasan: 'Kewajiban mengenakan helm bersertifikasi SNI bagi pengendara dan pembonceng sepeda motor.',
+        pasal_hukum: 'UU 22/2009 Pasal 106 Ayat 8',
+      },
+      {
+        id: 'fc_4_4',
+        judul: 'Larangan Menggunakan Ponsel',
+        kategori: 'aturan',
+        gambar_simbol: '📵',
+        arti: 'Dilarang Mengoperasikan Ponsel',
+        penjelasan: 'Mengoperasikan ponsel saat berkendara merusak konsentrasi dan meningkatkan risiko kecelakaan hingga 23 kali lipat.',
+        pasal_hukum: 'UU 22/2009 Pasal 283',
+      },
+    ],
+    kasus: [
+      {
+        id: 'case_4_1',
+        judul: 'Panggilan Telepon Penting Saat Berkendara',
+        skenario: 'Ponsel Anda berdering di saku jaket saat Anda melaju di jalan raya. Layar menunjukkan panggilan penting dari keluarga. Bagaimana tindakan yang benar?',
+        opsi: [
+          {
+            text: 'Mengangkat telepon sambil menyetir dengan satu tangan dan menurunkan kecepatan.',
+            skor_aman: 0,
+            feedback: 'Sangat berbahaya! Menyetir dengan satu tangan menghilangkan reflek menghindar dan melanggar Pasal 283 UU 22/2009.',
+          },
+          {
+            text: 'Nyalakan lampu sein kiri, menepi ke tempat yang aman di luar badan jalan, lalu berhenti total sebelum menerima telepon.',
+            skor_aman: 100,
+            feedback: 'Benar sekali! Keselamatan adalah prioritas nomor satu. Menerima telepon hanya boleh dilakukan saat kendaraan berhenti sempurna di tempat aman.',
+          },
+          {
+            text: 'Membaca pesan teks sekilas sambil tetap melaju lurus.',
+            skor_aman: 10,
+            feedback: 'Melihat layar ponsel selama 3 detik pada kecepatan 40 km/jam sama dengan melaju dengan mata tertutup sejauh 33 meter!',
+          },
+        ],
+        analisis_behavioral: 'Distracted driving akibat penggunaan gawai menyumbang lebih dari 35% penyebab fatalitas kecelakaan remaja di Indonesia.',
+        rekomendasi_korlantas: 'Aktifkan fitur "Do Not Disturb While Driving" di smartphone Anda saat mulai menyalakan mesin kendaraan.',
+      },
+    ],
+  },
+
+  // MODUL 5
+  {
+    id: 'modul_05',
+    nomor: 5,
+    judul: 'Kesehatan & Keselamatan Pengemudi',
+    deskripsi: 'Menghindari bahaya microsleep, mengenali titik buta kendaraan besar, dan teknik berkendara defensif.',
+    icon_name: 'HeartPulse',
+    warna: '#EF4444', // Red / Rose
+    durasi_estimasi: '11 Menit',
+    lessons: [
+      {
+        id: 'lesson_5_1',
+        judul: 'Bahaya Microsleep & Gejala Kelelahan',
+        durasi_menit: 6,
+        youtubeId: 'h8L3v0N1M2A',
+        deskripsi: 'Mengenali tanda-tanda tubuh kehilangan kesadaran singkat dan cara mencegah kecelakaan tunggal.',
+        ringkasan: [
+          'Microsleep: Kondisi tertidur pulas selama 2 hingga 15 detik tanpa disadari, sering terjadi saat mengemudi di jalan lurus yang monoton.',
+          'Gejala Awal: Menguap terus-menerus, kelopak mata terasa berat, sulit mengingat 2-3 kilometer jalan yang baru dilewati, kendaraan mulai keluar lajur.',
+          'Mitos: Membuka jendela, minum kopi kental, atau menyetel musik keras TIDAK BISA menyembuhkan microsleep secara efektif.',
+          'Satu-satunya Solusi: Segera menepi di rest area atau SPBU, kunci kendaraan, dan tidur singkat (power nap) 15–20 menit.',
+        ],
+        poinPenting: [
+          'Istirahat maksimal setiap 2 jam berkendara motor atau 4 jam berkendara mobil.',
+          'Jangan memaksakan berkendara saat tubuh lelah setelah begadang.',
+          'Power nap 15 menit mengembalikan kesegaran otak hingga 80%.',
+        ],
+        hukumTerkait: 'UU No. 22/2009 Pasal 90 tentang Waktu Kerja & Istirahat Pengemudi',
+      },
+      {
+        id: 'lesson_5_2',
+        judul: 'Blind Spot Kendaraan Besar (Truk & Bus)',
+        durasi_menit: 5,
+        youtubeId: 'j9k0L1m2N3B',
+        deskripsi: 'Mengetahui zona tidak terlihat pengemudi truk/bus dan aturan menyalip yang aman.',
+        ringkasan: [
+          '4 Zona Blind Spot Truk: Tepat di depan bemper (1-2 meter), tepat di belakang bak truk (hingga 10 meter), dan di sisi kiri-kanan dekat pintu kemudi.',
+          'Prinsip Kaca Spion: "Jika Anda tidak dapat melihat wajah sopir truk di kaca spionnya, berarti sopir truk tersebut PASTI tidak dapat melihat Anda."',
+          'Dilarang Menyalip dari Kiri: Sisi kiri truk memiliki area blind spot paling luas dan berbahaya.',
+          'Menjaga Jarak di Belakang Truk: Beri jarak minimal 4-5 meter agar pengemudi truk mengetahui keberadaan Anda.',
+        ],
+        poinPenting: [
+          'Jangan pernah memotong laju truk yang sedang berbelok.',
+          'Gunakan lampu dim atau klakson pendek saat akan mendahului truk.',
+          'Hindari berada berlama-lama di samping ban truk trailer.',
+        ],
+        hukumTerkait: 'Buku Panduan Safety Driving Korlantas Polri',
+      },
+    ],
+    flashcards: [
+      {
+        id: 'fc_5_1',
+        judul: 'Bahaya Microsleep',
+        kategori: 'aturan',
+        gambar_simbol: '😴',
+        arti: 'Tidur Singkat 2-15 Detik',
+        penjelasan: 'Kondisi hilangnya kesadaran otak akibat kelelahan berat yang menjadi penyebab utama tabrakan frontal di jalan bebas hambatan.',
+        pasal_hukum: 'UU 22/2009 Pasal 90',
+      },
+      {
+        id: 'fc_5_2',
+        judul: 'Aturan Kaca Spion Truk',
+        kategori: 'aturan',
+        gambar_simbol: '🚛',
+        arti: 'Zona Blind Spot Truk Besar',
+        penjelasan: 'Jika Anda tidak melihat pantulan wajah sopir truk di kaca spionnya, Anda sedang berada di zona mematikan (blind spot).',
+        pasal_hukum: 'Panduan Keselamatan Kemenhub',
+      },
+      {
+        id: 'fc_5_3',
+        judul: 'Power Nap 15 Menit',
+        kategori: 'aturan',
+        gambar_simbol: '🔋',
+        arti: 'Istirahat Pemulihan Refleks',
+        penjelasan: 'Tidur sejenak 15-20 menit di tempat aman untuk mengembalikan refleks motorik dan fokus otak pengemudi.',
+        pasal_hukum: 'Standard Medis Lalu Lintas',
+      },
+      {
+        id: 'fc_5_4',
+        judul: 'Aquaplaning (Hydroplaning)',
+        kategori: 'peringatan',
+        gambar_simbol: '🌊',
+        arti: 'Ban Melayang di Atas Genangan Air',
+        penjelasan: 'Hilangnya cengkeraman ban akibat lapisan air di jalan basah. Jangan rem mendadak, lepas gas perlahan dan jaga kemudi tetap lurus.',
+        pasal_hukum: 'Defensive Riding Standard',
+      },
+    ],
+    kasus: [
+      {
+        id: 'case_5_1',
+        judul: 'Truk Gandeng Hendak Berbelok ke Kiri',
+        skenario: 'Di depan Anda, sebuah truk gandeng panjang menyalakan lampu sein kiri namun mengambil ancang-ancang ke arah kanan sebelum berbelok. Ada celah kosong di sebelah kiri truk. Apa yang Anda lakukan?',
+        opsi: [
+          {
+            text: 'Langsung menyalip melalui celah kosong di sebelah kiri truk.',
+            skor_aman: 0,
+            feedback: 'Sangat berbahaya! Truk besar memerlukan ruang putar (swept path). Saat berbelok, bodi truk akan menyapu celah kiri dan dapat menggilas kendaraan Anda.',
+          },
+          {
+            text: 'Menahan laju kendaraan, berhenti di belakang truk, dan memberi ruang hingga truk selesai berbelok.',
+            skor_aman: 100,
+            feedback: 'Tepat sekali! Memahami swept path dan blind spot kendaraan panjang adalah prinsip emas keselamatan di jalan raya.',
+          },
+          {
+            text: 'Membunyikan klakson dan mendahului dari sisi kanan truk.',
+            skor_aman: 40,
+            feedback: 'Mendahului kendaraan yang sedang bermanuver belok tetap berisiko tinggi.',
+          },
+        ],
+        analisis_behavioral: 'Banyak pengendara motor terjepit ban truk karena mengira celah kosong saat truk mengambil ancang-ancang adalah lajur bebas hambatan.',
+        rekomendasi_korlantas: 'Selalu bersabar di belakang kendaraan berat saat bermanuver: "Lebih baik kehilangan 1 menit di jalan daripada kehilangan seluruh masa depan."',
+      },
+    ],
+  },
+
+  // MODUL 6
+  {
+    id: 'modul_06',
+    nomor: 6,
+    judul: 'Darurat & Pertolongan di Jalan',
+    deskripsi: 'Langkah tanggap darurat kecelakaan lalu lintas (DRABC), memanggil bantuan 110/118, dan pengamanan lokasi kejadian.',
+    icon_name: 'ShieldAlert',
+    warna: '#DC2626', // Deep Red
+    durasi_estimasi: '11 Menit',
+    lessons: [
+      {
+        id: 'lesson_6_1',
+        judul: 'Langkah Pertama di TKP Kecelakaan (DRABC)',
+        durasi_menit: 6,
+        youtubeId: 'm4n5O6p7Q8R',
+        deskripsi: 'Prosedur pertolongan pertama gawat darurat tanpa memperburuk cedera korban.',
+        ringkasan: [
+          'D - Danger: Pastikan keselamatan diri Anda dan TKP aman sebelum mendekati korban (matikan mesin kendaraan yang terlibat, hindari ceceran bensin).',
+          'R - Response: Cek kesadaran korban dengan memanggil dan menepuk pundak perlahan. JANGAN mengguncang kepala atau leher.',
+          'A - Airway & B - Breathing: Pastikan jalan napas terbuka dan korban bernapas normal.',
+          'C - Circulation & Call for Help: Hentikan pendarahan luar dengan balut tekan bersih dan segera hubungi 110 Polri & 118/119 Ambulans.',
+        ],
+        poinPenting: [
+          'Jangan memindahkan korban yang dicurigai patah tulang leher/punggung kecuali ada bahaya kebakaran/ledakan.',
+          'Pasang segitiga pengaman minimal 30 meter di belakang TKP.',
+          'Laporkan lokasi presisi, jumlah korban, dan kondisi kesadaran kepada operator 110.',
+        ],
+        hukumTerkait: 'UU No. 22/2009 Pasal 231 & Pasal 232',
+      },
+      {
+        id: 'lesson_6_2',
+        judul: 'Pemanfaatan Tombol Darurat SOS SIGAP & Hak Korban',
+        durasi_menit: 5,
+        youtubeId: 'p9q0R1s2T3U',
+        deskripsi: 'Mengintegrasikan telemetri darurat dan memahami santunan asuransi Jasa Raharja.',
+        ringkasan: [
+          'Tombol SOS SIGAP: Tekan dan tahan tombol SOS selama 3 detik untuk mengirim koordinat telemetri GPS langsung ke Command Center Polri.',
+          'Hak Korban Kecelakaan: Setiap korban kecelakaan lalu lintas berhak mendapatkan perawatan medis darurat di rumah sakit terdekat tanpa diskriminasi.',
+          'Asuransi Jasa Raharja: Menjamin biaya perawatan medis korban laka ganda sesuai UU No. 34 Tahun 1964 melalui laporan polisi resmi (LP).',
+          'Kewajiban Pengemudi: Pengemudi yang terlibat kecelakaan wajib menghentikan kendaraan, menolong korban, dan melaporkan ke kepolisian terdekat.',
+        ],
+        poinPenting: [
+          'Tabrak lari adalah tindak pidana berat dengan ancaman penjara hingga 3 tahun (Pasal 312).',
+          'Gunakan aplikasi SIGAP untuk mempercepat respons kedatangan unit patroli lantas.',
+          'Tetap dampingi korban hingga petugas medis dan kepolisian tiba di lokasi.',
+        ],
+        hukumTerkait: 'UU No. 22/2009 Pasal 231 & Pasal 312',
+      },
+    ],
+    flashcards: [
+      {
+        id: 'fc_6_1',
+        judul: 'Nomor Darurat 110 & 118',
+        kategori: 'petunjuk',
+        gambar_simbol: '📞',
+        arti: 'Pusat Panggilan Darurat Polri & Ambulans',
+        penjelasan: '110 untuk pelaporan kepolisian darurat 24 jam bebas pulsa, 118/119 untuk armada ambulans IGD rumah sakit.',
+        pasal_hukum: 'Layanan Darurat Nasional',
+      },
+      {
+        id: 'fc_6_2',
+        judul: 'Segitiga Pengaman Darurat',
+        kategori: 'peringatan',
+        gambar_simbol: '🔺',
+        arti: 'Tanda Peringatan 30 Meter',
+        penjelasan: 'Wajib dipasang minimal 30 meter di belakang kendaraan yang mogok atau mengalami kecelakaan di jalan raya.',
+        pasal_hukum: 'UU 22/2009 Pasal 121',
+      },
+      {
+        id: 'fc_6_3',
+        judul: 'Prinsip Penanganan Leher (C-Spine)',
+        kategori: 'aturan',
+        gambar_simbol: '🩹',
+        arti: 'Imobilisasi Tulang Leher',
+        penjelasan: 'Jangan memutar atau mengangkat kepala korban kecelakaan benturan keras untuk mencegah kelumpuhan permanen akibat patah tulang leher.',
+        pasal_hukum: 'Protokol Medis First Aid',
+      },
+      {
+        id: 'fc_6_4',
+        judul: 'Sanksi Tabrak Lari',
+        kategori: 'larangan',
+        gambar_simbol: '⚖️',
+        arti: 'Pidana Penjara Hingga 3 Tahun',
+        penjelasan: 'Pengemudi yang tidak menghentikan kendaraan dan tidak memberikan pertolongan kepada korban kecelakaan dipidana penjara paling lama 3 tahun.',
+        pasal_hukum: 'UU 22/2009 Pasal 312',
+      },
+    ],
+    kasus: [
+      {
+        id: 'case_6_1',
+        judul: 'Menyaksikan Korban Tergeletak Pasca-Kecelakaan',
+        skenario: 'Anda melintas dan melihat seorang pengendara motor tergeletak di aspal setelah menabrak pembatas jalan. Korban masih sadar namun mengeluh lehernya sangat sakit dan tidak bisa digerakkan. Apa yang Anda lakukan?',
+        opsi: [
+          {
+            text: 'Segera mengangkat tubuh korban ke pinggir jalan dengan menarik kedua tangannya.',
+            skor_aman: 0,
+            feedback: 'Sangat fatal! Menarik tubuh korban yang cedera leher dapat memutus sumsum tulang belakang (spinal cord) dan menyebabkan kelumpuhan total atau kematian seketika.',
+          },
+          {
+            text: 'Amankan TKP dengan segitiga pengaman, minta korban tidak bergerak, hubungi 110 & 118, dan tahan posisi kepala korban agar tetap lurus.',
+            skor_aman: 100,
+            feedback: 'Sempurna! Anda mempraktikkan imobilisasi tulang leher (c-spine control) sambil menunggu tim medis profesional tiba dengan penyangga leher (neck collar).',
+          },
+          {
+            text: 'Memberikan air minum dan meminta korban mencoba duduk sendiri.',
+            skor_aman: 20,
+            feedback: 'Memberi minum pada korban trauma kepala/leher berisiko menyebabkan tersedak (aspirasi paru) yang menyumbat jalan napas.',
+          },
+        ],
+        analisis_behavioral: 'Banyak orang berniat baik menolong namun melakukan kesalahan fatal saat memindahkan korban karena panik dan kurangnya edukasi first aid.',
+        rekomendasi_korlantas: 'Terapkan prinsip medis: "First, do no harm (Pertama, jangan menambah cedera baru pada korban)."',
+      },
+    ],
+  },
+];
+
+export const ALL_MODULES = CURRICULUM_MODULES;
