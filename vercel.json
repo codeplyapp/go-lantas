@@ -1,0 +1,12 @@
+{
+  "buildCommand": "npm --prefix demo-lantas run build",
+  "outputDirectory": "demo-lantas/dist",
+  "installCommand": "npm --prefix demo-lantas install",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

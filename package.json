@@ -1,11 +1,11 @@
 {
-  "name": "sigap-korlantas-lkti",
+  "name": "go-lantas-korlantas",
   "private": true,
   "version": "1.0.0",
-  "description": "Prototipe Web SIGAP (Sistem Inovasi Generasi Aman berlalu lintas dan Peduli) untuk LKTI Korlantas POLRI 2026",
+  "description": "GO Lantas - Sistem Informasi & Edukasi Keselamatan Lalu Lintas Korlantas POLRI",
   "scripts": {
-    "dev": "npm --prefix demo-sigap run dev",
-    "build": "npm --prefix demo-sigap run build",
-    "preview": "npm --prefix demo-sigap run preview"
+    "dev": "npm --prefix demo-lantas run dev",
+    "build": "npm --prefix demo-lantas run build",
+    "preview": "npm --prefix demo-lantas run preview"
   }
 }
