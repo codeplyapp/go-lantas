@@ -37,7 +37,7 @@ export const PairingCard: React.FC<PairingCardProps> = ({ user }) => {
     sound.playClick();
     NotificationService.showInAppToast(
       'Fitur Segera Hadir',
-      'Hubungan keluarga berbasis Firestore akan tersedia di Fase B. Kode pairing Anda sudah disiapkan.',
+      'Sinkronisasi hubungan keluarga akan segera tersedia. Kode pairing Anda sudah disiapkan.',
       'info'
     );
     setInputCode('');

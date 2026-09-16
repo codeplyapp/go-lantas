@@ -122,7 +122,7 @@ export const SOSView: React.FC = () => {
       <div className="p-3.5 sm:p-4 rounded-[14px] bg-amber-500/10 border border-amber-500/30 flex items-start gap-2.5 text-xs text-amber-900 shadow-xs">
         <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
         <p className="leading-relaxed font-medium">
-          <strong className="font-extrabold text-amber-950">Catatan Notifikasi Real-Time:</strong> Sinyal darurat disiarkan secara langsung via Firestore. Anggota keluarga perlu membuka aplikasi untuk menerima pembaruan status dan koordinat GPS darurat secara instan.
+          <strong className="font-extrabold text-amber-950">Catatan Notifikasi Real-Time:</strong> Sinyal darurat disiarkan secara langsung dan instan. Anggota keluarga perlu membuka aplikasi untuk menerima pembaruan status dan koordinat GPS darurat secara instan.
         </p>
       </div>
 

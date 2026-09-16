@@ -43,7 +43,7 @@ export const LogoutCard: React.FC<LogoutCardProps> = ({
           <div className="flex items-start gap-2.5 text-xs text-slate-700 py-1">
             <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
             <p className="leading-relaxed font-medium">
-              Anda akan keluar dari akun GO Lantas. Data Anda tetap aman di server Firestore.
+              Anda akan keluar dari akun GO Lantas. Data akun Anda tetap tersimpan dengan aman.
             </p>
           </div>
 
