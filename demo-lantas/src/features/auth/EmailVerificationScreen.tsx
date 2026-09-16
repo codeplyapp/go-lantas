@@ -33,6 +33,22 @@ export const EmailVerificationScreen: React.FC<EmailVerificationScreenProps> = (
     return () => clearInterval(interval);
   }, [cooldown]);
 
+  // Auto-poll every 3.5s to automatically transition as soon as user clicks verify link in email
+  useEffect(() => {
+    const pollInterval = setInterval(async () => {
+      try {
+        const verified = await authService.checkEmailVerified();
+        if (verified) {
+          clearInterval(pollInterval);
+          sound.playCorrect();
+          onVerified();
+        }
+      } catch {}
+    }, 3500);
+
+    return () => clearInterval(pollInterval);
+  }, [onVerified]);
+
   const handleResend = async () => {
     if (cooldown > 0) return;
     setIsResending(true);
