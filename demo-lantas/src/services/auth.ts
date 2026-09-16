@@ -76,6 +76,9 @@ export function getFriendlyErrorMessage(error: any): string {
   if (code.includes('auth/user-disabled')) {
     return 'Akun ini telah dinonaktifkan oleh administrator Korlantas.';
   }
+  if (code.includes('auth/unauthorized-domain')) {
+    return 'Domain Vercel ini belum didaftarkan di Firebase Console. Buka Firebase Console > Authentication > Settings > Authorized domains, lalu tambahkan domain aplikasi Vercel Anda.';
+  }
   if (code.includes('auth/operation-not-allowed') || code.includes('auth/configuration-not-found')) {
     return 'Layanan Authentication belum diaktifkan di Firebase Console. Pastikan menu Authentication > Sign-in method (Email/Password & Google) sudah diaktifkan.';
   }
