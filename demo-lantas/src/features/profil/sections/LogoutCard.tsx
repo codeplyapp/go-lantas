@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
-import { LogOut, RotateCcw, AlertTriangle, Sparkles } from 'lucide-react';
+import { LogOut, AlertTriangle } from 'lucide-react';
 import { Sheet } from '../../../shared/components/Sheet';
 import { Btn } from '../../../shared/components/Btn';
 import { sound } from '../../../shared/services/sound';
 
 interface LogoutCardProps {
   onSignOut?: () => void;
-  onOpenOnboarding?: () => void;
 }
 
 export const LogoutCard: React.FC<LogoutCardProps> = ({ 
-  onSignOut,
-  onOpenOnboarding
+  onSignOut
 }) => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
@@ -59,22 +57,6 @@ export const LogoutCard: React.FC<LogoutCardProps> = ({
                 onClick={handleSignOutAction}
               >
                 Keluar dari Akun Ini (Sign Out)
-              </Btn>
-            )}
-
-            {/* Lihat Ulang Onboarding */}
-            {onOpenOnboarding && (
-              <Btn
-                variant="secondary"
-                className="w-full justify-start py-3 px-4 text-xs sm:text-sm text-slate-700"
-                icon={<Sparkles className="w-4 h-4 mr-1.5 text-[#0077C0]" />}
-                onClick={() => {
-                  sound.playClick();
-                  setIsConfirmOpen(false);
-                  onOpenOnboarding();
-                }}
-              >
-                Lihat Ulang Onboarding (3 Slide)
               </Btn>
             )}
 

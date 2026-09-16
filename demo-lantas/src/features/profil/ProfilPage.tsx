@@ -13,7 +13,6 @@ interface ProfilPageProps {
   onNavigateTab?: (tab: string) => void;
   onOpenRobotChat?: (prompt?: string) => void;
   onSignOut?: () => void;
-  onOpenOnboarding?: () => void;
   onProfileUpdated?: (partial: Partial<UserProfile>) => void;
 }
 
@@ -21,7 +20,6 @@ export const ProfilPage: React.FC<ProfilPageProps> = ({
   user,
   onNavigateTab,
   onSignOut,
-  onOpenOnboarding,
   onProfileUpdated,
 }) => {
   const safeUser: UserProfile = user || {
@@ -61,7 +59,6 @@ export const ProfilPage: React.FC<ProfilPageProps> = ({
       {/* 7. Logout (Card 7) */}
       <LogoutCard 
         onSignOut={onSignOut}
-        onOpenOnboarding={onOpenOnboarding}
       />
     </div>
   );

@@ -8,7 +8,6 @@ interface ProfilViewProps {
   onOpenPersonaModal?: () => void;
   onOpenRobotChat?: (prompt?: string) => void;
   onSignOut?: () => void;
-  onOpenOnboarding?: () => void;
   onProfileUpdated?: (partial: Partial<UserProfile>) => void;
 }
 

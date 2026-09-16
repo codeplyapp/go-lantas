@@ -264,7 +264,6 @@ export const App: React.FC = () => {
                   onNavigateTab={(tab) => setActiveTab(tab as TabType)}
                   onOpenRobotChat={handleOpenRobotChat}
                   onSignOut={handleSignOut}
-                  onOpenOnboarding={() => setAppState('onboarding')}
                   onProfileUpdated={(partial) => {
                     if (session?.profile) {
                       setSession({
