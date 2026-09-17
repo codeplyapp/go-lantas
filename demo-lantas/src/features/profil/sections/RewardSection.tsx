@@ -20,12 +20,20 @@ export const RewardSection: React.FC<RewardSectionProps> = ({ user }) => {
   const [myRank, setMyRank] = useState<number>(0);
 
   useEffect(() => {
-    firestoreService.getLeaderboard(20).then((entries) => {
+    const unsubLb = firestoreService.subscribeLeaderboard((entries) => {
       setLeaderboard(entries);
       const rank = entries.findIndex((e) => e.uid === user.uid);
       setMyRank(rank >= 0 ? rank + 1 : 0);
-    });
-    firestoreService.getQuizAttempts(user.uid, 20).then(setAttempts);
+    }, { limit: 20 });
+
+    const unsubAttempts = firestoreService.subscribeQuizAttempts(user.uid, (data) => {
+      setAttempts(data);
+    }, 20);
+
+    return () => {
+      if (unsubLb) unsubLb();
+      if (unsubAttempts) unsubAttempts();
+    };
   }, [user.uid]);
 
   return (

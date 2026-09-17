@@ -11,6 +11,38 @@
       ]
     },
     {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "role",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "poin_total",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "role",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sekolah_kampus",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "poin_total",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
       "collectionGroup": "quiz_attempts",
       "queryScope": "COLLECTION",
       "fields": [

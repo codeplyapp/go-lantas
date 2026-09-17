@@ -23,7 +23,15 @@ service cloud.firestore {
       // Authenticated users can read profiles for leaderboard, student search, and family pairing
       allow read: if isAuthenticated();
       // Only the user owner can create or update their own profile
-      allow create, update: if isOwner(uid);
+      allow create: if isOwner(uid);
+      allow update: if isOwner(uid) && (
+        !('poin_total' in request.resource.data) ||
+        !('poin_total' in resource.data) ||
+        (
+          request.resource.data.poin_total >= resource.data.poin_total &&
+          request.resource.data.poin_total - resource.data.poin_total <= 200
+        )
+      );
       allow delete: if isOwner(uid) || isAdmin();
 
       // Subcollection module_progress: only owner can read/write

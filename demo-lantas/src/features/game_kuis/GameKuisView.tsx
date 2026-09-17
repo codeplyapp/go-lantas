@@ -53,14 +53,23 @@ export const GameKuisView: React.FC<GameKuisViewProps> = ({ profile }) => {
   useEffect(() => {
     if (subTab === 'leaderboard') {
       setIsLeaderboardLoading(true);
-      firestoreService.getLeaderboard(20).then((data) => {
-        setLeaderboard(data);
-        setIsLeaderboardLoading(false);
-      }).catch(() => {
-        setIsLeaderboardLoading(false);
-      });
+      const unsub = firestoreService.subscribeLeaderboard(
+        (data) => {
+          setLeaderboard(data);
+          setIsLeaderboardLoading(false);
+        },
+        {
+          scope: leaderboardScope,
+          school: profile?.sekolah_kampus,
+          role: leaderboardScope === 'sekolah' ? 'pelajar' : leaderboardScope === 'kampus' ? 'mahasiswa' : undefined,
+          limit: 20,
+        }
+      );
+      return () => {
+        if (unsub) unsub();
+      };
     }
-  }, [subTab]);
+  }, [subTab, leaderboardScope, profile?.sekolah_kampus]);
 
   const handleSelectOption = (index: number) => {
     if (isAnswered || !currentQuestion) return;
@@ -69,6 +78,24 @@ export const GameKuisView: React.FC<GameKuisViewProps> = ({ profile }) => {
     setIsAnswered(true);
 
     const isCorrect = index === currentQuestion.jawaban_benar;
+
+    // Gamification persistence to Firestore
+    if (safeUser.uid && safeUser.uid !== 'guest') {
+      firestoreService.saveQuizAttempt({
+        uid: safeUser.uid,
+        question_id: currentQuestion.id,
+        level: activeLevel,
+        pilihan_user: index,
+        benar: isCorrect,
+        poin_didapat: isCorrect ? currentQuestion.poin : 0,
+        timestamp: new Date().toISOString(),
+      });
+      firestoreService.registerActivity(safeUser.uid, { isCorrect });
+      if (isCorrect) {
+        firestoreService.addPoints(safeUser.uid, currentQuestion.poin);
+      }
+    }
+
     if (isCorrect) {
       sound.playCorrect();
       setSessionScore(prev => prev + currentQuestion.poin);
@@ -103,6 +130,9 @@ export const GameKuisView: React.FC<GameKuisViewProps> = ({ profile }) => {
       setIsAnswered(false);
     } else {
       setQuizCompleted(true);
+      if (safeUser.uid && safeUser.uid !== 'guest') {
+        firestoreService.registerActivity(safeUser.uid, { quizDone: true });
+      }
       sound.playLevelUp();
       confetti({
         particleCount: 100,

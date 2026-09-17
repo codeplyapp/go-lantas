@@ -3,7 +3,7 @@ import { db, isFirebaseConfigured } from '../config/firebase';
 import {
   doc, getDoc, setDoc, updateDoc,
   collection, getDocs, addDoc, query, where, orderBy, limit,
-  onSnapshot, serverTimestamp, Timestamp, Unsubscribe,
+  onSnapshot, serverTimestamp, Timestamp, Unsubscribe, increment,
 } from 'firebase/firestore';
 import { 
   UserProfile, UserRole, QuizAttempt, ModuleProgress, 
@@ -69,6 +69,7 @@ export const firestoreService = {
       avatar_url: initial.avatar_url || '/mascot/logo.png',
       pairing_code: 'SGP-' + Math.floor(1000 + Math.random() * 9000),
       created_at: new Date().toISOString(),
+      last_aktivitas: new Date().toISOString().slice(0, 10),
     };
 
     if (isFirebaseConfigured() && db) {
@@ -96,6 +97,93 @@ export const firestoreService = {
     }
   },
 
+  /**
+   * Add points atomically using FieldValue.increment
+   */
+  async addPoints(uid: string, delta: number): Promise<void> {
+    if (!isFirebaseConfigured() || !db || delta <= 0) return;
+    try {
+      const userDocRef = doc(db, COLLECTION_USERS, uid);
+      await updateDoc(userDocRef, {
+        poin_total: increment(delta),
+      });
+    } catch (err) {
+      console.warn('[Firestore] Error adding points:', err);
+    }
+  },
+
+  /**
+   * Register user quiz/study activity (updates streak and answer counters)
+   */
+  async registerActivity(uid: string, stats?: { isCorrect?: boolean; quizDone?: boolean }): Promise<void> {
+    if (!isFirebaseConfigured() || !db) return;
+    try {
+      const userDocRef = doc(db, COLLECTION_USERS, uid);
+      const snap = await getDoc(userDocRef);
+      if (!snap.exists()) return;
+
+      const current = snap.data() as UserProfile;
+      const today = new Date().toISOString().slice(0, 10);
+      const last = current.last_aktivitas;
+
+      let newStreak = current.streak_hari || 1;
+      if (!last) {
+        newStreak = 1;
+      } else if (last === today) {
+        // Same day activity - streak remains
+        newStreak = current.streak_hari || 1;
+      } else {
+        const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+        if (last === yesterday) {
+          newStreak = (current.streak_hari || 0) + 1;
+        } else {
+          newStreak = 1; // Missed day, reset streak
+        }
+      }
+
+      const updates: Record<string, any> = {
+        last_aktivitas: today,
+        streak_hari: newStreak,
+      };
+
+      if (stats?.quizDone) {
+        updates.kuis_selesai = increment(1);
+      }
+      if (stats?.isCorrect !== undefined) {
+        updates.total_jawaban = increment(1);
+        if (stats.isCorrect) {
+          updates.jawaban_benar = increment(1);
+        }
+      }
+
+      await updateDoc(userDocRef, updates);
+    } catch (err) {
+      console.warn('[Firestore] Error registering activity:', err);
+    }
+  },
+
+  /**
+   * Realtime listener for a specific user profile
+   */
+  subscribeUserProfile(uid: string, callback: (profile: UserProfile | null) => void): Unsubscribe | null {
+    if (!isFirebaseConfigured() || !db) return null;
+    try {
+      const userDocRef = doc(db, COLLECTION_USERS, uid);
+      return onSnapshot(userDocRef, (snap) => {
+        if (snap.exists()) {
+          callback(snap.data() as UserProfile);
+        } else {
+          callback(null);
+        }
+      }, (err) => {
+        console.warn('[Firestore] User profile listener error:', err);
+      });
+    } catch (err) {
+      console.warn('[Firestore] Error setting up user profile listener:', err);
+      return null;
+    }
+  },
+
   // ─── Quiz Attempts ─────────────────────────────────────────────────────────
 
   /**
@@ -107,6 +195,7 @@ export const firestoreService = {
     try {
       await addDoc(collection(db, COLLECTION_QUIZ_ATTEMPTS), {
         ...attempt,
+        timestamp: attempt.timestamp || new Date().toISOString(),
         createdAt: serverTimestamp(),
       });
     } catch (err) {
@@ -115,7 +204,7 @@ export const firestoreService = {
   },
 
   /**
-   * Get quiz attempts for a specific user
+   * Get quiz attempts for a specific user (one-time fetch)
    */
   async getQuizAttempts(uid: string, maxItems = 20): Promise<QuizAttempt[]> {
     if (!isFirebaseConfigured() || !db) return [];
@@ -131,6 +220,30 @@ export const firestoreService = {
     } catch (err) {
       console.warn('[Firestore] Error fetching quiz attempts:', err);
       return [];
+    }
+  },
+
+  /**
+   * Realtime listener for quiz attempts of a user
+   */
+  subscribeQuizAttempts(uid: string, callback: (attempts: QuizAttempt[]) => void, maxLimit = 20): Unsubscribe | null {
+    if (!isFirebaseConfigured() || !db) return null;
+    try {
+      const q = query(
+        collection(db, COLLECTION_QUIZ_ATTEMPTS),
+        where('uid', '==', uid),
+        orderBy('timestamp', 'desc'),
+        limit(maxLimit)
+      );
+      return onSnapshot(q, (snap) => {
+        const attempts = snap.docs.map((d) => ({ id: d.id, ...d.data() } as QuizAttempt));
+        callback(attempts);
+      }, (err) => {
+        console.warn('[Firestore] Quiz attempts listener warning:', err);
+      });
+    } catch (err) {
+      console.warn('[Firestore] Error setting up quiz attempts listener:', err);
+      return null;
     }
   },
 
@@ -152,6 +265,95 @@ export const firestoreService = {
     } catch (err) {
       console.warn('[Firestore] Error fetching leaderboard:', err);
       return [];
+    }
+  },
+
+  /**
+   * Real-time listener for Leaderboard with scope filter (nasional, sekolah, kampus)
+   */
+  subscribeLeaderboard(
+    callback: (entries: UserProfile[]) => void,
+    options?: {
+      scope?: 'nasional' | 'sekolah' | 'kampus';
+      school?: string;
+      role?: string;
+      limit?: number;
+    }
+  ): Unsubscribe | null {
+    if (!isFirebaseConfigured() || !db) return null;
+    try {
+      const maxLimit = options?.limit || 20;
+      const scope = options?.scope || 'nasional';
+
+      let q = query(
+        collection(db, COLLECTION_USERS),
+        orderBy('poin_total', 'desc'),
+        limit(maxLimit)
+      );
+
+      if (scope === 'sekolah') {
+        if (options?.school) {
+          q = query(
+            collection(db, COLLECTION_USERS),
+            where('role', '==', 'pelajar'),
+            where('sekolah_kampus', '==', options.school),
+            orderBy('poin_total', 'desc'),
+            limit(maxLimit)
+          );
+        } else {
+          q = query(
+            collection(db, COLLECTION_USERS),
+            where('role', '==', 'pelajar'),
+            orderBy('poin_total', 'desc'),
+            limit(maxLimit)
+          );
+        }
+      } else if (scope === 'kampus') {
+        if (options?.school) {
+          q = query(
+            collection(db, COLLECTION_USERS),
+            where('role', '==', 'mahasiswa'),
+            where('sekolah_kampus', '==', options.school),
+            orderBy('poin_total', 'desc'),
+            limit(maxLimit)
+          );
+        } else {
+          q = query(
+            collection(db, COLLECTION_USERS),
+            where('role', '==', 'mahasiswa'),
+            orderBy('poin_total', 'desc'),
+            limit(maxLimit)
+          );
+        }
+      }
+
+      return onSnapshot(q, (snap) => {
+        const entries = snap.docs.map((d) => d.data() as UserProfile);
+        callback(entries);
+      }, (err) => {
+        console.warn('[Firestore] Scoped leaderboard listener fallback on error/missing index:', err);
+        // Fallback to national query with client filter if compound index is pending
+        try {
+          if (!db) return;
+          const fallbackQ = query(
+            collection(db, COLLECTION_USERS),
+            orderBy('poin_total', 'desc'),
+            limit(50)
+          );
+          onSnapshot(fallbackQ, (fallbackSnap) => {
+            let items = fallbackSnap.docs.map((d) => d.data() as UserProfile);
+            if (scope === 'sekolah') {
+              items = items.filter(u => u.role === 'pelajar' || (options?.school && u.sekolah_kampus === options.school));
+            } else if (scope === 'kampus') {
+              items = items.filter(u => u.role === 'mahasiswa' || (options?.school && u.sekolah_kampus === options.school));
+            }
+            callback(items.slice(0, maxLimit));
+          });
+        } catch {}
+      });
+    } catch (err) {
+      console.warn('[Firestore] Error setting up leaderboard listener:', err);
+      return null;
     }
   },
 

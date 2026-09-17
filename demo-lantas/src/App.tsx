@@ -5,6 +5,7 @@ import { BottomNavBar, TabType } from './shared/components/BottomNavBar';
 import { ToastContainer } from './shared/components/ToastContainer';
 import { NotificationService } from './shared/services/notification';
 import { authService, AuthSession } from './services/auth';
+import { firestoreService } from './services/firestore';
 import { UserProfile } from './core/types';
 
 // Flow Screens
@@ -76,6 +77,31 @@ export const App: React.FC = () => {
 
     return () => unsubAuth();
   }, []);
+
+  // Real-time listener for user profile to keep points/stats live across views
+  useEffect(() => {
+    const uid = session?.user?.uid;
+    if (!uid) return;
+
+    const unsubProfile = firestoreService.subscribeUserProfile(uid, (liveProfile) => {
+      if (liveProfile) {
+        setSession((prev) => {
+          if (!prev) return prev;
+          const updatedSession: AuthSession = {
+            ...prev,
+            profile: liveProfile,
+          };
+          sessionRef.current = updatedSession;
+          authService.setCachedSession(updatedSession);
+          return updatedSession;
+        });
+      }
+    });
+
+    return () => {
+      if (unsubProfile) unsubProfile();
+    };
+  }, [session?.user?.uid]);
 
   // Handle Splash Screen Completion & Route to Destination
   const handleSplashFinish = () => {

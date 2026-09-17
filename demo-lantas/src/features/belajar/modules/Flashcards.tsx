@@ -4,6 +4,8 @@ import {
   Layers, Award, Sparkles, Filter 
 } from 'lucide-react';
 import { FlashcardItem, ModuleProgress } from '../../../core/types';
+import { firestoreService } from '../../../services/firestore';
+import { authService } from '../../../services/auth';
 import { sound } from '../../../shared/services/sound';
 import { NotificationService } from '../../../shared/services/notification';
 import confetti from 'canvas-confetti';
@@ -76,6 +78,15 @@ export const Flashcards: React.FC<FlashcardsProps> = ({
         : [...progress.flashcards_done, currentCard.id],
       last_study: new Date().toISOString(),
     };
+
+    // Firestore gamification: +10 points on first flashcard mastered
+    const uid = authService.getCurrentUser()?.uid;
+    if (uid) {
+      firestoreService.addPoints(uid, 10);
+      firestoreService.registerActivity(uid, { quizDone: false });
+      firestoreService.updateModuleProgress(uid, moduleId, updatedProgress);
+    }
+
     onProgressUpdated(updatedProgress);
     NotificationService.showInAppToast(
       'Rambu Dikuasai! ✨',

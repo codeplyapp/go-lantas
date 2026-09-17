@@ -6,6 +6,7 @@ import {
 import { QuestionItem, ExamAttempt } from '../../../core/types';
 import { SIM_EXAM_QUESTIONS, ALL_QUESTIONS } from '../../../data/questions';
 import { authService } from '../../../services/auth';
+import { firestoreService } from '../../../services/firestore';
 import { sound } from '../../../shared/services/sound';
 
 interface SimulasiUjianProps {
@@ -32,6 +33,16 @@ export const SimulasiUjian: React.FC<SimulasiUjianProps> = ({
   const [attempts, setAttempts] = useState<ExamAttempt[]>([]);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Load previous exam attempts on mount
+  useEffect(() => {
+    const user = authService.getCurrentUser();
+    if (user?.uid) {
+      firestoreService.getExamAttempts(user.uid).then((res) => {
+        if (res && res.length > 0) setAttempts(res);
+      }).catch(() => {});
+    }
+  }, []);
 
   // Initialize random 20 questions
   const startExam = () => {
@@ -129,7 +140,13 @@ export const SimulasiUjian: React.FC<SimulasiUjianProps> = ({
 
     setAttempts(prev => [attempt, ...prev]);
 
-    // (Firestore save of exam attempt will be implemented in Phase B)
+    // Firestore gamification & attempt write
+    if (currentUser?.uid && currentUser.uid !== 'guest') {
+      const pointsAwarded = lulus ? 150 : 30;
+      firestoreService.saveExamAttempt(attempt);
+      firestoreService.addPoints(currentUser.uid, pointsAwarded);
+      firestoreService.registerActivity(currentUser.uid, { quizDone: true });
+    }
 
     if (lulus) {
       sound.playSuccess();

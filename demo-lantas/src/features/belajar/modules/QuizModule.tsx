@@ -4,6 +4,8 @@ import {
   Award, BookOpen, ShieldCheck, AlertTriangle 
 } from 'lucide-react';
 import { QuizQuestion, ModuleProgress } from '../../../core/types';
+import { firestoreService } from '../../../services/firestore';
+import { authService } from '../../../services/auth';
 import { sound } from '../../../shared/services/sound';
 import { NotificationService } from '../../../shared/services/notification';
 import confetti from 'canvas-confetti';
@@ -40,6 +42,24 @@ export const QuizModule: React.FC<QuizModuleProps> = ({
     setIsAnswered(true);
 
     const isCorrect = idx === currentQ.jawaban_benar;
+    const uid = authService.getCurrentUser()?.uid;
+
+    if (uid) {
+      firestoreService.saveQuizAttempt({
+        uid,
+        question_id: currentQ.id,
+        level: 1,
+        pilihan_user: idx,
+        benar: isCorrect,
+        poin_didapat: isCorrect ? 20 : 0,
+        timestamp: new Date().toISOString(),
+      });
+      firestoreService.registerActivity(uid, { isCorrect });
+      if (isCorrect) {
+        firestoreService.addPoints(uid, 20);
+      }
+    }
+
     if (isCorrect) {
       sound.playCorrect();
     } else {
@@ -68,6 +88,9 @@ export const QuizModule: React.FC<QuizModuleProps> = ({
     const correctCount = userAnswers.filter(a => a.isCorrect).length;
     const score = Math.round((correctCount / totalQuestions) * 100);
     const passed = score >= 70;
+    const bonusPoints = passed ? (!progress.kuis_passed ? 120 : 50) : 15;
+
+    const uid = authService.getCurrentUser()?.uid;
 
     if (passed) {
       sound.playLevelUp();
@@ -84,13 +107,12 @@ export const QuizModule: React.FC<QuizModuleProps> = ({
     } else {
       NotificationService.showInAppToast(
         'Belum Memenuhi Passing Grade',
-        `Skor Anda: ${score}% (Minimal 70%). Pelajari kembali pembahasannya dan coba lagi.`,
+        `Skor Anda: ${score}% (Minimal 70%). +15 Poin partisipasi ditambahkan. Pelajari kembali pembahasannya dan coba lagi.`,
         'warning'
       );
     }
 
-    // Update progress locally
-    const correctAnswers = userAnswers.filter(a => a.isCorrect).length;
+    // Update progress locally and Firestore
     const updatedProgress: ModuleProgress = {
       ...progress,
       kuis_attempts: (progress.kuis_attempts || 0) + 1,
@@ -98,6 +120,13 @@ export const QuizModule: React.FC<QuizModuleProps> = ({
       kuis_passed: progress.kuis_passed || passed,
       last_study: new Date().toISOString(),
     };
+
+    if (uid) {
+      firestoreService.addPoints(uid, bonusPoints);
+      firestoreService.registerActivity(uid, { quizDone: true });
+      firestoreService.updateModuleProgress(uid, moduleId, updatedProgress);
+    }
+
     onQuizCompleted(updatedProgress);
     setIsFinished(true);
   };

@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   BookOpen, FileText, Trophy, Award, CheckCircle2, 
   TrendingUp, Clock, ShieldCheck, ChevronRight, Layers, Play 
 } from 'lucide-react';
 import { ModuleData, ModuleProgress, UserProfile } from '../../core/types';
 import { ALL_MODULES } from '../../data/modules';
+import { firestoreService } from '../../services/firestore';
 import { sound } from '../../shared/services/sound';
 
 import { ModuleList } from './modules/ModuleList';
@@ -23,6 +24,23 @@ export const BelajarPage: React.FC<BelajarPageProps> = ({ profile }) => {
   const [activeTab, setActiveTab] = useState<BelajarSubTab>('modules');
   const [selectedModule, setSelectedModule] = useState<ModuleData | null>(null);
   const [progressMap, setProgressMap] = useState<Record<string, ModuleProgress>>({});
+
+  // Load user's saved module progress from Firestore
+  useEffect(() => {
+    if (profile?.uid) {
+      firestoreService.getModuleProgress(profile.uid).then((progressList) => {
+        if (progressList && progressList.length > 0) {
+          const map: Record<string, ModuleProgress> = {};
+          progressList.forEach((p) => {
+            map[p.moduleId] = p;
+          });
+          setProgressMap((prev) => ({ ...prev, ...map }));
+        }
+      }).catch((err) => {
+        console.warn('[BelajarPage] Error loading module progress:', err);
+      });
+    }
+  }, [profile?.uid]);
 
   // Compute total curriculum progress
   const totalModules = ALL_MODULES.length;
@@ -238,7 +256,7 @@ export const BelajarPage: React.FC<BelajarPageProps> = ({ profile }) => {
           )}
 
           {activeTab === 'leaderboard' && (
-            <Leaderboard />
+            <Leaderboard profile={profile} />
           )}
 
           {activeTab === 'certificate' && (

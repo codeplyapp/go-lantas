@@ -4,6 +4,8 @@ import {
   Award, ShieldCheck, ArrowRight, Lightbulb 
 } from 'lucide-react';
 import { CaseStudyItem, ModuleProgress } from '../../../core/types';
+import { firestoreService } from '../../../services/firestore';
+import { authService } from '../../../services/auth';
 import { sound } from '../../../shared/services/sound';
 import { NotificationService } from '../../../shared/services/notification';
 import confetti from 'canvas-confetti';
@@ -37,7 +39,25 @@ export const CaseStudy: React.FC<CaseStudyProps> = ({
     setIsEvaluated(true);
 
     const chosen = activeCase.opsi[index];
-    if (chosen.skor_aman >= 80) {
+    const isSafest = chosen.skor_aman >= 80;
+
+    const updatedProgress: ModuleProgress = {
+      ...progress,
+      cases_done: progress.cases_done.includes(activeCase.id)
+        ? progress.cases_done
+        : [...progress.cases_done, activeCase.id],
+      last_study: new Date().toISOString(),
+    };
+
+    // Firestore gamification: +25 points on first safest case study choice
+    const uid = authService.getCurrentUser()?.uid;
+    if (!isCaseCompleted && isSafest && uid) {
+      firestoreService.addPoints(uid, 25);
+      firestoreService.registerActivity(uid, { quizDone: false });
+      firestoreService.updateModuleProgress(uid, moduleId, updatedProgress);
+    }
+
+    if (isSafest) {
       sound.playLevelUp();
       confetti({
         particleCount: 50,
@@ -46,7 +66,7 @@ export const CaseStudy: React.FC<CaseStudyProps> = ({
       });
       NotificationService.showInAppToast(
         'Keputusan Sangat Bijak! 🌟',
-        `Pilihan Anda paling aman. (+25 Poin)`,
+        `Pilihan Anda paling aman. ${!isCaseCompleted ? '(+25 Poin)' : ''}`,
         'success'
       );
     } else {
@@ -58,13 +78,6 @@ export const CaseStudy: React.FC<CaseStudyProps> = ({
       );
     }
 
-    const updatedProgress: ModuleProgress = {
-      ...progress,
-      cases_done: progress.cases_done.includes(activeCase.id)
-        ? progress.cases_done
-        : [...progress.cases_done, activeCase.id],
-      last_study: new Date().toISOString(),
-    };
     onProgressUpdated(updatedProgress);
   };
 

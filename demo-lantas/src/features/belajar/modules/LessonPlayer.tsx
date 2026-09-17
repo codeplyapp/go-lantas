@@ -6,6 +6,8 @@ import {
 } from 'lucide-react';
 import { LessonItem, ModuleProgress } from '../../../core/types';
 import { CURRICULUM_VIDEOS } from '../../../data/videos';
+import { firestoreService } from '../../../services/firestore';
+import { authService } from '../../../services/auth';
 import { sound } from '../../../shared/services/sound';
 import { NotificationService } from '../../../shared/services/notification';
 import confetti from 'canvas-confetti';
@@ -62,10 +64,19 @@ export const LessonPlayer: React.FC<LessonPlayerProps> = ({
       total_menit: (progress.total_menit || 0) + 5,
       last_study: new Date().toISOString(),
     };
+
+    // Firestore gamification: +20 points on first lesson completion
+    const uid = authService.getCurrentUser()?.uid;
+    if (!isDone && uid) {
+      firestoreService.addPoints(uid, 20);
+      firestoreService.registerActivity(uid, { quizDone: false });
+      firestoreService.updateModuleProgress(uid, moduleId, updatedProgress);
+    }
+
     onLessonCompleted(updatedProgress);
     NotificationService.showInAppToast(
       'Pelajaran Selesai! 🎉',
-      `Anda menyelesaikan "${lesson.judul}". Progres modul diperbarui.`,
+      `Anda menyelesaikan "${lesson.judul}". ${!isDone ? '+20 Poin ditambahkan!' : 'Progres modul diperbarui.'}`,
       'success'
     );
   };

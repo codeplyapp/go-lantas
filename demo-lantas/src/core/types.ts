@@ -16,6 +16,7 @@ export interface UserProfile {
   avatar_url?: string;
   pairing_code: string; // 6-char code for parent pairing
   created_at: string;
+  last_aktivitas?: string; // YYYY-MM-DD for daily streak calculation
 }
 
 export type QuizCategory = 'rambu' | 'marka' | 'etika' | 'darurat';

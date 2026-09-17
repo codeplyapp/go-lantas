@@ -29,38 +29,37 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ profile }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    let isMounted = true;
     setIsLoading(true);
-    firestoreService.getLeaderboard(50).then((data) => {
-      if (isMounted) {
+    const unsub = firestoreService.subscribeLeaderboard(
+      (data) => {
         setUsers(data);
         setIsLoading(false);
+      },
+      {
+        scope,
+        school: profile?.sekolah_kampus,
+        role: scope === 'sekolah' ? 'pelajar' : scope === 'kampus' ? 'mahasiswa' : undefined,
+        limit: 50,
       }
-    }).catch(() => {
-      if (isMounted) setIsLoading(false);
-    });
-    return () => { isMounted = false; };
-  }, []);
+    );
 
-  // Filter users based on scope
-  const filteredUsers = users.filter((u) => {
-    if (scope === 'sekolah') {
-      return u.role === 'pelajar' || (profile?.sekolah_kampus && u.sekolah_kampus === profile.sekolah_kampus);
-    }
-    if (scope === 'kampus') {
-      return u.role === 'mahasiswa' || (profile?.sekolah_kampus && u.sekolah_kampus === profile.sekolah_kampus);
-    }
-    return true;
-  });
+    return () => {
+      if (unsub) unsub();
+    };
+  }, [scope, profile?.sekolah_kampus]);
 
-  // Ensure current user is in the list if they have points but aren't in top fetched
-  let combinedList = [...filteredUsers];
+  // Ensure current user is included if they have points in this scope
+  let combinedList = [...users];
   if (profile && !combinedList.some((u) => u.uid === profile.uid)) {
-    combinedList.push(profile);
+    const matchesScope =
+      scope === 'nasional' ||
+      (scope === 'sekolah' && (profile.role === 'pelajar' || !profile.role)) ||
+      (scope === 'kampus' && profile.role === 'mahasiswa');
+    if (matchesScope) {
+      combinedList.push(profile);
+      combinedList.sort((a, b) => (b.poin_total || 0) - (a.poin_total || 0));
+    }
   }
-
-  // Sort descending by points
-  combinedList.sort((a, b) => (b.poin_total || 0) - (a.poin_total || 0));
 
   const leaderboardList: LeaderboardUser[] = combinedList.map((item, idx) => ({
     rank: idx + 1,
