@@ -278,7 +278,7 @@ export const BelajarPage: React.FC<BelajarPageProps> = ({ profile }) => {
                     Sertifikat Kelulusan
                   </h4>
                   <p className="text-[11px] text-slate-500 font-medium">
-                    {isEligibleCert ? 'Siap Diunduh (Tingkat Dasar Lulus)' : 'Terkunci (6 Modul Dasar)'}
+                    {isEligibleCert ? 'Sertifikat Dasar & Tingkat Lanjut Tersedia' : 'Tersedia untuk Tiap Tingkat'}
                   </p>
                 </div>
               </div>
@@ -395,6 +395,7 @@ export const BelajarPage: React.FC<BelajarPageProps> = ({ profile }) => {
             <Certificate
               profile={profile}
               progressMap={progressMap}
+              allModules={allModules}
               onBack={() => handleTabChange('modules')}
               onOpenModule={(modId) => {
                 const mod = allModules.find((m) => m.id === modId);

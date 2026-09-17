@@ -356,6 +356,8 @@ export interface SchoolCampusEntry {
 export interface CertificateData {
   id: string;
   uid: string;
+  tier?: CurriculumTier;
+  tier_name?: string;
   nama_penerima: string;
   nama_peserta?: string;
   nomor_sertifikat: string;
