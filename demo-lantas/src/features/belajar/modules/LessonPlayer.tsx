@@ -69,6 +69,12 @@ export const LessonPlayer: React.FC<LessonPlayerProps> = ({
     const uid = authService.getCurrentUser()?.uid;
     if (!isDone && uid) {
       firestoreService.addPoints(uid, 20);
+      firestoreService.recordPointAward(
+        uid,
+        'lesson',
+        `Pelajaran: ${lesson.judul}`,
+        20
+      );
       firestoreService.registerActivity(uid, { quizDone: false });
       firestoreService.updateModuleProgress(uid, moduleId, updatedProgress);
     }

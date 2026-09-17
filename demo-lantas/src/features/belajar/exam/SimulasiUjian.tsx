@@ -145,6 +145,12 @@ export const SimulasiUjian: React.FC<SimulasiUjianProps> = ({
       const pointsAwarded = lulus ? 150 : 30;
       firestoreService.saveExamAttempt(attempt);
       firestoreService.addPoints(currentUser.uid, pointsAwarded);
+      firestoreService.recordPointAward(
+        currentUser.uid,
+        'simulasi_ujian',
+        `Simulasi Ujian SIM (${lulus ? 'Lulus' : 'Belum Lulus'})`,
+        pointsAwarded
+      );
       firestoreService.registerActivity(currentUser.uid, { quizDone: true });
     }
 

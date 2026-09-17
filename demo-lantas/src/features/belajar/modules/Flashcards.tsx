@@ -83,6 +83,12 @@ export const Flashcards: React.FC<FlashcardsProps> = ({
     const uid = authService.getCurrentUser()?.uid;
     if (uid) {
       firestoreService.addPoints(uid, 10);
+      firestoreService.recordPointAward(
+        uid,
+        'flashcard',
+        `Flashcard: ${currentCard.judul || 'Rambu'}`,
+        10
+      );
       firestoreService.registerActivity(uid, { quizDone: false });
       firestoreService.updateModuleProgress(uid, moduleId, updatedProgress);
     }

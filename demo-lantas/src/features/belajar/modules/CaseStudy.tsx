@@ -53,6 +53,12 @@ export const CaseStudy: React.FC<CaseStudyProps> = ({
     const uid = authService.getCurrentUser()?.uid;
     if (!isCaseCompleted && isSafest && uid) {
       firestoreService.addPoints(uid, 25);
+      firestoreService.recordPointAward(
+        uid,
+        'case_study',
+        `Studi Kasus: ${activeCase.judul}`,
+        25
+      );
       firestoreService.registerActivity(uid, { quizDone: false });
       firestoreService.updateModuleProgress(uid, moduleId, updatedProgress);
     }

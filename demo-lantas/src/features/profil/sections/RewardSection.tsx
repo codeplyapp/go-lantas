@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, History, Award, Flame, Star, CheckCircle, ChevronRight, ShieldCheck } from 'lucide-react';
-import { UserProfile, LeaderboardEntry, QuizAttempt } from '../../../core/types';
+import { 
+  Trophy, History, Award, Flame, Star, CheckCircle, 
+  ShieldCheck, Gamepad2, BookOpen, Layers, Gift 
+} from 'lucide-react';
+import { UserProfile, PointHistoryEntry, PointSource } from '../../../core/types';
 import { firestoreService } from '../../../services/firestore';
-import { authService } from '../../../services/auth';
 import { SectionHeader } from '../../../shared/components/SectionHeader';
 import { Card } from '../../../shared/components/Card';
 import { FieldRow } from '../../../shared/components/FieldRow';
@@ -13,10 +15,33 @@ interface RewardSectionProps {
   user: UserProfile;
 }
 
+const getSourceMeta = (source: PointSource) => {
+  switch (source) {
+    case 'kuis_modul':
+      return { icon: CheckCircle, bg: 'bg-emerald-50 text-emerald-600' };
+    case 'kuis_sim':
+      return { icon: Gamepad2, bg: 'bg-blue-50 text-[#0077c0]' };
+    case 'simulasi_ujian':
+      return { icon: Award, bg: 'bg-indigo-50 text-indigo-600' };
+    case 'lesson':
+      return { icon: BookOpen, bg: 'bg-sky-50 text-sky-600' };
+    case 'flashcard':
+      return { icon: Layers, bg: 'bg-amber-50 text-amber-600' };
+    case 'case_study':
+      return { icon: ShieldCheck, bg: 'bg-purple-50 text-purple-600' };
+    case 'bonus_modul':
+      return { icon: Award, bg: 'bg-amber-50 text-amber-600' };
+    case 'welcome':
+      return { icon: Gift, bg: 'bg-rose-50 text-rose-600' };
+    default:
+      return { icon: History, bg: 'bg-slate-50 text-slate-600' };
+  }
+};
+
 export const RewardSection: React.FC<RewardSectionProps> = ({ user }) => {
   const [activeSheet, setActiveSheet] = useState<'leaderboard' | 'history' | 'certificate' | null>(null);
   const [leaderboard, setLeaderboard] = useState<UserProfile[]>([]);
-  const [attempts, setAttempts] = useState<QuizAttempt[]>([]);
+  const [pointHistory, setPointHistory] = useState<PointHistoryEntry[]>([]);
   const [myRank, setMyRank] = useState<number>(0);
 
   useEffect(() => {
@@ -26,13 +51,13 @@ export const RewardSection: React.FC<RewardSectionProps> = ({ user }) => {
       setMyRank(rank >= 0 ? rank + 1 : 0);
     }, { limit: 20 });
 
-    const unsubAttempts = firestoreService.subscribeQuizAttempts(user.uid, (data) => {
-      setAttempts(data);
+    const unsubHistory = firestoreService.subscribePointHistory(user.uid, (data) => {
+      setPointHistory(data);
     }, 20);
 
     return () => {
       if (unsubLb) unsubLb();
-      if (unsubAttempts) unsubAttempts();
+      if (unsubHistory) unsubHistory();
     };
   }, [user.uid]);
 
@@ -144,50 +169,51 @@ export const RewardSection: React.FC<RewardSectionProps> = ({ user }) => {
       <Sheet
         isOpen={activeSheet === 'history'}
         onClose={() => setActiveSheet(null)}
-        title="Riwayat Poin Kuis"
-        subtitle="Aktivitas penyelesaian modul kuis keselamatan lalu lintas"
+        title="Riwayat Poin"
+        subtitle="Catatan lengkap perolehan poin dari kuis, modul, flashcard, dan ujian"
       >
         <div className="space-y-3">
-          {attempts.length === 0 ? (
+          {pointHistory.length === 0 ? (
             <div className="text-center py-8 text-slate-400 space-y-2">
               <Star className="w-8 h-8 mx-auto text-slate-300" />
-              <p className="text-xs font-semibold">Belum ada riwayat kuis terbaru.</p>
-              <p className="text-[11px] text-slate-400">Selesaikan kuis di tab Belajar untuk mendapatkan poin!</p>
+              <p className="text-xs font-semibold">Belum ada riwayat perolehan poin.</p>
+              <p className="text-[11px] text-slate-400">Selesaikan kuis, modul, atau flashcard untuk mendapatkan poin!</p>
             </div>
           ) : (
             <div className="divide-y divide-slate-100 rounded-xl border border-slate-100 overflow-hidden bg-white">
-              {attempts.slice(-10).reverse().map((att) => (
-                <div key={att.id} className="p-3 flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2.5">
-                    <div
-                      className="w-7 h-7 rounded-lg flex items-center justify-center bg-[#0077c0]/10 text-[#0077c0]"
-                    >
-                      {att.benar ? <CheckCircle className="w-4 h-4 text-[#0077c0]" /> : <History className="w-4 h-4 text-[#0077c0]" />}
-                    </div>
-                    <div>
-                      <p className="font-bold text-slate-800">
-                        {att.benar ? 'Jawaban Benar' : 'Belum Tepat'} • Level {att.level}
-                      </p>
-                      <p className="text-[10px] text-slate-400">
-                        {new Date(att.timestamp).toLocaleString('id-ID', {
-                          day: 'numeric',
-                          month: 'short',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </p>
-                    </div>
-                  </div>
+              {pointHistory.slice(0, 10).map((entry) => {
+                const meta = getSourceMeta(entry.source);
+                const IconComponent = meta.icon;
 
-                  <span
-                    className={`font-mono font-bold ${
-                      att.benar ? 'text-[#0077c0]' : 'text-slate-400'
-                    }`}
-                  >
-                    {att.benar ? `+${att.poin_didapat} Pts` : '+0 Pts'}
-                  </span>
-                </div>
-              ))}
+                return (
+                  <div key={entry.id} className="p-3 flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1 mr-2">
+                      <div
+                        className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${meta.bg}`}
+                      >
+                        <IconComponent className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-bold text-slate-800 truncate">
+                          {entry.judul}
+                        </p>
+                        <p className="text-[10px] text-slate-400">
+                          {new Date(entry.timestamp).toLocaleString('id-ID', {
+                            day: 'numeric',
+                            month: 'short',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </p>
+                      </div>
+                    </div>
+
+                    <span className="font-mono font-bold text-[#0077c0] shrink-0 text-xs">
+                      +{entry.poin} Pts
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

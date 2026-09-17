@@ -8,10 +8,11 @@ import {
 import { 
   UserProfile, UserRole, QuizAttempt, ModuleProgress, 
   ExamAttempt, CertificateData, SOSAlert, FamilyLink, FamilyAccessLog,
-  ModuleData, QuizQuestion
+  ModuleData, QuizQuestion, PointSource, PointHistoryEntry
 } from '../core/types';
 
 const COLLECTION_USERS = 'users';
+const COLLECTION_POINT_HISTORY = 'point_history';
 const COLLECTION_QUIZ_ATTEMPTS = 'quiz_attempts';
 const COLLECTION_EXAM_ATTEMPTS = 'exam_attempts';
 const COLLECTION_CERTIFICATES = 'certificates';
@@ -77,6 +78,7 @@ export const firestoreService = {
       try {
         const userDocRef = doc(db, COLLECTION_USERS, uid);
         await setDoc(userDocRef, newProfile, { merge: true });
+        await this.recordPointAward(uid, 'welcome', 'Bonus Selamat Datang', 100, 'Pendaftaran akun baru GO Lantas');
       } catch (err) {
         console.warn('[Firestore] Error creating user profile:', err);
       }
@@ -244,6 +246,71 @@ export const firestoreService = {
       });
     } catch (err) {
       console.warn('[Firestore] Error setting up quiz attempts listener:', err);
+      return null;
+    }
+  },
+
+  // ─── Point History ─────────────────────────────────────────────────────────
+
+  /**
+   * Record point award entry in point_history collection
+   */
+  async recordPointAward(
+    uid: string,
+    source: PointSource,
+    judul: string,
+    poin: number,
+    detail?: string
+  ): Promise<void> {
+    if (!isFirebaseConfigured() || !db || !uid || poin <= 0) return;
+    try {
+      const historyCol = collection(db, COLLECTION_POINT_HISTORY);
+      await addDoc(historyCol, {
+        uid,
+        source,
+        judul,
+        poin,
+        detail: detail || '',
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      console.warn('[Firestore] Error recording point award:', err);
+    }
+  },
+
+  /**
+   * Realtime listener for point history of a user
+   */
+  subscribePointHistory(
+    uid: string,
+    callback: (entries: PointHistoryEntry[]) => void,
+    maxLimit = 20
+  ): Unsubscribe | null {
+    if (!isFirebaseConfigured() || !db || !uid) return null;
+    try {
+      const historyCol = collection(db, COLLECTION_POINT_HISTORY);
+      const q = query(
+        historyCol,
+        where('uid', '==', uid),
+        orderBy('timestamp', 'desc'),
+        limit(maxLimit)
+      );
+
+      return onSnapshot(
+        q,
+        (snap) => {
+          const list = snap.docs.map((d) => ({
+            id: d.id,
+            ...d.data(),
+          })) as PointHistoryEntry[];
+          callback(list);
+        },
+        (err) => {
+          console.warn('[Firestore] Point history listener warning:', err);
+        }
+      );
+    } catch (err) {
+      console.warn('[Firestore] Error subscribing to point history:', err);
       return null;
     }
   },

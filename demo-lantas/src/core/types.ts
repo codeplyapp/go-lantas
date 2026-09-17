@@ -46,6 +46,21 @@ export interface QuizLevelInfo {
   warna_tema: string;
 }
 
+export type PointSource = 
+  | 'kuis_modul' | 'kuis_sim' | 'simulasi_ujian' 
+  | 'lesson' | 'flashcard' | 'case_study' 
+  | 'bonus_modul' | 'welcome';
+
+export interface PointHistoryEntry {
+  id: string;
+  uid: string;
+  source: PointSource;
+  judul: string;
+  poin: number;
+  timestamp: string;
+  detail?: string;
+}
+
 export interface QuizAttempt {
   id: string;
   uid: string;

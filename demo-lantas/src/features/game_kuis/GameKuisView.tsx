@@ -93,6 +93,12 @@ export const GameKuisView: React.FC<GameKuisViewProps> = ({ profile }) => {
       firestoreService.registerActivity(safeUser.uid, { isCorrect });
       if (isCorrect) {
         firestoreService.addPoints(safeUser.uid, currentQuestion.poin);
+        firestoreService.recordPointAward(
+          safeUser.uid,
+          'kuis_sim',
+          `Kuis SIM Level ${activeLevel}`,
+          currentQuestion.poin
+        );
       }
     }
 

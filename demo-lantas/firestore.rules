@@ -51,6 +51,17 @@ service cloud.firestore {
     }
 
     // ─── 2. USER PROGRESS & ATTEMPTS ─────────────────────────────────────────
+    // Point history: read owner/admin, create owner, delete owner
+    match /point_history/{docId} {
+      allow read: if isAuthenticated() && (
+        resource == null || 
+        resource.data.uid == request.auth.uid || 
+        isAdmin()
+      );
+      allow create: if isAuthenticated() && request.auth.uid == request.resource.data.uid;
+      allow delete: if isAuthenticated() && request.auth.uid == resource.data.uid;
+    }
+
     // Quiz attempts: read authenticated, create by owner (request.resource.data.uid), update/delete by owner (resource.data.uid)
     match /quiz_attempts/{docId} {
       allow read: if isAuthenticated();

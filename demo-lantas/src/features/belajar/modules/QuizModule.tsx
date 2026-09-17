@@ -67,6 +67,12 @@ export const QuizModule: React.FC<QuizModuleProps> = ({
       firestoreService.registerActivity(uid, { isCorrect });
       if (isCorrect) {
         firestoreService.addPoints(uid, pointPerQuestion);
+        firestoreService.recordPointAward(
+          uid,
+          'kuis_modul',
+          `Kuis Modul: ${module?.judul || 'Modul Keselamatan'}`,
+          pointPerQuestion
+        );
       }
     }
 
@@ -136,6 +142,12 @@ export const QuizModule: React.FC<QuizModuleProps> = ({
 
     if (uid) {
       firestoreService.addPoints(uid, bonusPoints);
+      firestoreService.recordPointAward(
+        uid,
+        'bonus_modul',
+        `Bonus ${passed ? 'Lulus Modul' : 'Partisipasi'}: ${module?.judul || 'Modul Keselamatan'}`,
+        bonusPoints
+      );
       firestoreService.registerActivity(uid, { quizDone: true });
       firestoreService.updateModuleProgress(uid, moduleId, updatedProgress);
     }

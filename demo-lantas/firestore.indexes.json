@@ -43,6 +43,20 @@
       ]
     },
     {
+      "collectionGroup": "point_history",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "uid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "timestamp",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
       "collectionGroup": "quiz_attempts",
       "queryScope": "COLLECTION",
       "fields": [
