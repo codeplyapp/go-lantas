@@ -28,8 +28,8 @@ export const FloatingMascotBubble: React.FC<FloatingMascotBubbleProps> = ({ onCl
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className="relative group focus:outline-none min-w-[54px] min-h-[54px] btn-press transition-transform duration-200"
-        title="Tanya GO Lantas (Asisten AI Korlantas)"
-        aria-label="Tanya Robot AI GO Lantas"
+        title="Tanya GO Lantas (Asisten Korlantas)"
+        aria-label="Tanya Asisten GO Lantas"
       >
         {/* Soft Animated Glow Aura */}
         <div className="absolute inset-0 rounded-full bg-[#0077c0]/20 blur-md animate-pulse -z-10" />
@@ -51,10 +51,10 @@ export const FloatingMascotBubble: React.FC<FloatingMascotBubbleProps> = ({ onCl
           />
         </div>
 
-        {/* Mini Pill AI Badge */}
+        {/* Mini Pill Live Status Badge */}
         <div className="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full bg-[#0077c0] text-white font-extrabold text-[9px] border border-white shadow-sm flex items-center justify-center gap-1 group-hover:bg-[#008be0] transition-colors">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
-          <span>AI</span>
+          <span>CHAT</span>
         </div>
 
         {/* Floating Tooltip Pill on Hover */}

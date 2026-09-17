@@ -3,10 +3,10 @@
 export const MASCOT_CONFIG = {
   id: 'sigap-ai-bot',
   name: 'Go Lantas',
-  title: 'Asisten AI Keselamatan Korlantas Polri',
+  title: 'Asisten Presisi Korlantas Polri',
   avatarUrl: '/mascot/mascot.png',
   fallbackAvatarUrl: '/mascot/mascot.png',
-  welcomeGreeting: 'Halo! Saya Go Lantas AI, asisten lalu lintas Korlantas Polri. Silakan tanyakan rute bebas macet Banyuwangi, aturan SIM & helm SNI, atau penanganan darurat.',
+  welcomeGreeting: 'Halo! Saya Go Lantas, asisten lalu lintas Korlantas Polri. Silakan tanyakan rute bebas macet Banyuwangi, aturan SIM & helm SNI, atau penanganan darurat.',
   shortGreeting: 'Siap membantu informasi lalu lintas!',
   quickSuggestions: [
     { label: '🚦 Macet di Gajah Mada?', prompt: 'Bagaimana kondisi kemacetan di Jalan Gajah Mada Banyuwangi saat ini dan apa rute alternatifnya?' },

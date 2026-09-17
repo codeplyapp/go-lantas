@@ -69,7 +69,7 @@ const TIER_CERT_THEMES: Record<CurriculumTier, TierCertTheme> = {
   berkelanjutan: {
     title: 'SERTIFIKAT DUTA KESELAMATAN BERKELANJUTAN',
     subTitle: 'Inovasi Mobilitas Cerdas & Edukasi Masa Depan',
-    description: 'Atas dedikasi berkelanjutan dalam mengikuti perkembangan teknologi mobilitas baru (Electric Vehicle, ADAS, Smart Traffic AI) dan mempelopori budaya tertib tanpa batas.',
+    description: 'Atas dedikasi berkelanjutan dalam mengikuti perkembangan teknologi mobilitas terpadu (Electric Vehicle, ADAS, Smart Mobility) dan mempelopori budaya tertib tanpa batas.',
     primaryColor: '#D97706',
     gradientColors: ['#B45309', '#D97706', '#F59E0B'],
     badgeBg: '#FFFBEB',
@@ -461,7 +461,7 @@ export const Certificate: React.FC<CertificateProps> = ({
 
             {tierModules.length === 0 ? (
               <p className="text-xs text-slate-500 font-medium p-3 bg-slate-50 rounded-xl border border-slate-200">
-                Modul {tierConfig.nama} belum dibuat. Buka tab <strong>Kurikulum Modul</strong> untuk menghasilkan modul AI tingkat ini.
+                Modul {tierConfig.nama} belum dibuat. Buka tab <strong>Kurikulum Modul</strong> untuk membuka modul tingkat ini.
               </p>
             ) : (
               <div className="space-y-2">

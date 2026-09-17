@@ -78,7 +78,7 @@ export const BerandaView: React.FC<BerandaViewProps> = ({
     { id: 'peta', label: 'Peta Live', sublabel: 'Traffic GPS', icon: MapPin, color: 'bg-blue-50 text-[#0077C0]' },
     { id: 'sos', label: 'SOS 110', sublabel: 'Siaga Darurat', icon: ShieldAlert, color: 'bg-rose-50 text-rose-600' },
     { id: 'keluarga', label: 'Keluarga', sublabel: 'UU PDP', icon: Users, color: 'bg-blue-50 text-[#0077C0]' },
-    { id: 'robot', label: 'Go Lantas AI', sublabel: 'Tanya AI', icon: Bot, color: 'bg-blue-50 text-[#0077C0]' },
+    { id: 'robot', label: 'Go Lantas Bot', sublabel: 'Tanya Petugas', icon: Bot, color: 'bg-blue-50 text-[#0077C0]' },
   ];
 
   useEffect(() => {
@@ -439,7 +439,7 @@ export const BerandaView: React.FC<BerandaViewProps> = ({
                   {MASCOT_CONFIG.name}
                 </h3>
                 <span className="text-xs font-semibold text-slate-500">
-                  • AI Korlantas
+                  • Asisten Korlantas
                 </span>
               </div>
               <p className="text-xs text-slate-700 mt-1 leading-relaxed font-medium">
@@ -469,7 +469,7 @@ export const BerandaView: React.FC<BerandaViewProps> = ({
           onClick={() => onOpenRobotChat()}
           className="w-full py-2.5 px-4 rounded-xl bg-[#0077C0] hover:bg-[#005fa3] text-white text-xs font-bold transition-all btn-press flex items-center justify-center gap-1.5 shadow-xs"
         >
-          <span>Buka Obrolan AI</span>
+          <span>Buka Obrolan</span>
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>

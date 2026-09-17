@@ -151,7 +151,7 @@ export const ModuleList: React.FC<ModuleListProps> = ({
             <p className="text-xs sm:text-sm text-slate-500 font-medium">
               {currentTier === 'menengah' && 'Selesaikan dan lulus kuis pada seluruh 6 modul Tingkat Dasar untuk membuka kurikulum ini.'}
               {currentTier === 'lanjutan' && 'Selesaikan dan lulus kuis pada seluruh 2 modul Tingkat Menengah untuk membuka materi lanjutan.'}
-              {currentTier === 'berkelanjutan' && 'Selesaikan seluruh modul Tingkat Lanjutan untuk membuka mode pembelajaran AI berkelanjutan.'}
+              {currentTier === 'berkelanjutan' && 'Selesaikan seluruh modul Tingkat Lanjutan untuk membuka mode pembelajaran berkelanjutan.'}
             </p>
           </div>
 
@@ -169,15 +169,15 @@ export const ModuleList: React.FC<ModuleListProps> = ({
           </button>
         </div>
       ) : isGeneratingTier ? (
-        /* --- AI GENERATING STATE --- */
+        /* --- MODULE PREPARATION STATE --- */
         <div className="p-10 rounded-[24px] apple-card bg-white border border-[#E5EBE8] text-center space-y-4 shadow-xs">
           <div className="w-12 h-12 border-3 border-[#0077c0] border-t-transparent rounded-full animate-spin mx-auto" />
           <div className="space-y-1">
             <h3 className="text-sm sm:text-base font-heading font-extrabold text-[#0F172A]">
-              Menghasilkan Kurikulum AI {activeTierConfig.nama}...
+              Menyiapkan Kurikulum {activeTierConfig.nama}...
             </h3>
             <p className="text-xs text-slate-500 font-medium max-w-md mx-auto">
-              AI Gemini sedang menyusun topik materi terstruktur, kartu flashcard interaktif, studi kasus jalan raya, dan kuis evaluasi standar Korlantas POLRI.
+              Sistem sedang menyusun topik materi terstruktur, kartu flashcard interaktif, studi kasus jalan raya, dan kuis evaluasi standar Korlantas POLRI.
             </p>
           </div>
         </div>
@@ -190,10 +190,10 @@ export const ModuleList: React.FC<ModuleListProps> = ({
 
           <div className="space-y-1.5 max-w-md mx-auto">
             <h3 className="text-base sm:text-lg font-heading font-extrabold text-[#0F172A]">
-              Aktifkan Gemini API key untuk membuka {activeTierConfig.nama}
+              Aktifkan Akses API Key untuk Membuka {activeTierConfig.nama}
             </h3>
             <p className="text-xs text-slate-600 leading-relaxed font-medium">
-              Materi {activeTierConfig.nama} di-generate secara dinamis oleh Gemini AI untuk menyajikan kasus nyata, simulasi behavioral driving, dan kuis adaptif.
+              Materi {activeTierConfig.nama} disiapkan secara adaptif untuk menyajikan kasus nyata, simulasi behavioral driving, dan kuis komprehensif.
             </p>
             {generationError && (
               <p className="text-[11px] text-rose-600 font-bold bg-rose-50 p-2 rounded-xl border border-rose-200">
@@ -222,7 +222,7 @@ export const ModuleList: React.FC<ModuleListProps> = ({
               className="w-full sm:w-auto px-4 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center justify-center gap-1.5 transition-all btn-press"
             >
               <Key className="w-4 h-4" />
-              <span>Input Gemini API Key</span>
+              <span>Input Kunci Akses API Key</span>
             </button>
           </div>
         </div>
@@ -245,7 +245,7 @@ export const ModuleList: React.FC<ModuleListProps> = ({
                 className="px-3.5 py-1.5 rounded-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs transition-all btn-press"
               >
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Buat Set Modul AI Baru</span>
+                <span>Buat Set Modul Baru</span>
               </button>
             </div>
           )}
@@ -375,7 +375,7 @@ export const ModuleList: React.FC<ModuleListProps> = ({
             <div className="flex items-center justify-between">
               <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
                 <Key className="w-5 h-5 text-[#0077c0]" />
-                <span>Pengaturan Gemini API Key</span>
+                <span>Pengaturan Kunci Akses Modul</span>
               </h3>
               <button
                 onClick={() => setShowApiKeyModal(false)}
@@ -386,11 +386,11 @@ export const ModuleList: React.FC<ModuleListProps> = ({
             </div>
 
             <p className="text-xs text-slate-600 leading-relaxed font-medium">
-              Masukkan Gemini API Key dari Google AI Studio untuk mengaktifkan generator modul kurikulum AI tingkat Menengah, Lanjutan, dan Mode Berkelanjutan.
+              Masukkan Kunci Akses (API Key) untuk mengaktifkan modul kurikulum tingkat Menengah, Lanjutan, dan Mode Berkelanjutan.
             </p>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700 block">Gemini API Key</label>
+              <label className="text-xs font-bold text-slate-700 block">Kunci Akses API Key</label>
               <input
                 type="password"
                 value={apiKeyInput}
@@ -412,7 +412,7 @@ export const ModuleList: React.FC<ModuleListProps> = ({
                 disabled={!apiKeyInput.trim()}
                 className="px-5 py-2 rounded-full bg-[#0077c0] hover:bg-[#008be0] text-white text-xs font-extrabold shadow-xs transition-all disabled:opacity-50"
               >
-                Simpan & Generate Modul
+                Simpan & Buka Modul
               </button>
             </div>
           </div>

@@ -159,7 +159,7 @@ export const ModuleDetail: React.FC<ModuleDetailProps> = ({
               {module.is_ai_generated && (
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 flex items-center gap-1">
                   <Sparkles className="w-3 h-3" />
-                  AI Generated
+                  Kurikulum Terpadu
                 </span>
               )}
             </div>

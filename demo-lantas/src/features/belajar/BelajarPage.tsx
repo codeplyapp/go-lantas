@@ -124,7 +124,7 @@ export const BelajarPage: React.FC<BelajarPageProps> = ({ profile }) => {
   const handleGenerateTier = useCallback(async (tier: CurriculumTier, isNextBatch = false) => {
     if (tier === 'dasar') return;
     if (!profile?.uid) {
-      NotificationService.showInAppToast('Silakan Masuk Akun', 'Masuk akun untuk menghasilkan materi AI.', 'warning');
+      NotificationService.showInAppToast('Silakan Masuk Akun', 'Masuk akun untuk membuka materi modul.', 'warning');
       return;
     }
 
@@ -152,16 +152,16 @@ export const BelajarPage: React.FC<BelajarPageProps> = ({ profile }) => {
         }
 
         NotificationService.showInAppToast(
-          'Kurikulum AI Terbit! 🚀',
-          `Modul baru untuk ${CURRICULUM_TIERS[tier].nama} berhasil dihasilkan dan siap dipelajari.`,
+          'Kurikulum Pembelajaran Terbit! 🚀',
+          `Modul baru untuk ${CURRICULUM_TIERS[tier].nama} berhasil disiapkan dan siap dipelajari.`,
           'success'
         );
       } else {
-        setGenerationError(res.error || 'Gagal menghasilkan modul AI.');
+        setGenerationError(res.error || 'Gagal memuat modul pembelajaran.');
       }
     } catch (err: any) {
       console.warn('[BelajarPage] Generation error:', err);
-      setGenerationError(err?.message || 'Terjadi kendala saat menghubungi AI Gemini.');
+      setGenerationError(err?.message || 'Terjadi kendala saat memuat kurikulum materi.');
     } finally {
       setIsGeneratingTier(false);
     }
@@ -201,7 +201,7 @@ export const BelajarPage: React.FC<BelajarPageProps> = ({ profile }) => {
                 </h1>
               </div>
               <p className="text-xs text-slate-500 font-medium">
-                3 Tingkat Pembelajaran Terstruktur + Generator AI Berstandar Korlantas POLRI.
+                3 Tingkat Pembelajaran Terstruktur & Evaluasi Interaktif Berstandar Korlantas POLRI.
               </p>
             </div>
 

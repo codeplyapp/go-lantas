@@ -55,13 +55,13 @@ export const ONBOARDING_SLIDES: OnboardingSlideData[] = [
   },
   {
     id: 3,
-    badge: 'AI Assistant & Tanggap Cepat',
-    title: 'Pendamping AI & Darurat 110',
+    badge: 'Asisten Presisi & Tanggap Cepat',
+    title: 'Pendamping Edukasi & Darurat 110',
     subtitle: 'Informasi Rute Aman & Bantuan Darurat Terpadu',
-    description: 'Tanya asisten AI seputar pasal undang-undang dan titik rawan macet, serta akses tombol SOS darurat Satlantas 24/7.',
+    description: 'Tanya asisten seputar pasal undang-undang dan titik rawan macet, serta akses tombol SOS darurat Satlantas 24/7.',
     mascotUrl: '/mascot/mascot_salute.png',
     mascotSide: 'left',
-    robotSpeech: 'Asisten AI & tombol darurat 110 siap siaga menjagamu 24 jam penuh!',
+    robotSpeech: 'Asisten keselamatan & tombol darurat 110 siap siaga menjagamu 24 jam penuh!',
     robotTapReactions: [
       'Hotline 110 terintegrasi dengan koordinat GPS akurat!',
       'Tanyakan rute aman sekolah dan pasal undang-undang kapan saja!',

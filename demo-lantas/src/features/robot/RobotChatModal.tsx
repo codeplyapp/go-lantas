@@ -250,7 +250,7 @@ export const RobotChatModal: React.FC<RobotChatModalProps> = ({
                     <span>{msg.timestamp}</span>
                     {isBot && (
                       <span className="text-[#0077c0] font-bold">
-                        {msg.is_fallback ? '⚡ Respon Cepat' : '✨ Gemini 3.6 Flash'}
+                        {msg.is_fallback ? '⚡ Respon Cepat' : '✨ Terverifikasi'}
                       </span>
                     )}
                   </div>

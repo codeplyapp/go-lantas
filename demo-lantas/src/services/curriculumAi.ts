@@ -29,7 +29,7 @@ export class CurriculumAiService {
       return {
         success: false,
         requiresApiKey: true,
-        error: `Aktifkan Gemini API key untuk membuka ${CURRICULUM_TIERS[tier]?.nama || 'tingkat ini'}.`,
+        error: `Aktifkan Kunci Akses API Key untuk membuka ${CURRICULUM_TIERS[tier]?.nama || 'tingkat ini'}.`,
       };
     }
 
@@ -294,7 +294,7 @@ Kembalikan HANYA format JSON murni (tanpa teks pembuka atau penutup) dengan stru
           id: m.id || `modul_${tier}_${startModuleNumber + idx}`,
           nomor: m.nomor || (startModuleNumber + idx),
           judul: m.judul || `Modul ${tierName} #${idx + 1}`,
-          deskripsi: m.deskripsi || 'Materi kurikulum AI Korlantas POLRI.',
+          deskripsi: m.deskripsi || 'Materi kurikulum terstruktur Korlantas POLRI.',
           icon_name: m.icon_name || 'ShieldCheck',
           warna: m.warna || tierConfig.warna,
           durasi_estimasi: m.durasi_estimasi || '14 Menit',
@@ -352,7 +352,7 @@ Kembalikan HANYA format JSON murni (tanpa teks pembuka atau penutup) dengan stru
 
     return {
       success: false,
-      error: `Gagal menghasilkan modul AI untuk ${tierName}. Pastikan koneksi internet dan API key Gemini Anda aktif.`,
+      error: `Gagal memuat modul pembelajaran untuk ${tierName}. Pastikan koneksi internet dan API key Anda aktif.`,
     };
   }
 }

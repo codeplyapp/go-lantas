@@ -9,7 +9,7 @@ import { Btn } from '../../../shared/components/Btn';
 const FAQ_ITEMS = [
   {
     q: 'Apa itu aplikasi Go Lantas Korlantas POLRI?',
-    a: 'Go Lantas adalah platform keselamatan berlalu lintas terintegrasi yang dirancang untuk pelajar, mahasiswa, dan orang tua. Aplikasi ini menggabungkan edukasi gamifikasi, pemantauan rute keluarga, sinyal SOS darurat, dan asisten AI Go Lantas.',
+    a: 'Go Lantas adalah platform keselamatan berlalu lintas terintegrasi yang dirancang untuk pelajar, mahasiswa, dan orang tua. Aplikasi ini menggabungkan edukasi gamifikasi, pemantauan rute keluarga, sinyal SOS darurat, dan asisten virtual Go Lantas.',
   },
   {
     q: 'Bagaimana cara kerja fitur pemantauan keluarga?',

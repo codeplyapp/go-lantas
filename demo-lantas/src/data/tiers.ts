@@ -25,7 +25,7 @@ export const CURRICULUM_TIERS: Record<CurriculumTier, TierConfig> = {
     nomor: 2,
     nama: 'Tingkat Menengah',
     subjudul: 'Defensive Riding & Behavioral Risk',
-    deskripsi: '2 Modul AI adaptif berfokus pada navigasi titik buta kendaraan berat, antisipasi blind corner, dan etika berkendara jam sibuk.',
+    deskripsi: '2 Modul adaptif berfokus pada navigasi titik buta kendaraan berat, antisipasi blind corner, dan etika berkendara jam sibuk.',
     passingGrade: 75,
     pointPerQuestion: 25,
     bonusPoints: {
@@ -43,7 +43,7 @@ export const CURRICULUM_TIERS: Record<CurriculumTier, TierConfig> = {
     nomor: 3,
     nama: 'Tingkat Lanjutan',
     subjudul: 'Mastery & Rekonstruksi Hukum',
-    deskripsi: '2 Modul AI tingkat tinggi mencakup manuver pengereman darurat (threshold/cadence), bedah yurisprudensi laka, dan manajemen risiko konvoi.',
+    deskripsi: '2 Modul tingkat tinggi mencakup manuver pengereman darurat (threshold/cadence), bedah yurisprudensi laka, dan manajemen risiko konvoi.',
     passingGrade: 80,
     pointPerQuestion: 30,
     bonusPoints: {
@@ -60,8 +60,8 @@ export const CURRICULUM_TIERS: Record<CurriculumTier, TierConfig> = {
     id: 'berkelanjutan',
     nomor: 4,
     nama: 'Mode Berkelanjutan',
-    subjudul: 'Siklus Pembelajaran Dinamis AI',
-    deskripsi: 'Generasi set modul baru tak terbatas oleh AI Gemini untuk topik lalu lintas terkini (EV safety, ADAS, navigasi jalan tol baru).',
+    subjudul: 'Siklus Pembelajaran Dinamis & Berkelanjutan',
+    deskripsi: 'Set modul lanjutan berkala untuk topik lalu lintas terkini (EV safety, ADAS, navigasi jalan tol baru).',
     passingGrade: 80,
     pointPerQuestion: 30,
     bonusPoints: {
