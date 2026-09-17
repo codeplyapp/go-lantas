@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { MapPin, Navigation, Search, Check, X, Compass, Globe } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { MapPin, Navigation, Search, Check, X, Globe } from 'lucide-react';
 import { 
   locationService, 
   LocationState, 
@@ -17,14 +18,35 @@ export const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ is
   const [currentLocation, setCurrentLocation] = useState<LocationState>(locationService.getLocation());
   const [searchQuery, setSearchQuery] = useState('');
   const [isDetectingGPS, setIsDetectingGPS] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    setMounted(true);
     return locationService.subscribe((loc) => {
       setCurrentLocation(loc);
     });
   }, []);
 
-  if (!isOpen) return null;
+  // Close on ESC key and prevent body scroll when open
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen || !mounted) return null;
 
   const handleAutoGPS = async () => {
     sound.playClick();
@@ -61,11 +83,19 @@ export const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ is
     c.province.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/40 backdrop-blur-sm animate-fadeIn">
-      <div className="w-full max-w-md bg-white rounded-[24px] border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+  const modalContent = (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 select-none">
+      {/* Dark Blur Backdrop (Click to close) */}
+      <div 
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-200 animate-fadeIn cursor-pointer"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      {/* Modal Dialog */}
+      <div className="relative w-full max-w-md bg-white rounded-[28px] border border-slate-100 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col max-h-[85vh] z-10 animate-scaleUp text-slate-900 select-text">
         {/* Header */}
-        <div className="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+        <div className="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-[#0077c0]/15 text-[#0077c0]">
               <Globe className="w-4.5 h-4.5" />
@@ -80,17 +110,20 @@ export const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ is
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
             className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors btn-press"
+            aria-label="Tutup"
           >
             <X className="w-4.5 h-4.5" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-4 space-y-3.5 overflow-y-auto no-scrollbar">
+        <div className="p-4 space-y-3.5 overflow-y-auto overscroll-contain no-scrollbar">
           {/* Real-time GPS Auto Detect Button */}
           <button
+            type="button"
             onClick={handleAutoGPS}
             disabled={isDetectingGPS}
             className="w-full p-3 rounded-2xl bg-gradient-to-r from-[#0077C0] to-[#0095f6] text-white flex items-center justify-between gap-3 shadow-md hover:opacity-95 transition-all btn-press"
@@ -133,12 +166,13 @@ export const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ is
               Pilihan Kota Utama Indonesia
             </span>
 
-            <div className="space-y-1.5 max-h-[38vh] overflow-y-auto no-scrollbar pt-1">
+            <div className="space-y-1.5 max-h-[36vh] overflow-y-auto overscroll-contain no-scrollbar pt-1">
               {filteredCities.map((city) => {
                 const isSelected = !currentLocation.isGPS && currentLocation.cityName === city.name;
                 return (
                   <button
                     key={city.id}
+                    type="button"
                     onClick={() => handleSelectCity(city.id)}
                     className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all btn-press ${
                       isSelected
@@ -171,7 +205,7 @@ export const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ is
         </div>
 
         {/* Footer */}
-        <div className="p-3 bg-slate-50 border-t border-slate-100 text-center">
+        <div className="p-3 bg-slate-50 border-t border-slate-100 text-center shrink-0">
           <p className="text-[10px] text-slate-500 font-medium">
             📍 Lokasi aktif: <strong>{currentLocation.cityName}</strong> {currentLocation.isGPS ? '(GPS Presisi)' : ''}
           </p>
@@ -179,4 +213,6 @@ export const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ is
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
