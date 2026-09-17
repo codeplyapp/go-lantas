@@ -29,13 +29,23 @@ service cloud.firestore {
         !('poin_total' in resource.data) ||
         (
           request.resource.data.poin_total >= resource.data.poin_total &&
-          request.resource.data.poin_total - resource.data.poin_total <= 200
+          request.resource.data.poin_total - resource.data.poin_total <= 300
         )
       );
       allow delete: if isOwner(uid) || isAdmin();
 
       // Subcollection module_progress: only owner can read/write
       match /module_progress/{moduleId} {
+        allow read, write: if isOwner(uid);
+      }
+
+      // Subcollection extra_modules (AI-generated curriculum): only owner can read/write
+      match /extra_modules/{moduleId} {
+        allow read, write: if isOwner(uid);
+      }
+
+      // Subcollection extra_module_quizzes (AI-generated quizzes): only owner can read/write
+      match /extra_module_quizzes/{moduleId} {
         allow read, write: if isOwner(uid);
       }
     }

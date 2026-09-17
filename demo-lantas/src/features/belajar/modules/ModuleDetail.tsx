@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { 
   ChevronLeft, Play, CheckCircle2, Award, BookOpen, 
-  HelpCircle, Layers, Brain, Clock, ShieldCheck, ChevronRight 
+  HelpCircle, Layers, Brain, Clock, ShieldCheck, ChevronRight, Sparkles 
 } from 'lucide-react';
-import { ModuleData, ModuleProgress, LessonItem } from '../../../core/types';
+import { ModuleData, ModuleProgress, LessonItem, QuizQuestion } from '../../../core/types';
 import { MODULE_QUIZ_QUESTIONS } from '../../../data/questions';
+import { CURRICULUM_TIERS } from '../../../data/tiers';
 import { sound } from '../../../shared/services/sound';
 
 import { LessonPlayer } from './LessonPlayer';
@@ -15,6 +16,7 @@ import { CaseStudy } from './CaseStudy';
 interface ModuleDetailProps {
   module: ModuleData;
   progress: ModuleProgress;
+  extraQuizzes?: Record<string, QuizQuestion[]>;
   onBack: () => void;
   onProgressUpdated: (updatedProgress: ModuleProgress) => void;
 }
@@ -24,16 +26,20 @@ type SubView = 'overview' | 'lesson' | 'quiz' | 'flashcard' | 'case_study';
 export const ModuleDetail: React.FC<ModuleDetailProps> = ({
   module,
   progress,
+  extraQuizzes = {},
   onBack,
   onProgressUpdated,
 }) => {
   const [activeSubView, setActiveSubView] = useState<SubView>('overview');
   const [selectedLesson, setSelectedLesson] = useState<LessonItem | null>(null);
 
+  const tierKey = module.tier || 'dasar';
+  const tierConfig = CURRICULUM_TIERS[tierKey];
+
   const completedLessonsCount = progress.lessons_done.length;
   const totalLessonsCount = module.lessons.length;
   const isQuizPassed = progress.kuis_passed;
-  const quizQuestions = MODULE_QUIZ_QUESTIONS[module.id] || [];
+  const quizQuestions = extraQuizzes[module.id] || MODULE_QUIZ_QUESTIONS[module.id] || [];
 
   const handleOpenLesson = (lesson: LessonItem) => {
     sound.playClick();
@@ -74,6 +80,7 @@ export const ModuleDetail: React.FC<ModuleDetailProps> = ({
   if (activeSubView === 'quiz') {
     return (
       <QuizModule
+        module={module}
         moduleId={module.id}
         moduleTitle={module.judul}
         questions={quizQuestions}
@@ -130,15 +137,32 @@ export const ModuleDetail: React.FC<ModuleDetailProps> = ({
           <span>Kembali ke Kurikulum</span>
         </button>
 
-        <span className="text-xs font-bold text-slate-500">
-          Modul #{module.nomor}
-        </span>
+        <div className="flex items-center gap-1.5 text-xs font-bold">
+          <span className="px-2 py-0.5 rounded-full bg-blue-50 text-[#0077c0]">
+            {tierConfig.nama}
+          </span>
+          <span className="text-slate-400">•</span>
+          <span className="text-slate-600">
+            Modul #{module.nomor}
+          </span>
+        </div>
       </div>
 
       {/* Module Overview Hero Banner */}
       <div className="p-5 sm:p-6 rounded-[24px] apple-card bg-white border border-[#E5EBE8] space-y-4 shadow-xs">
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-1 flex-1">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#0077c0]/10 text-[#0077c0]">
+                {tierConfig.nama}
+              </span>
+              {module.is_ai_generated && (
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 flex items-center gap-1">
+                  <Sparkles className="w-3 h-3" />
+                  AI Generated
+                </span>
+              )}
+            </div>
             <h2 className="text-lg sm:text-xl font-heading font-extrabold text-[#0F172A] tracking-apple-tight leading-snug">
               {module.judul}
             </h2>
@@ -250,7 +274,7 @@ export const ModuleDetail: React.FC<ModuleDetailProps> = ({
               Kuis Evaluasi Modul
             </h4>
             <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-              {quizQuestions.length} Soal • Passing 70% (+120 Poin)
+              {quizQuestions.length} Soal • Passing {module.passing_grade || tierConfig.passingGrade}% (+{module.bonus_points?.first_pass || tierConfig.bonusPoints.first_pass} Poin)
             </p>
           </div>
         </div>

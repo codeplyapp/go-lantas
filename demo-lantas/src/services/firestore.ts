@@ -7,7 +7,8 @@ import {
 } from 'firebase/firestore';
 import { 
   UserProfile, UserRole, QuizAttempt, ModuleProgress, 
-  ExamAttempt, CertificateData, SOSAlert, FamilyLink, FamilyAccessLog 
+  ExamAttempt, CertificateData, SOSAlert, FamilyLink, FamilyAccessLog,
+  ModuleData, QuizQuestion
 } from '../core/types';
 
 const COLLECTION_USERS = 'users';
@@ -385,6 +386,131 @@ export const firestoreService = {
     } catch (err) {
       console.warn('[Firestore] Error updating module progress:', err);
     }
+  },
+
+  // ─── Extra / AI-Generated Curriculum Modules ───────────────────────────────
+
+  /**
+   * Save an AI-generated extra module and its corresponding quiz
+   */
+  async saveExtraModule(uid: string, module: ModuleData, quizQuestions: QuizQuestion[]): Promise<void> {
+    // 1. Cache to localStorage
+    if (typeof window !== 'undefined') {
+      try {
+        const modKey = `golantas_extra_modules_${uid}`;
+        const quizKey = `golantas_extra_quizzes_${uid}`;
+        const existingMods: ModuleData[] = JSON.parse(localStorage.getItem(modKey) || '[]');
+        const updatedMods = existingMods.filter(m => m.id !== module.id).concat(module);
+        localStorage.setItem(modKey, JSON.stringify(updatedMods));
+
+        const existingQuizzes: Record<string, QuizQuestion[]> = JSON.parse(localStorage.getItem(quizKey) || '{}');
+        existingQuizzes[module.id] = quizQuestions;
+        localStorage.setItem(quizKey, JSON.stringify(existingQuizzes));
+      } catch (cacheErr) {
+        console.warn('[Firestore] LocalStorage cache error:', cacheErr);
+      }
+    }
+
+    // 2. Persist to Firestore subcollections
+    if (!isFirebaseConfigured() || !db) return;
+    try {
+      const moduleDocRef = doc(db, COLLECTION_USERS, uid, 'extra_modules', module.id);
+      await setDoc(moduleDocRef, {
+        ...module,
+        created_at: serverTimestamp(),
+        updated_at: serverTimestamp(),
+      }, { merge: true });
+
+      if (quizQuestions && quizQuestions.length > 0) {
+        const quizDocRef = doc(db, COLLECTION_USERS, uid, 'extra_module_quizzes', module.id);
+        await setDoc(quizDocRef, {
+          moduleId: module.id,
+          questions: quizQuestions,
+          updated_at: serverTimestamp(),
+        }, { merge: true });
+      }
+    } catch (err) {
+      console.warn('[Firestore] Error saving extra module to Firestore:', err);
+    }
+  },
+
+  /**
+   * Retrieve all AI-generated extra modules for a user
+   */
+  async getExtraModules(uid: string): Promise<ModuleData[]> {
+    let localMods: ModuleData[] = [];
+    if (typeof window !== 'undefined') {
+      try {
+        localMods = JSON.parse(localStorage.getItem(`golantas_extra_modules_${uid}`) || '[]');
+      } catch {}
+    }
+
+    if (!isFirebaseConfigured() || !db) {
+      return localMods;
+    }
+
+    try {
+      const modulesRef = collection(db, COLLECTION_USERS, uid, 'extra_modules');
+      const snap = await getDocs(modulesRef);
+      if (!snap.empty) {
+        const firestoreMods = snap.docs.map(d => ({ id: d.id, ...d.data() } as ModuleData));
+        // Update local cache
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(`golantas_extra_modules_${uid}`, JSON.stringify(firestoreMods));
+        }
+        return firestoreMods;
+      }
+    } catch (err) {
+      console.warn('[Firestore] Error fetching extra modules from Firestore:', err);
+    }
+
+    return localMods;
+  },
+
+  /**
+   * Retrieve all AI-generated module quizzes for a user as a record map
+   */
+  async getExtraModuleQuizzes(uid: string): Promise<Record<string, QuizQuestion[]>> {
+    let localQuizzes: Record<string, QuizQuestion[]> = {};
+    if (typeof window !== 'undefined') {
+      try {
+        localQuizzes = JSON.parse(localStorage.getItem(`golantas_extra_quizzes_${uid}`) || '{}');
+      } catch {}
+    }
+
+    if (!isFirebaseConfigured() || !db) {
+      return localQuizzes;
+    }
+
+    try {
+      const quizRef = collection(db, COLLECTION_USERS, uid, 'extra_module_quizzes');
+      const snap = await getDocs(quizRef);
+      if (!snap.empty) {
+        const result: Record<string, QuizQuestion[]> = {};
+        snap.docs.forEach((d) => {
+          const data = d.data();
+          if (data && data.questions) {
+            result[d.id] = data.questions as QuizQuestion[];
+          }
+        });
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(`golantas_extra_quizzes_${uid}`, JSON.stringify(result));
+        }
+        return result;
+      }
+    } catch (err) {
+      console.warn('[Firestore] Error fetching extra module quizzes from Firestore:', err);
+    }
+
+    return localQuizzes;
+  },
+
+  /**
+   * Retrieve a single extra module quiz
+   */
+  async getExtraModuleQuiz(uid: string, moduleId: string): Promise<QuizQuestion[] | null> {
+    const all = await this.getExtraModuleQuizzes(uid);
+    return all[moduleId] || null;
   },
 
   // ─── Exam Attempts ─────────────────────────────────────────────────────────

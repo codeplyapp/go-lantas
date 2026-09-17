@@ -265,6 +265,27 @@ export interface CaseStudyItem {
   rekomendasi_korlantas: string;
 }
 
+export type CurriculumTier = 'dasar' | 'menengah' | 'lanjutan' | 'berkelanjutan';
+
+export interface TierConfig {
+  id: CurriculumTier;
+  nomor: number;
+  nama: string;
+  subjudul: string;
+  deskripsi: string;
+  passingGrade: number; // e.g. 70, 75, 80
+  pointPerQuestion: number; // e.g. 20, 25, 30
+  bonusPoints: {
+    first_pass: number;
+    repeat_pass: number;
+    fail: number;
+  };
+  totalModulesRequired: number;
+  isAiGenerated: boolean;
+  warna: string;
+  badge: string;
+}
+
 export interface ModuleData {
   id: string;
   nomor: number;
@@ -277,6 +298,15 @@ export interface ModuleData {
   durasi_estimasi: string;
   durasi_total_menit?: number;
   poin_modul?: number;
+  tier?: CurriculumTier;
+  passing_grade?: number;
+  bonus_points?: {
+    first_pass: number;
+    repeat_pass: number;
+    fail: number;
+  };
+  is_ai_generated?: boolean;
+  batch_index?: number;
   lessons: LessonItem[];
   flashcards: FlashcardItem[];
   kasus: CaseStudyItem[];
@@ -285,6 +315,7 @@ export interface ModuleData {
 export interface ModuleProgress {
   moduleId: string;
   module_id?: string;
+  tier?: CurriculumTier;
   lessons_done: string[];
   kuis_best: number;
   kuis_best_score?: number;

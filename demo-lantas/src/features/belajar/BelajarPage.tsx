@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
-  BookOpen, FileText, Trophy, Award, CheckCircle2, 
-  TrendingUp, Clock, ShieldCheck, ChevronRight, Layers, Play 
+  BookOpen, FileText, Trophy, Award, ChevronRight 
 } from 'lucide-react';
-import { ModuleData, ModuleProgress, UserProfile } from '../../core/types';
+import { ModuleData, ModuleProgress, UserProfile, QuizQuestion, CurriculumTier } from '../../core/types';
 import { ALL_MODULES } from '../../data/modules';
+import { CURRICULUM_TIERS } from '../../data/tiers';
 import { firestoreService } from '../../services/firestore';
+import { curriculumAiService } from '../../services/curriculumAi';
 import { sound } from '../../shared/services/sound';
+import { NotificationService } from '../../shared/services/notification';
+import confetti from 'canvas-confetti';
 
 import { ModuleList } from './modules/ModuleList';
 import { ModuleDetail } from './modules/ModuleDetail';
@@ -22,12 +25,19 @@ interface BelajarPageProps {
 
 export const BelajarPage: React.FC<BelajarPageProps> = ({ profile }) => {
   const [activeTab, setActiveTab] = useState<BelajarSubTab>('modules');
+  const [activeTier, setActiveTier] = useState<CurriculumTier>('dasar');
   const [selectedModule, setSelectedModule] = useState<ModuleData | null>(null);
   const [progressMap, setProgressMap] = useState<Record<string, ModuleProgress>>({});
+  const [extraModules, setExtraModules] = useState<ModuleData[]>([]);
+  const [extraQuizzes, setExtraQuizzes] = useState<Record<string, QuizQuestion[]>>({});
 
-  // Load user's saved module progress from Firestore
+  const [isGeneratingTier, setIsGeneratingTier] = useState<boolean>(false);
+  const [generationError, setGenerationError] = useState<string | null>(null);
+
+  // Load user's saved module progress, extra modules, and extra quizzes from Firestore/Cache
   useEffect(() => {
     if (profile?.uid) {
+      // 1. Module Progress
       firestoreService.getModuleProgress(profile.uid).then((progressList) => {
         if (progressList && progressList.length > 0) {
           const map: Record<string, ModuleProgress> = {};
@@ -39,13 +49,123 @@ export const BelajarPage: React.FC<BelajarPageProps> = ({ profile }) => {
       }).catch((err) => {
         console.warn('[BelajarPage] Error loading module progress:', err);
       });
+
+      // 2. Extra Modules
+      firestoreService.getExtraModules(profile.uid).then((mods) => {
+        if (mods && mods.length > 0) {
+          setExtraModules(mods);
+        }
+      }).catch((err) => {
+        console.warn('[BelajarPage] Error loading extra modules:', err);
+      });
+
+      // 3. Extra Quizzes
+      firestoreService.getExtraModuleQuizzes(profile.uid).then((quizzes) => {
+        if (quizzes && Object.keys(quizzes).length > 0) {
+          setExtraQuizzes(quizzes);
+        }
+      }).catch((err) => {
+        console.warn('[BelajarPage] Error loading extra quizzes:', err);
+      });
     }
   }, [profile?.uid]);
 
-  // Compute total curriculum progress
-  const totalModules = ALL_MODULES.length;
-  const passedModules = ALL_MODULES.filter((m: ModuleData) => progressMap[m.id]?.kuis_passed).length;
-  const isEligibleCert = passedModules >= ALL_MODULES.length;
+  // Combine static modules + AI extra modules
+  const allModules: ModuleData[] = [...ALL_MODULES, ...extraModules];
+
+  // Tier Completion Calculations
+  const passedDasarCount = ALL_MODULES.filter((m) => progressMap[m.id]?.kuis_passed).length;
+  const isEligibleCert = passedDasarCount >= ALL_MODULES.length; // Sertifikat = Dasar
+
+  const isMenengahUnlocked = passedDasarCount >= 6;
+  const menengahModules = extraModules.filter((m) => m.tier === 'menengah');
+  const passedMenengahCount = menengahModules.filter((m) => progressMap[m.id]?.kuis_passed).length;
+
+  const isLanjutanUnlocked = isMenengahUnlocked && passedMenengahCount >= 2;
+  const lanjutanModules = extraModules.filter((m) => m.tier === 'lanjutan');
+  const passedLanjutanCount = lanjutanModules.filter((m) => progressMap[m.id]?.kuis_passed).length;
+
+  const isContinuousUnlocked = isLanjutanUnlocked && passedLanjutanCount >= 2;
+  const continuousModules = extraModules.filter((m) => m.tier === 'berkelanjutan');
+
+  const tierUnlockStates: Record<CurriculumTier, boolean> = {
+    dasar: true,
+    menengah: isMenengahUnlocked,
+    lanjutan: isLanjutanUnlocked,
+    berkelanjutan: isContinuousUnlocked,
+  };
+
+  // Trigger celebration once per tier unlock
+  const triggerUnlockCelebration = useCallback((tierKey: CurriculumTier, tierName: string) => {
+    if (typeof window === 'undefined') return;
+    const guardKey = `sigap_tier_unlock_${tierKey}`;
+    if (localStorage.getItem(guardKey)) return;
+    localStorage.setItem(guardKey, 'true');
+
+    sound.playLevelUp();
+    confetti({
+      particleCount: 120,
+      spread: 80,
+      origin: { y: 0.6 },
+    });
+    NotificationService.sendSystemNotification(
+      `🎉 ${tierName} Baru Terbuka! ✨`,
+      `Selamat! Anda berhasil membuka kurikulum materi ${tierName}.`
+    );
+  }, []);
+
+  useEffect(() => {
+    if (isMenengahUnlocked) triggerUnlockCelebration('menengah', 'Tingkat Menengah');
+    if (isLanjutanUnlocked) triggerUnlockCelebration('lanjutan', 'Tingkat Lanjutan');
+    if (isContinuousUnlocked) triggerUnlockCelebration('berkelanjutan', 'Mode Berkelanjutan');
+  }, [isMenengahUnlocked, isLanjutanUnlocked, isContinuousUnlocked, triggerUnlockCelebration]);
+
+  // AI Tier Generation Handler
+  const handleGenerateTier = useCallback(async (tier: CurriculumTier, isNextBatch = false) => {
+    if (tier === 'dasar') return;
+    if (!profile?.uid) {
+      NotificationService.showInAppToast('Silakan Masuk Akun', 'Masuk akun untuk menghasilkan materi AI.', 'warning');
+      return;
+    }
+
+    setIsGeneratingTier(true);
+    setGenerationError(null);
+
+    const batchIndex = isNextBatch
+      ? Math.floor(continuousModules.length / 2) + 1
+      : 1;
+
+    try {
+      const res = await curriculumAiService.generateTierModules(profile.uid, tier as 'menengah' | 'lanjutan' | 'berkelanjutan', batchIndex);
+
+      if (res.success && res.modules && res.modules.length > 0) {
+        sound.playLevelUp();
+        confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } });
+
+        setExtraModules((prev) => {
+          const newIds = new Set((res.modules || []).map((m) => m.id));
+          return prev.filter((m) => !newIds.has(m.id)).concat(res.modules || []);
+        });
+
+        if (res.quizzes) {
+          setExtraQuizzes((prev) => ({ ...prev, ...res.quizzes }));
+        }
+
+        NotificationService.showInAppToast(
+          'Kurikulum AI Terbit! 🚀',
+          `Modul baru untuk ${CURRICULUM_TIERS[tier].nama} berhasil dihasilkan dan siap dipelajari.`,
+          'success'
+        );
+      } else {
+        setGenerationError(res.error || 'Gagal menghasilkan modul AI.');
+      }
+    } catch (err: any) {
+      console.warn('[BelajarPage] Generation error:', err);
+      setGenerationError(err?.message || 'Terjadi kendala saat menghubungi AI Gemini.');
+    } finally {
+      setIsGeneratingTier(false);
+    }
+  }, [profile?.uid, continuousModules.length]);
 
   const handleSelectModule = (module: ModuleData) => {
     setSelectedModule(module);
@@ -56,9 +176,9 @@ export const BelajarPage: React.FC<BelajarPageProps> = ({ profile }) => {
   };
 
   const handleProgressUpdated = (updated: ModuleProgress) => {
-    setProgressMap(prev => ({
+    setProgressMap((prev) => ({
       ...prev,
-      [updated.moduleId]: updated
+      [updated.moduleId]: updated,
     }));
   };
 
@@ -75,11 +195,13 @@ export const BelajarPage: React.FC<BelajarPageProps> = ({ profile }) => {
         <div className="p-5 sm:p-6 rounded-[24px] apple-card bg-white border border-[#E5EBE8] space-y-4 shadow-xs">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="space-y-1">
-              <h1 className="text-lg sm:text-xl font-heading font-extrabold text-[#0F172A] tracking-apple-tight">
-                Kurikulum Edukasi & Ujian Teori GO Lantas
-              </h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg sm:text-xl font-heading font-extrabold text-[#0F172A] tracking-apple-tight">
+                  Kurikulum Edukasi & Ujian Teori GO Lantas
+                </h1>
+              </div>
               <p className="text-xs text-slate-500 font-medium">
-                Kuasai materi rambu, etika, dan regulasi lalu lintas berstandar Korlantas POLRI.
+                3 Tingkat Pembelajaran Terstruktur + Generator AI Berstandar Korlantas POLRI.
               </p>
             </div>
 
@@ -90,25 +212,27 @@ export const BelajarPage: React.FC<BelajarPageProps> = ({ profile }) => {
                 <span>{(profile?.poin_total || 0).toLocaleString('id-ID')} Poin</span>
               </div>
               <span className="text-slate-300">•</span>
-              <span className="text-slate-600 font-bold">Level Pelopor</span>
+              <span className="text-slate-600 font-bold">
+                {isContinuousUnlocked ? 'Pelopor Utama ⚡' : isLanjutanUnlocked ? 'Tingkat Lanjutan' : isMenengahUnlocked ? 'Tingkat Menengah' : 'Tingkat Dasar'}
+              </span>
             </div>
           </div>
 
-          {/* Curriculum Completion Progress Bar (Flat, no card-in-card) */}
+          {/* Curriculum Completion Progress Bar */}
           <div className="pt-3 border-t border-slate-100 space-y-2">
             <div className="flex items-center justify-between text-xs font-bold">
               <span className="text-slate-700 flex items-center gap-1.5">
                 <BookOpen className="w-4 h-4 text-[#0077c0]" />
-                Progres Kurikulum Nasional
+                Progres Kurikulum Tingkat Dasar (Syarat Sertifikat)
               </span>
               <span className="text-[#0077c0] font-extrabold">
-                {passedModules} / {totalModules} Modul Lulus
+                {passedDasarCount} / 6 Modul Lulus
               </span>
             </div>
             <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200/80">
               <div 
                 className="bg-[#0077C0] h-full rounded-full transition-all duration-300"
-                style={{ width: `${(passedModules / totalModules) * 100}%` }}
+                style={{ width: `${(passedDasarCount / 6) * 100}%` }}
               />
             </div>
           </div>
@@ -154,7 +278,7 @@ export const BelajarPage: React.FC<BelajarPageProps> = ({ profile }) => {
                     Sertifikat Kelulusan
                   </h4>
                   <p className="text-[11px] text-slate-500 font-medium">
-                    {isEligibleCert ? 'Siap Diunduh (PNG)' : 'Terkunci (6 Modul)'}
+                    {isEligibleCert ? 'Siap Diunduh (Tingkat Dasar Lulus)' : 'Terkunci (6 Modul Dasar)'}
                   </p>
                 </div>
               </div>
@@ -221,8 +345,10 @@ export const BelajarPage: React.FC<BelajarPageProps> = ({ profile }) => {
       {selectedModule ? (
         <ModuleDetail
           module={selectedModule}
+          extraQuizzes={extraQuizzes}
           progress={progressMap[selectedModule.id] || {
             moduleId: selectedModule.id,
+            tier: selectedModule.tier || 'dasar',
             lessons_done: [],
             kuis_attempts: 0,
             kuis_best: 0,
@@ -239,10 +365,16 @@ export const BelajarPage: React.FC<BelajarPageProps> = ({ profile }) => {
         <>
           {activeTab === 'modules' && (
             <ModuleList
-              modules={ALL_MODULES}
+              currentTier={activeTier}
+              onSelectTier={setActiveTier}
+              modules={allModules}
               moduleProgress={progressMap}
+              tierUnlockStates={tierUnlockStates}
+              isGeneratingTier={isGeneratingTier}
+              generationError={generationError}
               onSelectModule={handleSelectModule}
-              onOpenExam={() => handleTabChange('exam')}
+              onRetryGeneration={handleGenerateTier}
+              onGenerateNextBatch={() => handleGenerateTier('berkelanjutan', true)}
             />
           )}
 
@@ -261,11 +393,14 @@ export const BelajarPage: React.FC<BelajarPageProps> = ({ profile }) => {
 
           {activeTab === 'certificate' && (
             <Certificate
+              profile={profile}
+              progressMap={progressMap}
               onBack={() => handleTabChange('modules')}
               onOpenModule={(modId) => {
-                const mod = ALL_MODULES.find((m: ModuleData) => m.id === modId);
+                const mod = allModules.find((m) => m.id === modId);
                 if (mod) {
                   setActiveTab('modules');
+                  if (mod.tier) setActiveTier(mod.tier);
                   setSelectedModule(mod);
                 }
               }}

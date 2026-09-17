@@ -3,14 +3,16 @@ import {
   ChevronLeft, CheckCircle, XCircle, ArrowRight, RotateCcw, 
   Award, BookOpen, ShieldCheck, AlertTriangle 
 } from 'lucide-react';
-import { QuizQuestion, ModuleProgress } from '../../../core/types';
+import { QuizQuestion, ModuleProgress, ModuleData } from '../../../core/types';
 import { firestoreService } from '../../../services/firestore';
 import { authService } from '../../../services/auth';
 import { sound } from '../../../shared/services/sound';
 import { NotificationService } from '../../../shared/services/notification';
+import { CURRICULUM_TIERS } from '../../../data/tiers';
 import confetti from 'canvas-confetti';
 
 interface QuizModuleProps {
+  module?: ModuleData;
   moduleId: string;
   moduleTitle: string;
   questions: QuizQuestion[];
@@ -20,6 +22,7 @@ interface QuizModuleProps {
 }
 
 export const QuizModule: React.FC<QuizModuleProps> = ({
+  module,
   moduleId,
   moduleTitle,
   questions,
@@ -33,8 +36,15 @@ export const QuizModule: React.FC<QuizModuleProps> = ({
   const [userAnswers, setUserAnswers] = useState<{ questionId: string; selected: number; isCorrect: boolean }[]>([]);
   const [isFinished, setIsFinished] = useState<boolean>(false);
 
+  const tierKey = module?.tier || 'dasar';
+  const tierConfig = CURRICULUM_TIERS[tierKey];
+
+  const passingGrade = module?.passing_grade || tierConfig.passingGrade || 70;
+  const pointPerQuestion = tierConfig.pointPerQuestion || 20;
+  const bonusConfig = module?.bonus_points || tierConfig.bonusPoints;
+
   const currentQ = questions[currentIndex] || questions[0];
-  const totalQuestions = questions.length;
+  const totalQuestions = questions.length || 1;
 
   const handleSelectOption = (idx: number) => {
     if (isAnswered) return;
@@ -48,15 +58,15 @@ export const QuizModule: React.FC<QuizModuleProps> = ({
       firestoreService.saveQuizAttempt({
         uid,
         question_id: currentQ.id,
-        level: 1,
+        level: tierKey === 'lanjutan' || tierKey === 'berkelanjutan' ? 3 : tierKey === 'menengah' ? 2 : 1,
         pilihan_user: idx,
         benar: isCorrect,
-        poin_didapat: isCorrect ? 20 : 0,
+        poin_didapat: isCorrect ? pointPerQuestion : 0,
         timestamp: new Date().toISOString(),
       });
       firestoreService.registerActivity(uid, { isCorrect });
       if (isCorrect) {
-        firestoreService.addPoints(uid, 20);
+        firestoreService.addPoints(uid, pointPerQuestion);
       }
     }
 
@@ -79,7 +89,6 @@ export const QuizModule: React.FC<QuizModuleProps> = ({
       setSelectedOption(null);
       setIsAnswered(false);
     } else {
-      // Calculate score and finish
       finishQuiz();
     }
   };
@@ -87,27 +96,29 @@ export const QuizModule: React.FC<QuizModuleProps> = ({
   const finishQuiz = () => {
     const correctCount = userAnswers.filter(a => a.isCorrect).length;
     const score = Math.round((correctCount / totalQuestions) * 100);
-    const passed = score >= 70;
-    const bonusPoints = passed ? (!progress.kuis_passed ? 120 : 50) : 15;
+    const passed = score >= passingGrade;
+    const bonusPoints = passed
+      ? (!progress.kuis_passed ? bonusConfig.first_pass : bonusConfig.repeat_pass)
+      : bonusConfig.fail;
 
     const uid = authService.getCurrentUser()?.uid;
 
     if (passed) {
       sound.playLevelUp();
       confetti({
-        particleCount: 75,
-        spread: 70,
-        origin: { y: 0.7 },
+        particleCount: 85,
+        spread: 75,
+        origin: { y: 0.65 },
       });
       NotificationService.showInAppToast(
         'Lulus Kuis Modul! 🏆',
-        `Skor Anda: ${score}%. ${!progress.kuis_passed ? 'Bonus +120 Poin ditambahkan!' : '+50 Poin ditambahkan.'}`,
+        `Skor Anda: ${score}%. ${!progress.kuis_passed ? `Bonus +${bonusConfig.first_pass} Poin ditambahkan!` : `+${bonusConfig.repeat_pass} Poin ulangan ditambahkan.`}`,
         'success'
       );
     } else {
       NotificationService.showInAppToast(
         'Belum Memenuhi Passing Grade',
-        `Skor Anda: ${score}% (Minimal 70%). +15 Poin partisipasi ditambahkan. Pelajari kembali pembahasannya dan coba lagi.`,
+        `Skor Anda: ${score}% (Minimal ${passingGrade}%). +${bonusConfig.fail} Poin partisipasi ditambahkan. Pelajari kembali pembahasannya dan coba lagi.`,
         'warning'
       );
     }
@@ -115,6 +126,8 @@ export const QuizModule: React.FC<QuizModuleProps> = ({
     // Update progress locally and Firestore
     const updatedProgress: ModuleProgress = {
       ...progress,
+      moduleId,
+      tier: tierKey,
       kuis_attempts: (progress.kuis_attempts || 0) + 1,
       kuis_best: Math.max(progress.kuis_best || 0, score),
       kuis_passed: progress.kuis_passed || passed,
@@ -144,7 +157,7 @@ export const QuizModule: React.FC<QuizModuleProps> = ({
   if (isFinished) {
     const correctCount = userAnswers.filter(a => a.isCorrect).length;
     const score = Math.round((correctCount / totalQuestions) * 100);
-    const passed = score >= 70;
+    const passed = score >= passingGrade;
 
     return (
       <div className="space-y-4 pb-6 animate-fadeIn">
@@ -157,14 +170,14 @@ export const QuizModule: React.FC<QuizModuleProps> = ({
             <ChevronLeft className="w-4 h-4" />
             <span>Kembali ke Modul</span>
           </button>
-          <span className="text-xs font-bold text-slate-500">Hasil Evaluasi</span>
+          <span className="text-xs font-bold text-slate-500">Hasil Evaluasi • {tierConfig.nama}</span>
         </div>
 
         {/* Score Summary Card */}
         <div className={`p-5 sm:p-6 rounded-[22px] apple-card text-center space-y-3 ${
           passed ? 'bg-gradient-to-b from-emerald-50 to-white border-emerald-200' : 'bg-gradient-to-b from-rose-50 to-white border-rose-200'
         }`}>
-          <div className="inline-flex p-3 rounded-full bg-white shadow-sm">
+          <div className="inline-flex p-3 rounded-full bg-white shadow-xs">
             {passed ? (
               <Award className="w-10 h-10 text-emerald-600" />
             ) : (
@@ -177,7 +190,7 @@ export const QuizModule: React.FC<QuizModuleProps> = ({
               {passed ? 'Selamat! Anda Lulus Kuis Modul' : 'Belum Mencapai Nilai Kelulusan'}
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              {moduleTitle} • Passing Grade: 70%
+              {moduleTitle} • Passing Grade: {passingGrade}%
             </p>
           </div>
 
@@ -204,7 +217,7 @@ export const QuizModule: React.FC<QuizModuleProps> = ({
             </button>
             <button
               onClick={onBack}
-              className="flex-1 py-2.5 px-4 rounded-full bg-[#0077c0] hover:bg-[#008be0] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all btn-press"
+              className="flex-1 py-2.5 px-4 rounded-full bg-[#0077c0] hover:bg-[#008be0] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs transition-all btn-press"
             >
               <span>Lanjut ke Modul</span>
             </button>
@@ -291,10 +304,10 @@ export const QuizModule: React.FC<QuizModuleProps> = ({
       </div>
 
       {/* Question Card */}
-      <div className="p-5 sm:p-6 rounded-[20px] apple-card bg-white space-y-4 shadow-sm border-[#E5EBE8]">
+      <div className="p-5 sm:p-6 rounded-[20px] apple-card bg-white space-y-4 shadow-xs border-[#E5EBE8]">
         <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
-          <span>Kategori: {currentQ.kategori}</span>
-          <span className="text-[#0077c0]">+20 Poin</span>
+          <span>Kategori: {currentQ.kategori.toUpperCase()}</span>
+          <span className="text-[#0077c0]">+{pointPerQuestion} Poin / Benar</span>
         </div>
 
         <h3 className="text-sm sm:text-base font-extrabold text-[#0F172A] leading-relaxed">
@@ -345,7 +358,7 @@ export const QuizModule: React.FC<QuizModuleProps> = ({
           })}
         </div>
 
-        {/* Instant Explanation Callout (Flat, no card-in-card) */}
+        {/* Instant Explanation Callout */}
         {isAnswered && (
           <div className="pt-3.5 border-t border-slate-100 space-y-1.5 animate-fadeIn">
             <div className="flex items-center gap-1.5 font-extrabold text-slate-900 text-xs">

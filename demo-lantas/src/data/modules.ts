@@ -694,4 +694,13 @@ export const CURRICULUM_MODULES: ModuleData[] = [
   },
 ];
 
-export const ALL_MODULES = CURRICULUM_MODULES;
+export const ALL_MODULES: ModuleData[] = CURRICULUM_MODULES.map((m) => ({
+  ...m,
+  tier: 'dasar' as const,
+  passing_grade: 70,
+  bonus_points: {
+    first_pass: 120,
+    repeat_pass: 50,
+    fail: 15,
+  },
+}));
