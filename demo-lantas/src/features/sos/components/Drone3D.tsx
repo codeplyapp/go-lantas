@@ -9,15 +9,55 @@ interface DroneMeshProps {
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-// Procedural Drone Quadcopter Component
+// Tri-blade propeller generator helper (120 degrees apart)
+const TriBladePropeller: React.FC<{ status: DroneStatus }> = ({ status }) => {
+  const bladeAngles = [0, (2 * Math.PI) / 3, (4 * Math.PI) / 3];
+
+  return (
+    <>
+      {/* Central Spinner Hub Cap */}
+      <mesh position={[0, 0.015, 0]}>
+        <sphereGeometry args={[0.035, 16, 16]} />
+        <meshStandardMaterial color="#0077C0" roughness={0.25} metalness={0.8} />
+      </mesh>
+
+      {/* 3 Airfoil Rotor Blades */}
+      {bladeAngles.map((angle, idx) => (
+        <group key={idx} rotation={[0, angle, 0]}>
+          {/* Main Blade Body */}
+          <mesh position={[0.22, 0, 0]} rotation={[0, 0, 0.06]}>
+            <boxGeometry args={[0.44, 0.008, 0.048]} />
+            <meshStandardMaterial
+              color="#0F172A"
+              roughness={0.2}
+              metalness={0.85}
+              transparent
+              opacity={status === 'flying' ? 0.65 : 0.95}
+            />
+          </mesh>
+          {/* Aerodynamic Winglet Tip Accent */}
+          <mesh position={[0.42, 0.004, 0]}>
+            <boxGeometry args={[0.07, 0.01, 0.05]} />
+            <meshStandardMaterial
+              color="#00E5FF"
+              emissive="#00E5FF"
+              emissiveIntensity={status === 'flying' ? 2.5 : 1.0}
+            />
+          </mesh>
+        </group>
+      ))}
+    </>
+  );
+};
+
+// Procedural Tactical FPV Drone Mesh (Adapted strictly from Wireframe Sketch)
 const DroneMesh: React.FC<DroneMeshProps> = ({ status }) => {
   const droneGroupRef = useRef<any>(null);
   const gimbalRef = useRef<any>(null);
   const beaconLightRef = useRef<any>(null);
   const beaconMeshRef = useRef<any>(null);
   const shadowMeshRef = useRef<any>(null);
-  const alertIconRef = useRef<any>(null);
-  
+
   // Rotor refs for 4 propellers
   const rotorRefs = [
     useRef<any>(null),
@@ -29,25 +69,25 @@ const DroneMesh: React.FC<DroneMeshProps> = ({ status }) => {
   useFrame((state, delta) => {
     const t = state.clock.getElapsedTime();
 
-    // 1. Rotor rotation speed based on status
-    let rotorSpeed = 14; // rad/s for standby
+    // 1. Rotor rotation speed based on flight status
+    let rotorSpeed = 15; // rad/s for standby
     if (status === 'arming') {
-      rotorSpeed = 40;
+      rotorSpeed = 42;
     } else if (status === 'flying') {
-      rotorSpeed = 75;
+      rotorSpeed = 80;
     } else if (status === 'on_scene') {
-      rotorSpeed = 28;
+      rotorSpeed = 30;
     }
 
     rotorRefs.forEach((ref, index) => {
       if (ref.current) {
-        // Alternating CW and CCW rotation for realistic quadcopter physics
+        // Alternating CW and CCW rotation
         const dir = index % 2 === 0 ? 1 : -1;
         ref.current.rotation.y += dir * rotorSpeed * delta;
       }
     });
 
-    // 2. Beacon Flashing Strobe (Red Emergency Light)
+    // 2. Emergency Beacon Flashing Strobe
     if (beaconLightRef.current && beaconMeshRef.current) {
       const flash = Math.sin(t * 8) > 0.1 ? 1 : 0.05;
       beaconLightRef.current.intensity = flash * 3.5;
@@ -57,59 +97,51 @@ const DroneMesh: React.FC<DroneMeshProps> = ({ status }) => {
       }
     }
 
-    // 3. Floating Exclamation Mark (!) Animation
-    if (alertIconRef.current) {
-      alertIconRef.current.position.y = 0.44 + Math.sin(t * 3) * 0.025;
-      const pulseScale = 1.0 + Math.sin(t * 4) * 0.06;
-      alertIconRef.current.scale.set(pulseScale, pulseScale, pulseScale);
-    }
-
-    // 4. Drone Movement & Flight Dynamics (Facing Front / Forward Perspective)
+    // 3. Drone Movement & Flight Dynamics (Front Dynamic Perspective, No Exclamation Mark)
     if (droneGroupRef.current) {
       const group = droneGroupRef.current;
 
       if (status === 'standby') {
-        // Gentle front-facing hover
-        const targetY = Math.sin(t * 1.8) * 0.04;
+        // Subtle floating hover facing front
+        const targetY = Math.sin(t * 1.8) * 0.035;
         group.position.y = lerp(group.position.y, targetY, 0.1);
         group.position.x = lerp(group.position.x, 0, 0.1);
         group.position.z = lerp(group.position.z, 0, 0.1);
-        
-        // Locked front facing orientation
+
         group.rotation.x = lerp(group.rotation.x, Math.sin(t * 1.2) * 0.015, 0.1);
-        group.rotation.y = lerp(group.rotation.y, 0, 0.08); // Perfect front-facing alignment
+        group.rotation.y = lerp(group.rotation.y, 0, 0.08); // Head-on alignment
         group.rotation.z = lerp(group.rotation.z, Math.cos(t * 1.4) * 0.015, 0.1);
       } else if (status === 'arming') {
-        // Spooling up: fast micro-vibration indicating engine ignition
+        // Fast engine spooling vibration
         const vibration = Math.sin(t * 50) * 0.012;
         group.position.y = lerp(group.position.y, vibration + 0.02, 0.2);
         group.rotation.x = lerp(group.rotation.x, -0.04, 0.1);
         group.rotation.y = lerp(group.rotation.y, 0, 0.1);
         group.rotation.z = lerp(group.rotation.z, (Math.random() - 0.5) * 0.015, 0.2);
       } else if (status === 'flying') {
-        // Forward high speed climb & pitch
-        const targetY = 0.42 + Math.sin(t * 2.8) * 0.06;
+        // Forward high speed climb & aggressive forward pitch
+        const targetY = 0.38 + Math.sin(t * 2.8) * 0.05;
         group.position.y = lerp(group.position.y, targetY, 0.08);
         group.position.z = lerp(group.position.z, -0.12, 0.08);
-        
-        group.rotation.x = lerp(group.rotation.x, -0.22, 0.1); // ~12 deg forward pitch
+
+        group.rotation.x = lerp(group.rotation.x, -0.25, 0.1); // ~14 deg forward rake
         group.rotation.y = lerp(group.rotation.y, 0, 0.08);
         group.rotation.z = lerp(group.rotation.z, Math.sin(t * 2.2) * 0.05, 0.1);
       } else if (status === 'on_scene') {
-        // Tactical aerial surveillance hover (front-facing patrol scan)
-        const targetY = 0.22 + Math.sin(t * 1.5) * 0.05;
+        // Tactical aerial surveillance hover
+        const targetY = 0.20 + Math.sin(t * 1.5) * 0.04;
         group.position.y = lerp(group.position.y, targetY, 0.08);
         group.position.z = lerp(group.position.z, 0, 0.08);
-        
-        group.rotation.x = lerp(group.rotation.x, 0.04, 0.08);
-        group.rotation.y = lerp(group.rotation.y, Math.sin(t * 0.6) * 0.12, 0.05); // gentle front scanning
+
+        group.rotation.x = lerp(group.rotation.x, 0.03, 0.08);
+        group.rotation.y = lerp(group.rotation.y, Math.sin(t * 0.6) * 0.12, 0.05);
         group.rotation.z = lerp(group.rotation.z, Math.sin(t * 1.6) * 0.03, 0.08);
       }
     }
 
-    // 5. Ground Shadow scaling and opacity reacting to altitude
+    // 4. Ground Shadow scaling & opacity
     if (shadowMeshRef.current) {
-      const targetScale = status === 'flying' ? 1.25 : 1.0;
+      const targetScale = status === 'flying' ? 1.2 : 1.0;
       const targetOpacity = status === 'flying' ? 0.12 : 0.24;
       shadowMeshRef.current.scale.x = lerp(shadowMeshRef.current.scale.x, targetScale, 0.1);
       shadowMeshRef.current.scale.y = lerp(shadowMeshRef.current.scale.y, targetScale, 0.1);
@@ -122,113 +154,66 @@ const DroneMesh: React.FC<DroneMeshProps> = ({ status }) => {
       }
     }
 
-    // 6. Camera Gimbal Tracking
+    // 5. Front Nose FPV Camera Pitch Tracking
     if (gimbalRef.current) {
       if (status === 'flying' || status === 'on_scene') {
-        // Pitch camera down slightly to survey road / ground
-        gimbalRef.current.rotation.x = lerp(gimbalRef.current.rotation.x, 0.4, 0.1);
+        gimbalRef.current.rotation.x = lerp(gimbalRef.current.rotation.x, 0.35, 0.1);
       } else {
-        gimbalRef.current.rotation.x = lerp(gimbalRef.current.rotation.x, 0.08, 0.1);
+        gimbalRef.current.rotation.x = lerp(gimbalRef.current.rotation.x, 0.05, 0.1);
       }
     }
   });
 
-  // Arm positions: 4 diagonal quadcopter corners
-  const armRadius = 0.85;
-  const armAngleDeg = [45, 135, 225, 315];
-  const armPositions = armAngleDeg.map((deg) => {
-    const rad = (deg * Math.PI) / 180;
-    return {
-      x: Math.cos(rad) * armRadius,
-      z: Math.sin(rad) * armRadius,
-      angle: -rad + Math.PI / 2,
-    };
-  });
+  // 4 Arm positions matching the aggressive X-frame in the sketch
+  const armConfigs = [
+    // Front-Left
+    { x: -0.68, y: 0.01, z: 0.44, angle: Math.PI / 4, isFront: true },
+    // Front-Right
+    { x: 0.68, y: 0.01, z: 0.44, angle: -Math.PI / 4, isFront: true },
+    // Rear-Left
+    { x: -0.64, y: 0.03, z: -0.56, angle: (3 * Math.PI) / 4, isFront: false },
+    // Rear-Right
+    { x: 0.64, y: 0.03, z: -0.56, angle: -(3 * Math.PI) / 4, isFront: false },
+  ];
 
   return (
     <>
       <group ref={droneGroupRef} position={[0, 0, 0]}>
-        {/* 0. 3D FLOATING EMERGENCY EXCLAMATION MARK (!) ABOVE DRONE */}
-        <group ref={alertIconRef} position={[0, 0.46, 0]}>
-          {/* Exclamation stem top cap */}
-          <mesh position={[0, 0.20, 0]}>
-            <sphereGeometry args={[0.046, 16, 16]} />
-            <meshStandardMaterial
-              color="#DC2626"
-              emissive="#EF4444"
-              emissiveIntensity={3.5}
-              roughness={0.1}
-            />
-          </mesh>
-          {/* Exclamation stem body */}
-          <mesh position={[0, 0.10, 0]}>
-            <cylinderGeometry args={[0.046, 0.032, 0.20, 16]} />
-            <meshStandardMaterial
-              color="#DC2626"
-              emissive="#EF4444"
-              emissiveIntensity={3.5}
-              roughness={0.1}
-            />
-          </mesh>
-          {/* Exclamation stem bottom cap */}
-          <mesh position={[0, 0.00, 0]}>
-            <sphereGeometry args={[0.032, 16, 16]} />
-            <meshStandardMaterial
-              color="#DC2626"
-              emissive="#EF4444"
-              emissiveIntensity={3.5}
-              roughness={0.1}
-            />
-          </mesh>
-          {/* Exclamation dot */}
-          <mesh position={[0, -0.075, 0]}>
-            <sphereGeometry args={[0.042, 16, 16]} />
-            <meshStandardMaterial
-              color="#DC2626"
-              emissive="#EF4444"
-              emissiveIntensity={3.5}
-              roughness={0.1}
-            />
-          </mesh>
-          {/* Holographic Alert Ring */}
-          <mesh rotation={[0, 0, 0]}>
-            <torusGeometry args={[0.24, 0.016, 16, 32]} />
-            <meshStandardMaterial
-              color="#EF4444"
-              emissive="#EF4444"
-              emissiveIntensity={2.5}
-              transparent
-              opacity={0.85}
-            />
-          </mesh>
-          {/* Glowing Aura Point Light */}
-          <pointLight color="#EF4444" intensity={3} distance={3} />
-        </group>
-        {/* 1. CENTRAL FUSELAGE / BODY */}
+        {/* ========================================================= */}
+        {/* 1. AERODYNAMIC COCKPIT CANOPY (Adapted from Wireframe)  */}
+        {/* ========================================================= */}
         <group position={[0, 0, 0]}>
-          {/* Main Sleek Body Shell */}
-          <mesh castShadow receiveShadow position={[0, 0, 0]}>
-            <boxGeometry args={[0.55, 0.18, 0.7]} />
+          {/* Main Helmet Dome Canopy */}
+          <mesh castShadow receiveShadow position={[0, 0.06, -0.04]} scale={[1, 0.78, 1.22]}>
+            <sphereGeometry args={[0.27, 32, 24]} />
             <meshStandardMaterial
               color="#0F172A"
               roughness={0.25}
-              metalness={0.85}
+              metalness={0.88}
             />
           </mesh>
 
-          {/* Top Aerodynamic Hood / Shield */}
-          <mesh castShadow position={[0, 0.1, 0.02]}>
-            <boxGeometry args={[0.42, 0.06, 0.55]} />
+          {/* Top Aerodynamic Air Intake Vent / Grille (From Sketch) */}
+          <mesh position={[0, 0.185, 0.06]} rotation={[0.4, 0, 0]}>
+            <boxGeometry args={[0.16, 0.02, 0.12]} />
             <meshStandardMaterial
               color="#1E293B"
               roughness={0.2}
-              metalness={0.9}
+              metalness={0.95}
+            />
+          </mesh>
+          <mesh position={[0, 0.19, 0.06]} rotation={[0.4, 0, 0]}>
+            <boxGeometry args={[0.12, 0.008, 0.08]} />
+            <meshStandardMaterial
+              color="#0077C0"
+              emissive="#0077C0"
+              emissiveIntensity={0.8}
             />
           </mesh>
 
-          {/* Korlantas Blue Livery Stripe */}
-          <mesh position={[0, 0.132, 0.02]}>
-            <boxGeometry args={[0.16, 0.01, 0.52]} />
+          {/* Korlantas Racing Center Stripe */}
+          <mesh position={[0, 0.165, -0.06]}>
+            <boxGeometry args={[0.12, 0.015, 0.44]} />
             <meshStandardMaterial
               color="#0077C0"
               emissive="#0077C0"
@@ -237,20 +222,25 @@ const DroneMesh: React.FC<DroneMeshProps> = ({ status }) => {
             />
           </mesh>
 
-          {/* White Police Trim Accent */}
-          <mesh position={[0, 0.133, 0.15]}>
-            <boxGeometry args={[0.3, 0.008, 0.05]} />
-            <meshStandardMaterial
-              color="#FFFFFF"
-              emissive="#FFFFFF"
-              emissiveIntensity={0.4}
-              roughness={0.1}
-            />
+          {/* Left & Right Air Intake Cheeks */}
+          <mesh position={[-0.21, 0.03, -0.02]} rotation={[0, 0, 0.25]}>
+            <boxGeometry args={[0.07, 0.12, 0.32]} />
+            <meshStandardMaterial color="#1E293B" metalness={0.9} roughness={0.2} />
+          </mesh>
+          <mesh position={[0.21, 0.03, -0.02]} rotation={[0, 0, -0.25]}>
+            <boxGeometry args={[0.07, 0.12, 0.32]} />
+            <meshStandardMaterial color="#1E293B" metalness={0.9} roughness={0.2} />
           </mesh>
 
-          {/* Red Emergency Beacon (Top Strobe) */}
-          <mesh ref={beaconMeshRef} position={[0, 0.16, -0.08]}>
-            <cylinderGeometry args={[0.045, 0.055, 0.05, 16]} />
+          {/* Rear Battery Tray (Raked Downwards at 35 degrees) */}
+          <mesh position={[0, -0.03, -0.28]} rotation={[-0.35, 0, 0]}>
+            <boxGeometry args={[0.3, 0.14, 0.26]} />
+            <meshStandardMaterial color="#1E293B" metalness={0.85} roughness={0.3} />
+          </mesh>
+
+          {/* Top Emergency Beacon Strobe */}
+          <mesh ref={beaconMeshRef} position={[0, 0.22, -0.12]}>
+            <cylinderGeometry args={[0.035, 0.045, 0.04, 16]} />
             <meshStandardMaterial
               color="#EF4444"
               emissive="#EF4444"
@@ -260,138 +250,111 @@ const DroneMesh: React.FC<DroneMeshProps> = ({ status }) => {
           </mesh>
           <pointLight
             ref={beaconLightRef}
-            position={[0, 0.22, -0.08]}
+            position={[0, 0.28, -0.12]}
             color="#EF4444"
             intensity={3}
             distance={4}
           />
-
-          {/* Dual Forward Headlights (Blue / Bright White Tactical Searchlights) */}
-          <mesh position={[-0.14, -0.02, 0.35]}>
-            <cylinderGeometry args={[0.03, 0.03, 0.02, 12]} />
-            <meshStandardMaterial
-              color="#00E5FF"
-              emissive="#00E5FF"
-              emissiveIntensity={3}
-            />
-          </mesh>
-          <mesh position={[0.14, -0.02, 0.35]}>
-            <cylinderGeometry args={[0.03, 0.03, 0.02, 12]} />
-            <meshStandardMaterial
-              color="#00E5FF"
-              emissive="#00E5FF"
-              emissiveIntensity={3}
-            />
-          </mesh>
-          {/* Forward spot lighting */}
-          <pointLight position={[0, -0.02, 0.45]} color="#00E5FF" intensity={1.5} distance={3} />
         </group>
 
-        {/* 2. GIMBAL CAMERA & THERMAL SENSOR (Underbelly) */}
-        <group ref={gimbalRef} position={[0, -0.12, 0.1]}>
-          {/* Gimbal base mount */}
-          <mesh position={[0, 0.03, 0]}>
-            <cylinderGeometry args={[0.07, 0.07, 0.04, 16]} />
-            <meshStandardMaterial color="#0F172A" metalness={0.9} roughness={0.2} />
+        {/* ========================================================= */}
+        {/* 2. FRONT NOSE FPV GIMBAL CAMERA (Signature Feature)       */}
+        {/* ========================================================= */}
+        <group ref={gimbalRef} position={[0, 0.02, 0.22]}>
+          {/* Left & Right Roll Damper Brackets */}
+          <mesh position={[-0.08, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+            <cylinderGeometry args={[0.028, 0.028, 0.04, 16]} />
+            <meshStandardMaterial color="#334155" metalness={0.9} />
           </mesh>
-          {/* Camera sphere housing */}
-          <mesh castShadow position={[0, -0.04, 0]}>
-            <sphereGeometry args={[0.09, 24, 24]} />
-            <meshStandardMaterial color="#1E293B" metalness={0.9} roughness={0.15} />
+          <mesh position={[0.08, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+            <cylinderGeometry args={[0.028, 0.028, 0.04, 16]} />
+            <meshStandardMaterial color="#334155" metalness={0.9} />
           </mesh>
-          {/* 4K Optical Lens Ring */}
-          <mesh position={[0, -0.04, 0.08]} rotation={[Math.PI / 2, 0, 0]}>
-            <torusGeometry args={[0.045, 0.01, 16, 24]} />
-            <meshStandardMaterial color="#0077C0" emissive="#0077C0" emissiveIntensity={0.8} />
+
+          {/* Front Cylindrical FPV Camera Barrel */}
+          <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0, 0.04]}>
+            <cylinderGeometry args={[0.064, 0.064, 0.09, 24]} />
+            <meshStandardMaterial color="#0F172A" metalness={0.92} roughness={0.15} />
           </mesh>
-          {/* Glass Lens Core */}
-          <mesh position={[0, -0.04, 0.082]} rotation={[Math.PI / 2, 0, 0]}>
-            <circleGeometry args={[0.04, 24]} />
+
+          {/* Sapphire Optical Lens Ring */}
+          <mesh position={[0, 0, 0.086]} rotation={[Math.PI / 2, 0, 0]}>
+            <torusGeometry args={[0.044, 0.009, 16, 24]} />
+            <meshStandardMaterial color="#0077C0" emissive="#0077C0" emissiveIntensity={1} />
+          </mesh>
+          {/* Glass Core */}
+          <mesh position={[0, 0, 0.088]} rotation={[Math.PI / 2, 0, 0]}>
+            <circleGeometry args={[0.038, 24]} />
             <meshStandardMaterial color="#0284C7" roughness={0.05} metalness={0.95} />
           </mesh>
-          {/* Secondary FLIR Thermal Sensor Lens */}
-          <mesh position={[0.045, -0.055, 0.065]} rotation={[Math.PI / 2, 0, 0]}>
-            <circleGeometry args={[0.018, 16]} />
-            <meshStandardMaterial color="#F59E0B" emissive="#D97706" emissiveIntensity={1} />
+
+          {/* Lower Auxiliary Obstacle Sensor (From Sketch) */}
+          <mesh position={[0, -0.065, 0.02]} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.025, 0.025, 0.03, 16]} />
+            <meshStandardMaterial color="#1E293B" metalness={0.9} />
           </mesh>
+          <mesh position={[0, -0.065, 0.036]} rotation={[Math.PI / 2, 0, 0]}>
+            <circleGeometry args={[0.02, 16]} />
+            <meshStandardMaterial color="#F59E0B" emissive="#D97706" emissiveIntensity={1.2} />
+          </mesh>
+
+          {/* Front Dual Tactical Headlights (Cyan LEDs) */}
+          <mesh position={[-0.13, 0.01, 0.02]}>
+            <cylinderGeometry args={[0.022, 0.022, 0.02, 12]} />
+            <meshStandardMaterial color="#00E5FF" emissive="#00E5FF" emissiveIntensity={3} />
+          </mesh>
+          <mesh position={[0.13, 0.01, 0.02]}>
+            <cylinderGeometry args={[0.022, 0.022, 0.02, 12]} />
+            <meshStandardMaterial color="#00E5FF" emissive="#00E5FF" emissiveIntensity={3} />
+          </mesh>
+          <pointLight position={[0, 0.01, 0.15]} color="#00E5FF" intensity={1.8} distance={3.5} />
         </group>
 
-        {/* 3. CARBON FIBER LANDING SKIDS */}
-        <group position={[0, -0.16, 0]}>
-          {/* Left Skid */}
-          <mesh position={[-0.24, -0.05, 0]}>
-            <boxGeometry args={[0.025, 0.015, 0.65]} />
-            <meshStandardMaterial color="#334155" metalness={0.9} roughness={0.3} />
-          </mesh>
-          <mesh position={[-0.24, 0.02, 0.15]} rotation={[0, 0, 0.25]}>
-            <cylinderGeometry args={[0.012, 0.012, 0.12, 8]} />
-            <meshStandardMaterial color="#334155" metalness={0.9} />
-          </mesh>
-          <mesh position={[-0.24, 0.02, -0.15]} rotation={[0, 0, 0.25]}>
-            <cylinderGeometry args={[0.012, 0.012, 0.12, 8]} />
-            <meshStandardMaterial color="#334155" metalness={0.9} />
-          </mesh>
-
-          {/* Right Skid */}
-          <mesh position={[0.24, -0.05, 0]}>
-            <boxGeometry args={[0.025, 0.015, 0.65]} />
-            <meshStandardMaterial color="#334155" metalness={0.9} roughness={0.3} />
-          </mesh>
-          <mesh position={[0.24, 0.02, 0.15]} rotation={[0, 0, -0.25]}>
-            <cylinderGeometry args={[0.012, 0.012, 0.12, 8]} />
-            <meshStandardMaterial color="#334155" metalness={0.9} />
-          </mesh>
-          <mesh position={[0.24, 0.02, -0.15]} rotation={[0, 0, -0.25]}>
-            <cylinderGeometry args={[0.012, 0.012, 0.12, 8]} />
-            <meshStandardMaterial color="#334155" metalness={0.9} />
-          </mesh>
-        </group>
-
-        {/* 4. 4 ROTOR ARMS & MOTOR PODS & PROPELLERS */}
-        {armPositions.map((arm, index) => {
-          const isFront = index < 2;
-          const ledColor = isFront ? '#0077C0' : '#10B981';
+        {/* ========================================================= */}
+        {/* 3. 4 CARBON FIBER ARMS, MOTOR PODS & VERTICAL FIN FEET    */}
+        {/* ========================================================= */}
+        {armConfigs.map((arm, index) => {
+          const ledColor = arm.isFront ? '#0077C0' : '#10B981';
 
           return (
             <group key={index}>
               {/* Carbon Arm Tube */}
               <mesh
-                position={[arm.x * 0.5, 0.01, arm.z * 0.5]}
+                position={[arm.x * 0.5, arm.y, arm.z * 0.5]}
                 rotation={[0, arm.angle, Math.PI / 2]}
               >
-                <cylinderGeometry args={[0.026, 0.026, armRadius, 12]} />
+                <cylinderGeometry args={[0.028, 0.028, 0.78, 16]} />
                 <meshStandardMaterial
                   color="#1E293B"
-                  roughness={0.4}
-                  metalness={0.8}
+                  roughness={0.35}
+                  metalness={0.85}
                 />
               </mesh>
 
               {/* Arm Navigation LED Strip */}
-              <mesh
-                position={[arm.x * 0.72, 0.035, arm.z * 0.72]}
-              >
+              <mesh position={[arm.x * 0.72, arm.y + 0.03, arm.z * 0.72]}>
                 <boxGeometry args={[0.03, 0.015, 0.08]} />
                 <meshStandardMaterial
                   color={ledColor}
                   emissive={ledColor}
-                  emissiveIntensity={1.8}
+                  emissiveIntensity={2.0}
                 />
               </mesh>
 
-              {/* Motor Pod Housing */}
-              <group position={[arm.x, 0.03, arm.z]}>
-                <mesh castShadow position={[0, 0, 0]}>
-                  <cylinderGeometry args={[0.085, 0.08, 0.12, 16]} />
+              {/* Motor Pod Assembly */}
+              <group position={[arm.x, arm.y, arm.z]}>
+                {/* Brushless Motor Bell */}
+                <mesh castShadow position={[0, 0.03, 0]}>
+                  <cylinderGeometry args={[0.085, 0.08, 0.1, 20]} />
                   <meshStandardMaterial
                     color="#0F172A"
-                    roughness={0.3}
-                    metalness={0.85}
+                    roughness={0.25}
+                    metalness={0.9}
                   />
                 </mesh>
                 {/* Titanium Motor Top Rim */}
-                <mesh position={[0, 0.065, 0]}>
-                  <cylinderGeometry args={[0.05, 0.05, 0.02, 16]} />
+                <mesh position={[0, 0.075, 0]}>
+                  <cylinderGeometry args={[0.052, 0.052, 0.02, 16]} />
                   <meshStandardMaterial
                     color="#94A3B8"
                     roughness={0.2}
@@ -399,55 +362,31 @@ const DroneMesh: React.FC<DroneMeshProps> = ({ status }) => {
                   />
                 </mesh>
 
-                {/* ROTATING PROPELLER BLADES */}
-                <group ref={rotorRefs[index]} position={[0, 0.08, 0]}>
-                  {/* Propeller Hub Cap */}
-                  <mesh position={[0, 0.015, 0]}>
-                    <sphereGeometry args={[0.035, 12, 12]} />
-                    <meshStandardMaterial color="#0077C0" roughness={0.3} metalness={0.7} />
+                {/* =================================================== */}
+                {/* VERTICAL LANDING FIN / LEG (Directly from Sketch)   */}
+                {/* =================================================== */}
+                <group position={[0, -0.1, 0]}>
+                  {/* Tapered Vertical Fin Leg */}
+                  <mesh position={[0, 0, 0]}>
+                    <cylinderGeometry args={[0.035, 0.018, 0.22, 12]} />
+                    <meshStandardMaterial
+                      color="#1E293B"
+                      metalness={0.88}
+                      roughness={0.3}
+                    />
                   </mesh>
+                  {/* Rubber Foot Tip */}
+                  <mesh position={[0, -0.115, 0]}>
+                    <sphereGeometry args={[0.02, 12, 12]} />
+                    <meshStandardMaterial color="#0F172A" roughness={0.8} />
+                  </mesh>
+                </group>
 
-                  {/* Blade 1 */}
-                  <mesh position={[0.26, 0, 0]} rotation={[0, 0, 0.08]}>
-                    <boxGeometry args={[0.52, 0.008, 0.045]} />
-                    <meshStandardMaterial
-                      color="#0F172A"
-                      roughness={0.2}
-                      metalness={0.8}
-                      transparent
-                      opacity={status === 'flying' ? 0.6 : 0.95}
-                    />
-                  </mesh>
-                  {/* Blade 1 Tip Stripe */}
-                  <mesh position={[0.48, 0.005, 0]}>
-                    <boxGeometry args={[0.08, 0.01, 0.046]} />
-                    <meshStandardMaterial
-                      color="#00E5FF"
-                      emissive="#00E5FF"
-                      emissiveIntensity={status === 'flying' ? 2 : 0.8}
-                    />
-                  </mesh>
-
-                  {/* Blade 2 */}
-                  <mesh position={[-0.26, 0, 0]} rotation={[0, 0, -0.08]}>
-                    <boxGeometry args={[0.52, 0.008, 0.045]} />
-                    <meshStandardMaterial
-                      color="#0F172A"
-                      roughness={0.2}
-                      metalness={0.8}
-                      transparent
-                      opacity={status === 'flying' ? 0.6 : 0.95}
-                    />
-                  </mesh>
-                  {/* Blade 2 Tip Stripe */}
-                  <mesh position={[-0.48, 0.005, 0]}>
-                    <boxGeometry args={[0.08, 0.01, 0.046]} />
-                    <meshStandardMaterial
-                      color="#00E5FF"
-                      emissive="#00E5FF"
-                      emissiveIntensity={status === 'flying' ? 2 : 0.8}
-                    />
-                  </mesh>
+                {/* =================================================== */}
+                {/* ROTATING TRI-BLADE PROPELLER (3-Bilah Sesuai Sketsa)*/}
+                {/* =================================================== */}
+                <group ref={rotorRefs[index]} position={[0, 0.09, 0]}>
+                  <TriBladePropeller status={status} />
                 </group>
               </group>
             </group>
@@ -455,17 +394,19 @@ const DroneMesh: React.FC<DroneMeshProps> = ({ status }) => {
         })}
       </group>
 
-      {/* 5. SOFT GROUND SHADOW (Subtle Three.js Disc) */}
+      {/* ========================================================= */}
+      {/* 4. SOFT GROUND SHADOW DISC                                */}
+      {/* ========================================================= */}
       <mesh
         ref={shadowMeshRef}
-        position={[0, -0.42, 0]}
+        position={[0, -0.38, 0]}
         rotation={[-Math.PI / 2, 0, 0]}
       >
-        <circleGeometry args={[0.68, 32]} />
+        <circleGeometry args={[0.72, 32]} />
         <meshBasicMaterial
           color="#0F172A"
           transparent
-          opacity={0.24}
+          opacity={0.22}
           depthWrite={false}
         />
       </mesh>
@@ -482,18 +423,18 @@ export const Drone3D: React.FC<Drone3DProps> = ({ status, className = '' }) => {
   return (
     <div className={`w-full h-full relative select-none pointer-events-none ${className}`}>
       <Canvas
-        camera={{ position: [0, 0.65, 2.8], fov: 38 }}
+        camera={{ position: [0, 0.78, 2.35], fov: 42 }}
         gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
         style={{ pointerEvents: 'none' }}
       >
-        {/* Soft Ambient & Directional Sun Lighting */}
-        <ambientLight intensity={1.4} />
+        {/* Soft Studio & Sun Lighting */}
+        <ambientLight intensity={1.5} />
         <directionalLight
           position={[4, 8, 4]}
-          intensity={1.8}
+          intensity={2.0}
           castShadow
         />
-        <directionalLight position={[-4, -2, -3]} intensity={0.5} color="#C7EEFF" />
+        <directionalLight position={[-4, -2, -3]} intensity={0.6} color="#C7EEFF" />
 
         {/* 3D Quadcopter Model */}
         <DroneMesh status={status} />
