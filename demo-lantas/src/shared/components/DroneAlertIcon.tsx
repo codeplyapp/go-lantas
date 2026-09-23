@@ -5,10 +5,11 @@ interface DroneAlertIconProps {
 }
 
 /**
- * Custom SVG Icon: Front-Facing Drone (Sketch-Adapted) with a Bold Emergency Warning Symbol (⚠️ / !)
- * Designed specifically for high-contrast clarity on emergency buttons and navbars.
+ * Custom SVG Icon: Front-Facing DJI-Style Drone adapted from the architectural sketch
+ * with emergency exclamation mark (!) on top, wide wingspan, arched landing gear,
+ * underbelly gimbal camera, and streamlined aerodynamic chassis.
  */
-export const DroneAlertIcon: React.FC<DroneAlertIconProps> = ({ className = 'w-8 h-8' }) => {
+export const DroneAlertIcon: React.FC<DroneAlertIconProps> = ({ className = 'w-7 h-7' }) => {
   return (
     <svg
       viewBox="0 0 32 32"
@@ -19,84 +20,73 @@ export const DroneAlertIcon: React.FC<DroneAlertIconProps> = ({ className = 'w-8
       strokeLinejoin="round"
       className={className}
     >
-      {/* 1. SIMBOL DARURAT UTAMA (Segitiga Hazard + Tanda Seru Tebal / Warning Alert Symbol) */}
-      <g>
-        {/* Segitiga Peringatan Darurat (Emergency Hazard Triangle) */}
-        <path
-          d="M16 1.2 L22.8 10.4 H9.2 Z"
-          strokeWidth="1.8"
-          strokeLinejoin="round"
-          fill="currentColor"
-          fillOpacity="0.22"
-        />
-        {/* Batang Tanda Seru Tebal & Tegas */}
-        <line
-          x1="16"
-          y1="3.8"
-          x2="16"
-          y2="7.2"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-        />
-        {/* Titik Tanda Seru Solid */}
-        <circle cx="16" cy="9.1" r="1.1" fill="currentColor" stroke="none" />
-      </g>
+      {/* 1. TANDA SERU (!) BESAR & SANGAT TEGAS DI ATAS DRONE */}
+      {/* Batang Tanda Seru Tebal & Kokoh */}
+      <path
+        d="M14.2 1.2 H17.8 L17.0 7.2 H15.0 Z"
+        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="1.0"
+        strokeLinejoin="round"
+      />
+      {/* Titik Tanda Seru Bulat Solid */}
+      <circle cx="16" cy="10.0" r="1.7" fill="currentColor" stroke="none" />
 
-      {/* 2. BALING-BALING KIRI & KANAN (Tapered Airfoil Blades Melengkung Mengikuti Tombol) */}
+      {/* 2. BALING-BALING KIRI & KANAN (Tapered Airfoil Blades) */}
       {/* Propeller Kiri */}
       <path
-        d="M1 12 C3 11 8 11 10 12 C8 12.8 3 12.8 1 12 Z"
+        d="M1 13.0 C3 12.0 8 12.0 10 13.0 C8 13.8 3 13.8 1 13.0 Z"
         fill="currentColor"
-        fillOpacity="0.95"
+        fillOpacity="0.9"
         strokeWidth="0.8"
       />
       {/* Propeller Kanan */}
       <path
-        d="M22 12 C24 11 29 11 31 12 C29 12.8 24 12.8 22 12 Z"
+        d="M22 13.0 C24 12.0 29 12.0 31 13.0 C29 13.8 24 13.8 22 13.0 Z"
         fill="currentColor"
-        fillOpacity="0.95"
+        fillOpacity="0.9"
         strokeWidth="0.8"
       />
 
       {/* 3. MOTOR PODS KIRI & KANAN */}
-      <rect x="4.4" y="12.8" width="2.4" height="2.2" rx="0.5" fill="currentColor" fillOpacity="0.4" />
-      <rect x="25.2" y="12.8" width="2.4" height="2.2" rx="0.5" fill="currentColor" fillOpacity="0.4" />
+      <rect x="4.4" y="13.8" width="2.4" height="2.2" rx="0.5" fill="currentColor" fillOpacity="0.3" />
+      <rect x="25.2" y="13.8" width="2.4" height="2.2" rx="0.5" fill="currentColor" fillOpacity="0.3" />
 
-      {/* 4. LENGAN WINGLET BAWAH MOTOR */}
-      <path d="M5.6 15 L6.6 17.8" strokeWidth="1.5" />
-      <path d="M26.4 15 L25.4 17.8" strokeWidth="1.5" />
+      {/* 4. LENGAN WINGLET BAWAH MOTOR (Sesuai Sketsa) */}
+      <path d="M5.6 16.0 L6.6 18.8" strokeWidth="1.5" />
+      <path d="M26.4 16.0 L25.4 18.8" strokeWidth="1.5" />
 
-      {/* 5. STRUKTUR BODI AERODINAMIS DRONE (Sesuai Sketsa) */}
-      {/* Upper Contour */}
+      {/* 5. LENGAN STRUKTURAL & BODI AERODINAMIS (Front Profile DJI) */}
+      {/* Upper Chassis Contour */}
       <path
-        d="M5.6 13.8 C10 14.1 12.5 12.5 16 12.5 C19.5 12.5 22 14.1 26.4 13.8"
+        d="M5.6 14.8 C10 15.1 12.5 13.6 16 13.6 C19.5 13.6 22 15.1 26.4 14.8"
         strokeWidth="1.7"
       />
-      {/* Lower Contour */}
+      {/* Lower Chassis Contour */}
       <path
-        d="M5.6 14.9 C9.5 16.5 12.2 16.8 16 16.8 C19.8 16.8 22.5 16.5 26.4 14.9"
+        d="M5.6 15.9 C9.5 17.5 12.2 17.8 16 17.8 C19.8 17.8 22.5 17.5 26.4 15.9"
         strokeWidth="1.5"
       />
-      {/* Garis Kubah Tengah */}
-      <path d="M12.8 13.7 C14 13.1 18 13.1 19.2 13.7" strokeWidth="1.2" />
+      {/* Central Dome Hood Seam */}
+      <path d="M12.8 14.7 C14 14.1 18 14.1 19.2 14.7" strokeWidth="1.2" />
 
-      {/* 6. GIMBAL CAMERA BOLA 4K */}
+      {/* 6. GIMBAL CAMERA BOLA 4K (Di Bawah Bodi Sesuai Sketsa) */}
       {/* Mount stem */}
-      <path d="M15.2 16.8 V17.8 H16.8 V16.8" strokeWidth="1.2" />
+      <path d="M15.2 17.8 V18.9 H16.8 V17.8" strokeWidth="1.2" />
       {/* Camera sphere housing */}
-      <circle cx="16" cy="20.4" r="2.2" strokeWidth="1.4" fill="currentColor" fillOpacity="0.25" />
-      {/* Camera optical lens core */}
-      <circle cx="16" cy="20.4" r="1.1" fill="currentColor" stroke="none" />
+      <circle cx="16" cy="21.5" r="2.2" strokeWidth="1.4" fill="currentColor" fillOpacity="0.2" />
+      {/* Camera lens ring */}
+      <circle cx="16" cy="21.5" r="1.1" fill="currentColor" stroke="none" />
 
       {/* 7. SEPASANG KAKI PENDARATAN MELENGKUNG (Arched Landing Gear) */}
       {/* Kaki Kiri */}
       <path
-        d="M12.2 16.7 L9.6 23.2 Q9.2 24.6 7.8 24.6"
+        d="M12.2 17.7 L9.6 24.1 Q9.2 25.5 7.8 25.5"
         strokeWidth="1.6"
       />
       {/* Kaki Kanan */}
       <path
-        d="M19.8 16.7 L22.4 23.2 Q22.8 24.6 24.2 24.6"
+        d="M19.8 17.7 L22.4 24.1 Q22.8 25.5 24.2 25.5"
         strokeWidth="1.6"
       />
     </svg>

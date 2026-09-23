@@ -149,60 +149,60 @@ const DroneMesh: React.FC<DroneMeshProps> = ({ status }) => {
     <>
       <group ref={droneGroupRef} position={[0, 0, 0]}>
         {/* 0. 3D FLOATING EMERGENCY EXCLAMATION MARK (!) ABOVE DRONE */}
-        <group ref={alertIconRef} position={[0, 0.44, 0]}>
+        <group ref={alertIconRef} position={[0, 0.46, 0]}>
           {/* Exclamation stem top cap */}
-          <mesh position={[0, 0.17, 0]}>
-            <sphereGeometry args={[0.036, 16, 16]} />
+          <mesh position={[0, 0.20, 0]}>
+            <sphereGeometry args={[0.046, 16, 16]} />
             <meshStandardMaterial
               color="#DC2626"
               emissive="#EF4444"
-              emissiveIntensity={2.5}
-              roughness={0.15}
+              emissiveIntensity={3.5}
+              roughness={0.1}
             />
           </mesh>
           {/* Exclamation stem body */}
-          <mesh position={[0, 0.09, 0]}>
-            <cylinderGeometry args={[0.036, 0.024, 0.16, 16]} />
+          <mesh position={[0, 0.10, 0]}>
+            <cylinderGeometry args={[0.046, 0.032, 0.20, 16]} />
             <meshStandardMaterial
               color="#DC2626"
               emissive="#EF4444"
-              emissiveIntensity={2.5}
-              roughness={0.15}
+              emissiveIntensity={3.5}
+              roughness={0.1}
             />
           </mesh>
           {/* Exclamation stem bottom cap */}
-          <mesh position={[0, 0.01, 0]}>
-            <sphereGeometry args={[0.024, 16, 16]} />
+          <mesh position={[0, 0.00, 0]}>
+            <sphereGeometry args={[0.032, 16, 16]} />
             <meshStandardMaterial
               color="#DC2626"
               emissive="#EF4444"
-              emissiveIntensity={2.5}
-              roughness={0.15}
+              emissiveIntensity={3.5}
+              roughness={0.1}
             />
           </mesh>
           {/* Exclamation dot */}
-          <mesh position={[0, -0.065, 0]}>
-            <sphereGeometry args={[0.034, 16, 16]} />
+          <mesh position={[0, -0.075, 0]}>
+            <sphereGeometry args={[0.042, 16, 16]} />
             <meshStandardMaterial
               color="#DC2626"
               emissive="#EF4444"
-              emissiveIntensity={2.5}
-              roughness={0.15}
+              emissiveIntensity={3.5}
+              roughness={0.1}
             />
           </mesh>
           {/* Holographic Alert Ring */}
           <mesh rotation={[0, 0, 0]}>
-            <torusGeometry args={[0.2, 0.012, 16, 32]} />
+            <torusGeometry args={[0.24, 0.016, 16, 32]} />
             <meshStandardMaterial
               color="#EF4444"
               emissive="#EF4444"
-              emissiveIntensity={1.8}
+              emissiveIntensity={2.5}
               transparent
-              opacity={0.8}
+              opacity={0.85}
             />
           </mesh>
           {/* Glowing Aura Point Light */}
-          <pointLight color="#EF4444" intensity={2} distance={2.5} />
+          <pointLight color="#EF4444" intensity={3} distance={3} />
         </group>
         {/* 1. CENTRAL FUSELAGE / BODY */}
         <group position={[0, 0, 0]}>
