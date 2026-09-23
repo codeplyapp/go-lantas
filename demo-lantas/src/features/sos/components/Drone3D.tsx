@@ -100,8 +100,8 @@ const DroneMesh: React.FC<DroneMeshProps> = ({ status }) => {
 
     // 4. Ground Shadow scaling and opacity reacting to altitude
     if (shadowMeshRef.current) {
-      const targetScale = status === 'flying' ? 1.4 : 1.0;
-      const targetOpacity = status === 'flying' ? 0.15 : 0.38;
+      const targetScale = status === 'flying' ? 1.3 : 1.0;
+      const targetOpacity = status === 'flying' ? 0.12 : 0.26;
       shadowMeshRef.current.scale.x = lerp(shadowMeshRef.current.scale.x, targetScale, 0.1);
       shadowMeshRef.current.scale.y = lerp(shadowMeshRef.current.scale.y, targetScale, 0.1);
       if (shadowMeshRef.current.material) {
@@ -390,17 +390,17 @@ const DroneMesh: React.FC<DroneMeshProps> = ({ status }) => {
         })}
       </group>
 
-      {/* 5. SOFT GROUND SHADOW (Native Three.js Plane) */}
+      {/* 5. SOFT GROUND SHADOW (Subtle Three.js Disc) */}
       <mesh
         ref={shadowMeshRef}
-        position={[0, -0.72, 0]}
+        position={[0, -0.42, 0]}
         rotation={[-Math.PI / 2, 0, 0]}
       >
-        <circleGeometry args={[0.95, 32]} />
+        <circleGeometry args={[0.68, 32]} />
         <meshBasicMaterial
-          color="#001a33"
+          color="#0F172A"
           transparent
-          opacity={0.38}
+          opacity={0.24}
           depthWrite={false}
         />
       </mesh>
@@ -417,7 +417,7 @@ export const Drone3D: React.FC<Drone3DProps> = ({ status, className = '' }) => {
   return (
     <div className={`w-full h-full relative select-none pointer-events-none ${className}`}>
       <Canvas
-        camera={{ position: [0, 1.35, 2.9], fov: 42 }}
+        camera={{ position: [0, 1.25, 2.7], fov: 40 }}
         gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
         style={{ pointerEvents: 'none' }}
       >

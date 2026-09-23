@@ -132,33 +132,44 @@ export const DroneResponseCard: React.FC<DroneResponseCardProps> = ({
         <div className="absolute -top-16 -right-16 w-48 h-48 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
       )}
 
-      {/* Header Row: Title & Badge */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-slate-100">
-        <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-xl bg-[#0077C0]/10 text-[#0077C0] border border-[#0077C0]/20 shrink-0">
-            <Radio className="w-4.5 h-4.5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-sm sm:text-base font-heading font-extrabold text-[#0F172A] tracking-apple-tight">
-                Unit Drone SIKAP-01
-              </h3>
-              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 uppercase tracking-wider">
-                DFR KORLANTAS
-              </span>
+      {/* Header Row: Title, Subtitle, & Status Badge */}
+      <div className="space-y-2.5 pb-3 border-b border-slate-100">
+        <div className="flex items-start justify-between gap-2.5">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-[#0077C0]/10 text-[#0077C0] border border-[#0077C0]/20 flex items-center justify-center shrink-0">
+              <Radio className="w-5 h-5" />
             </div>
-            <p className="text-[11.5px] text-slate-600 font-medium">
-              Respon Pertama sebelum petugas tiba di lokasi.
-            </p>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <h3 className="text-sm sm:text-base font-heading font-extrabold text-[#0F172A] tracking-apple-tight">
+                  Unit Drone SIKAP-01
+                </h3>
+                <span className="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 tracking-wider">
+                  DFR KORLANTAS
+                </span>
+              </div>
+              <p className="text-[11.5px] text-slate-500 font-medium truncate sm:whitespace-normal">
+                Respon Cepat Pertama Sebelum Petugas Tiba
+              </p>
+            </div>
+          </div>
+
+          {/* Desktop / Tablet Status Badge */}
+          <div className="shrink-0 hidden sm:block">
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-extrabold border shadow-2xs ${badge.bg}`}>
+              <span className={`w-2 h-2 rounded-full ${badge.dot}`} />
+              {badge.label}
+            </span>
           </div>
         </div>
 
-        {/* Dynamic Status Badge */}
-        <div className="flex items-center">
-          <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-extrabold border shadow-2xs ${badge.bg}`}>
+        {/* Mobile-Only Status Strip (Cleanly integrated without floating awkwardly) */}
+        <div className={`sm:hidden flex items-center justify-between px-3 py-1.5 rounded-xl border text-xs font-semibold ${badge.bg}`}>
+          <div className="flex items-center gap-1.5">
             <span className={`w-2 h-2 rounded-full ${badge.dot}`} />
-            {badge.label}
-          </span>
+            <span className="text-[11px] opacity-80">Status Armada:</span>
+          </div>
+          <span className="text-xs font-extrabold tracking-wide">{badge.label}</span>
         </div>
       </div>
 
@@ -167,12 +178,12 @@ export const DroneResponseCard: React.FC<DroneResponseCardProps> = ({
         {/* LEFT: 3D WebGL Canvas Viewport */}
         <div className="md:col-span-5 relative w-full h-48 sm:h-52 rounded-2xl bg-gradient-to-b from-slate-900/[0.02] via-slate-900/[0.04] to-[#0077C0]/[0.06] border border-slate-200/80 overflow-hidden shadow-inner flex items-center justify-center">
           {/* Tactical HUD Overlay Markers */}
-          <div className="absolute top-2 left-2.5 flex items-center gap-1.5 text-[9.5px] font-mono font-bold text-slate-500 select-none z-10">
+          <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 text-[9.5px] font-mono font-bold text-slate-600 bg-white/85 backdrop-blur-xs px-2 py-0.5 rounded-md border border-slate-200/70 select-none z-10 shadow-2xs">
             <Crosshair className="w-3 h-3 text-[#0077C0]" />
             <span>SIKAP-DFR // LIVE 3D</span>
           </div>
 
-          <div className="absolute top-2 right-2.5 flex items-center gap-1 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-white/80 backdrop-blur-xs text-slate-700 border border-slate-200 select-none z-10">
+          <div className="absolute top-2.5 right-2.5 flex items-center gap-1 text-[9px] font-mono font-bold px-2 py-0.5 rounded-md bg-white/85 backdrop-blur-xs text-slate-700 border border-slate-200/70 select-none z-10 shadow-2xs">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             60 FPS
           </div>
@@ -183,15 +194,15 @@ export const DroneResponseCard: React.FC<DroneResponseCardProps> = ({
           </Suspense>
 
           {/* Bottom HUD bar */}
-          <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between text-[10px] font-mono text-slate-600 bg-white/75 backdrop-blur-xs px-2.5 py-1 rounded-lg border border-slate-200/60 select-none z-10">
-            <span className="truncate font-semibold text-slate-700">
+          <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-[10px] font-mono text-slate-700 bg-white/90 backdrop-blur-xs px-2.5 py-1.5 rounded-lg border border-slate-200/80 select-none z-10 shadow-2xs">
+            <span className="truncate font-semibold text-slate-800">
               {droneStatus === 'flying'
                 ? `ETA: ${etaSeconds}s • Jarak: ${distanceMeters}m`
                 : droneStatus === 'on_scene'
                 ? 'OVERWATCH TKP AKTIF'
                 : 'PANGKALAN: ATAP POLSEK KOTA'}
             </span>
-            <span className="font-bold text-[#0077C0] shrink-0 ml-1">
+            <span className="font-extrabold text-[#0077C0] text-[9px] bg-[#0077C0]/10 px-1.5 py-0.5 rounded shrink-0 ml-1.5">
               AUTONOMI DFR
             </span>
           </div>
@@ -200,28 +211,28 @@ export const DroneResponseCard: React.FC<DroneResponseCardProps> = ({
         {/* RIGHT: Telemetry & Mission Brief */}
         <div className="md:col-span-7 space-y-3">
           {/* Context Mission Banner */}
-          <div className={`p-3 rounded-xl text-xs font-medium border leading-relaxed transition-all ${
+          <div className={`p-3 sm:p-3.5 rounded-xl text-xs font-medium border leading-relaxed transition-all ${
             droneStatus === 'flying'
               ? 'bg-rose-50 border-rose-200 text-rose-900'
               : droneStatus === 'on_scene'
               ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
               : droneStatus === 'arming'
               ? 'bg-amber-50 border-amber-200 text-amber-900'
-              : 'bg-slate-50 border-slate-200 text-slate-700'
+              : 'bg-slate-50 border-slate-200/80 text-slate-700'
           }`}>
             {droneStatus === 'standby' && (
               <p>
-                <strong className="font-extrabold text-slate-900">Moda Standby:</strong> Drone DFR berpusat di atap Command Center terdekat, siap meluncur secara otonom dalam 5 detik saat tombol SOS ditekan.
+                <strong className="font-extrabold text-slate-900">Moda Siaga:</strong> Drone DFR berpusat di atap Polsek terdekat, siap meluncur secara otonom dalam 5 detik saat tombol SOS ditekan.
               </p>
             )}
             {droneStatus === 'arming' && (
               <p className="animate-pulse">
-                <strong className="font-extrabold text-amber-950">Persiapan Peluncuran:</strong> Motor RPM dipercepat, koordinat GPS laporan dikunci ke sistem navigasi LiDAR drone.
+                <strong className="font-extrabold text-amber-950">Persiapan Lepas Landas:</strong> Motor RPM dipercepat, koordinat GPS laporan dikunci ke sistem navigasi autopilot drone.
               </p>
             )}
             {droneStatus === 'flying' && (
               <p>
-                <strong className="font-extrabold text-rose-950">Meluncur Menuju TKP:</strong> Drone sedang terbang dengan kecepatan 68 km/h menuju koordinat target {targetLocation ? `[${targetLocation.latitude.toFixed(4)}, ${targetLocation.longitude.toFixed(4)}]` : 'Banyuwangi Kota'}. Tiba dalam ±{etaSeconds} detik.
+                <strong className="font-extrabold text-rose-950">Meluncur Menuju TKP:</strong> Drone terbang dengan kecepatan 68 km/h menuju titik laporan {targetLocation ? `[${targetLocation.latitude.toFixed(4)}, ${targetLocation.longitude.toFixed(4)}]` : 'Banyuwangi Kota'}. Tiba dalam ±{etaSeconds} detik.
               </p>
             )}
             {droneStatus === 'on_scene' && (
@@ -231,49 +242,49 @@ export const DroneResponseCard: React.FC<DroneResponseCardProps> = ({
             )}
           </div>
 
-          {/* 4 Telemetry Inset Chips */}
+          {/* 4 Telemetry Inset Chips with Clean Vertical Stacking */}
           <div className="grid grid-cols-2 gap-2 text-xs">
             {/* Alt */}
-            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 flex flex-col justify-between space-y-1">
               <div className="flex items-center gap-1.5 text-slate-500">
-                <Gauge className="w-3.5 h-3.5 text-[#0077C0]" />
-                <span className="font-medium">Ketinggian</span>
+                <Gauge className="w-3.5 h-3.5 text-[#0077C0] shrink-0" />
+                <span className="text-[11px] font-semibold text-slate-600">Ketinggian</span>
               </div>
-              <span className="font-mono font-bold text-slate-900">
+              <div className="font-mono text-xs font-bold text-slate-900 truncate">
                 {getAltitude()}
-              </span>
+              </div>
             </div>
 
             {/* Speed */}
-            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 flex flex-col justify-between space-y-1">
               <div className="flex items-center gap-1.5 text-slate-500">
-                <Navigation className="w-3.5 h-3.5 text-[#0077C0]" />
-                <span className="font-medium">Kecepatan</span>
+                <Navigation className="w-3.5 h-3.5 text-[#0077C0] shrink-0" />
+                <span className="text-[11px] font-semibold text-slate-600">Kecepatan</span>
               </div>
-              <span className="font-mono font-bold text-slate-900">
+              <div className="font-mono text-xs font-bold text-slate-900 truncate">
                 {getSpeed()}
-              </span>
+              </div>
             </div>
 
             {/* Sensor & Camera */}
-            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 flex flex-col justify-between space-y-1">
               <div className="flex items-center gap-1.5 text-slate-500">
-                <Video className="w-3.5 h-3.5 text-[#0077C0]" />
-                <span className="font-medium">Kamera</span>
+                <Video className="w-3.5 h-3.5 text-[#0077C0] shrink-0" />
+                <span className="text-[11px] font-semibold text-slate-600">Sensor Optik</span>
               </div>
-              <span className="font-mono font-bold text-slate-900 text-[11px]">
+              <div className="font-mono text-xs font-bold text-slate-900 truncate">
                 4K UHD + FLIR
-              </span>
+              </div>
             </div>
 
             {/* Link & Battery */}
-            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 flex flex-col justify-between space-y-1">
               <div className="flex items-center gap-1.5 text-slate-500">
-                <Wifi className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="font-medium">RTK / Bat</span>
+                <Wifi className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span className="text-[11px] font-semibold text-slate-600">Sinyal & Daya</span>
               </div>
-              <div className="flex items-center gap-1 font-mono font-bold text-slate-900 text-[11px]">
-                <span className="text-emerald-700">99%</span>
+              <div className="flex items-center gap-1.5 font-mono text-xs font-bold text-slate-900">
+                <span className="text-emerald-700">RTK 99%</span>
                 <span className="text-slate-300">•</span>
                 <span className="inline-flex items-center text-slate-800">
                   <BatteryCharging className="w-3 h-3 text-emerald-600 mr-0.5" />
