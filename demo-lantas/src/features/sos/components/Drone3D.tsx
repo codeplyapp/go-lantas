@@ -16,6 +16,7 @@ const DroneMesh: React.FC<DroneMeshProps> = ({ status }) => {
   const beaconLightRef = useRef<any>(null);
   const beaconMeshRef = useRef<any>(null);
   const shadowMeshRef = useRef<any>(null);
+  const alertIconRef = useRef<any>(null);
   
   // Rotor refs for 4 propellers
   const rotorRefs = [
@@ -29,13 +30,13 @@ const DroneMesh: React.FC<DroneMeshProps> = ({ status }) => {
     const t = state.clock.getElapsedTime();
 
     // 1. Rotor rotation speed based on status
-    let rotorSpeed = 12; // rad/s for standby
+    let rotorSpeed = 14; // rad/s for standby
     if (status === 'arming') {
-      rotorSpeed = 38;
+      rotorSpeed = 40;
     } else if (status === 'flying') {
-      rotorSpeed = 70;
+      rotorSpeed = 75;
     } else if (status === 'on_scene') {
-      rotorSpeed = 26;
+      rotorSpeed = 28;
     }
 
     rotorRefs.forEach((ref, index) => {
@@ -56,52 +57,60 @@ const DroneMesh: React.FC<DroneMeshProps> = ({ status }) => {
       }
     }
 
-    // 3. Drone Movement & Flight Dynamics
+    // 3. Floating Exclamation Mark (!) Animation
+    if (alertIconRef.current) {
+      alertIconRef.current.position.y = 0.44 + Math.sin(t * 3) * 0.025;
+      const pulseScale = 1.0 + Math.sin(t * 4) * 0.06;
+      alertIconRef.current.scale.set(pulseScale, pulseScale, pulseScale);
+    }
+
+    // 4. Drone Movement & Flight Dynamics (Facing Front / Forward Perspective)
     if (droneGroupRef.current) {
       const group = droneGroupRef.current;
 
       if (status === 'standby') {
-        // Gentle floating hover
-        const targetY = Math.sin(t * 1.8) * 0.05;
+        // Gentle front-facing hover
+        const targetY = Math.sin(t * 1.8) * 0.04;
         group.position.y = lerp(group.position.y, targetY, 0.1);
         group.position.x = lerp(group.position.x, 0, 0.1);
         group.position.z = lerp(group.position.z, 0, 0.1);
         
-        group.rotation.x = lerp(group.rotation.x, Math.sin(t * 1.2) * 0.03, 0.1);
-        group.rotation.y = lerp(group.rotation.y, Math.sin(t * 0.5) * 0.15, 0.05);
-        group.rotation.z = lerp(group.rotation.z, Math.cos(t * 1.4) * 0.03, 0.1);
+        // Locked front facing orientation
+        group.rotation.x = lerp(group.rotation.x, Math.sin(t * 1.2) * 0.015, 0.1);
+        group.rotation.y = lerp(group.rotation.y, 0, 0.08); // Perfect front-facing alignment
+        group.rotation.z = lerp(group.rotation.z, Math.cos(t * 1.4) * 0.015, 0.1);
       } else if (status === 'arming') {
         // Spooling up: fast micro-vibration indicating engine ignition
         const vibration = Math.sin(t * 50) * 0.012;
-        group.position.y = lerp(group.position.y, vibration + 0.03, 0.2);
-        group.rotation.x = lerp(group.rotation.x, -0.05, 0.1);
-        group.rotation.z = lerp(group.rotation.z, (Math.random() - 0.5) * 0.02, 0.2);
+        group.position.y = lerp(group.position.y, vibration + 0.02, 0.2);
+        group.rotation.x = lerp(group.rotation.x, -0.04, 0.1);
+        group.rotation.y = lerp(group.rotation.y, 0, 0.1);
+        group.rotation.z = lerp(group.rotation.z, (Math.random() - 0.5) * 0.015, 0.2);
       } else if (status === 'flying') {
-        // High speed forward scramble & climb
-        const targetY = 0.45 + Math.sin(t * 2.8) * 0.08;
+        // Forward high speed climb & pitch
+        const targetY = 0.42 + Math.sin(t * 2.8) * 0.06;
         group.position.y = lerp(group.position.y, targetY, 0.08);
-        group.position.z = lerp(group.position.z, -0.15, 0.08);
+        group.position.z = lerp(group.position.z, -0.12, 0.08);
         
-        // Pitch forward (-X) + bank roll
-        group.rotation.x = lerp(group.rotation.x, -0.28, 0.1); // ~16 deg pitch down
-        group.rotation.z = lerp(group.rotation.z, Math.sin(t * 2.2) * 0.08, 0.1);
-        group.rotation.y = lerp(group.rotation.y, Math.sin(t * 0.8) * 0.2, 0.08);
+        group.rotation.x = lerp(group.rotation.x, -0.22, 0.1); // ~12 deg forward pitch
+        group.rotation.y = lerp(group.rotation.y, 0, 0.08);
+        group.rotation.z = lerp(group.rotation.z, Math.sin(t * 2.2) * 0.05, 0.1);
       } else if (status === 'on_scene') {
-        // Tactical aerial surveillance hover (yaw rotation scanning 360)
-        const targetY = 0.25 + Math.sin(t * 1.5) * 0.06;
+        // Tactical aerial surveillance hover (front-facing patrol scan)
+        const targetY = 0.22 + Math.sin(t * 1.5) * 0.05;
         group.position.y = lerp(group.position.y, targetY, 0.08);
         group.position.z = lerp(group.position.z, 0, 0.08);
         
-        group.rotation.x = lerp(group.rotation.x, 0.05, 0.08);
-        group.rotation.y += 0.4 * delta; // slow 360 scan
-        group.rotation.z = lerp(group.rotation.z, Math.sin(t * 1.6) * 0.04, 0.08);
+        group.rotation.x = lerp(group.rotation.x, 0.04, 0.08);
+        group.rotation.y = lerp(group.rotation.y, Math.sin(t * 0.6) * 0.12, 0.05); // gentle front scanning
+        group.rotation.z = lerp(group.rotation.z, Math.sin(t * 1.6) * 0.03, 0.08);
       }
     }
 
-    // 4. Ground Shadow scaling and opacity reacting to altitude
+    // 5. Ground Shadow scaling and opacity reacting to altitude
     if (shadowMeshRef.current) {
-      const targetScale = status === 'flying' ? 1.3 : 1.0;
-      const targetOpacity = status === 'flying' ? 0.12 : 0.26;
+      const targetScale = status === 'flying' ? 1.25 : 1.0;
+      const targetOpacity = status === 'flying' ? 0.12 : 0.24;
       shadowMeshRef.current.scale.x = lerp(shadowMeshRef.current.scale.x, targetScale, 0.1);
       shadowMeshRef.current.scale.y = lerp(shadowMeshRef.current.scale.y, targetScale, 0.1);
       if (shadowMeshRef.current.material) {
@@ -113,13 +122,13 @@ const DroneMesh: React.FC<DroneMeshProps> = ({ status }) => {
       }
     }
 
-    // 5. Camera Gimbal Tracking
+    // 6. Camera Gimbal Tracking
     if (gimbalRef.current) {
       if (status === 'flying' || status === 'on_scene') {
-        // Pitch camera down to survey road / ground
-        gimbalRef.current.rotation.x = lerp(gimbalRef.current.rotation.x, 0.45, 0.1);
+        // Pitch camera down slightly to survey road / ground
+        gimbalRef.current.rotation.x = lerp(gimbalRef.current.rotation.x, 0.4, 0.1);
       } else {
-        gimbalRef.current.rotation.x = lerp(gimbalRef.current.rotation.x, 0.1, 0.1);
+        gimbalRef.current.rotation.x = lerp(gimbalRef.current.rotation.x, 0.08, 0.1);
       }
     }
   });
@@ -139,6 +148,62 @@ const DroneMesh: React.FC<DroneMeshProps> = ({ status }) => {
   return (
     <>
       <group ref={droneGroupRef} position={[0, 0, 0]}>
+        {/* 0. 3D FLOATING EMERGENCY EXCLAMATION MARK (!) ABOVE DRONE */}
+        <group ref={alertIconRef} position={[0, 0.44, 0]}>
+          {/* Exclamation stem top cap */}
+          <mesh position={[0, 0.17, 0]}>
+            <sphereGeometry args={[0.036, 16, 16]} />
+            <meshStandardMaterial
+              color="#DC2626"
+              emissive="#EF4444"
+              emissiveIntensity={2.5}
+              roughness={0.15}
+            />
+          </mesh>
+          {/* Exclamation stem body */}
+          <mesh position={[0, 0.09, 0]}>
+            <cylinderGeometry args={[0.036, 0.024, 0.16, 16]} />
+            <meshStandardMaterial
+              color="#DC2626"
+              emissive="#EF4444"
+              emissiveIntensity={2.5}
+              roughness={0.15}
+            />
+          </mesh>
+          {/* Exclamation stem bottom cap */}
+          <mesh position={[0, 0.01, 0]}>
+            <sphereGeometry args={[0.024, 16, 16]} />
+            <meshStandardMaterial
+              color="#DC2626"
+              emissive="#EF4444"
+              emissiveIntensity={2.5}
+              roughness={0.15}
+            />
+          </mesh>
+          {/* Exclamation dot */}
+          <mesh position={[0, -0.065, 0]}>
+            <sphereGeometry args={[0.034, 16, 16]} />
+            <meshStandardMaterial
+              color="#DC2626"
+              emissive="#EF4444"
+              emissiveIntensity={2.5}
+              roughness={0.15}
+            />
+          </mesh>
+          {/* Holographic Alert Ring */}
+          <mesh rotation={[0, 0, 0]}>
+            <torusGeometry args={[0.2, 0.012, 16, 32]} />
+            <meshStandardMaterial
+              color="#EF4444"
+              emissive="#EF4444"
+              emissiveIntensity={1.8}
+              transparent
+              opacity={0.8}
+            />
+          </mesh>
+          {/* Glowing Aura Point Light */}
+          <pointLight color="#EF4444" intensity={2} distance={2.5} />
+        </group>
         {/* 1. CENTRAL FUSELAGE / BODY */}
         <group position={[0, 0, 0]}>
           {/* Main Sleek Body Shell */}
@@ -417,7 +482,7 @@ export const Drone3D: React.FC<Drone3DProps> = ({ status, className = '' }) => {
   return (
     <div className={`w-full h-full relative select-none pointer-events-none ${className}`}>
       <Canvas
-        camera={{ position: [0, 1.25, 2.7], fov: 40 }}
+        camera={{ position: [0, 0.65, 2.8], fov: 38 }}
         gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
         style={{ pointerEvents: 'none' }}
       >
