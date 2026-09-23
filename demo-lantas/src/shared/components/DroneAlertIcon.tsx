@@ -5,79 +5,193 @@ interface DroneAlertIconProps {
 }
 
 /**
- * Custom Solid SVG Icon: DJI FPV Tactical Drone (Identical to 3D Viewport Model)
+ * Custom Solid SVG Icon: Tactical DFR FPV Drone (100% Identical to 3D Viewport Model)
  * Features:
- * - Clear solid Exclamation Mark (!) on top
- * - Aerodynamic helmet cockpit canopy dome & cooling seam
- * - Front nose FPV camera gimbal with central optical eye & underbelly light
- * - X-frame tubular motor arms with vertical landing fin legs
- * - Airfoil tri-blade propellers with winglet accents
+ * - Crisp solid Emergency Exclamation Mark (!) prominently positioned above the canopy
+ * - Aerodynamic helmet dome canopy with intake ventilation seam
+ * - Front nose FPV gimbal camera housing with optical sapphire lens
+ * - Tactical underbelly searchlight (lampu senter) with downward projection
+ * - Symmetrical X-frame carbon arms with dual brushless motor bells
+ * - Dual spinning airfoil tri-blade rotor lines
+ * - Vertical landing fin legs extending straight down from under the motor pods
  */
 export const DroneAlertIcon: React.FC<DroneAlertIconProps> = ({ className = 'w-8 h-8' }) => {
   return (
     <svg
       viewBox="0 0 32 32"
       fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      xmlns="http://www.w3.org/2000/svg"
       className={className}
     >
-      {/* 1. TANDA SERU (!) SOLID & TEGAS DI ATAS DRONE */}
-      <path
-        d="M14.6 2 H17.4 L16.8 6.8 H15.2 Z"
+      {/* ========================================================= */}
+      {/* 1. TANDA SERU (!) SOLID & TEGAS DI ATAS DRONE            */}
+      {/* ========================================================= */}
+      {/* Batang vertikal tanda seru */}
+      <rect
+        x="14.6"
+        y="1.5"
+        width="2.8"
+        height="5.2"
+        rx="1.4"
         fill="currentColor"
-        stroke="none"
       />
-      <circle cx="16" cy="9.2" r="1.3" fill="currentColor" stroke="none" />
-
-      {/* 2. BALING-BALING KIRI & KANAN (Airfoil Rotors) */}
-      <path
-        d="M1.5 13.2 C3.2 12.2 7.8 12.2 9.5 13.2 C7.8 14.0 3.2 14.0 1.5 13.2 Z"
+      {/* Titik bulat tanda seru */}
+      <circle
+        cx="16"
+        cy="9.0"
+        r="1.4"
         fill="currentColor"
-        fillOpacity="0.85"
-        strokeWidth="0.8"
-      />
-      <path
-        d="M22.5 13.2 C24.2 12.2 28.8 12.2 30.5 13.2 C28.8 14.0 24.2 14.0 22.5 13.2 Z"
-        fill="currentColor"
-        fillOpacity="0.85"
-        strokeWidth="0.8"
       />
 
-      {/* 3. MOTOR PODS KIRI & KANAN */}
-      <rect x="4.2" y="13.6" width="2.6" height="2.4" rx="0.6" fill="currentColor" fillOpacity="0.4" />
-      <rect x="25.2" y="13.6" width="2.6" height="2.4" rx="0.6" fill="currentColor" fillOpacity="0.4" />
-
-      {/* 4. KAKI SIRIP PENDARATAN VERTIKAL (Vertical Landing Fin Legs dari Model 3D) */}
-      <path d="M5.5 16 V22.8" strokeWidth="1.8" />
-      <circle cx="5.5" cy="23.2" r="0.9" fill="currentColor" stroke="none" />
-
-      <path d="M26.5 16 V22.8" strokeWidth="1.8" />
-      <circle cx="26.5" cy="23.2" r="0.9" fill="currentColor" stroke="none" />
-
-      {/* 5. LENGAN X-FRAME KARBON */}
-      <path d="M5.5 14.8 L12.5 15.2" strokeWidth="1.8" />
-      <path d="M26.5 14.8 L19.5 15.2" strokeWidth="1.8" />
-
-      {/* 6. BODI UTAMA KANOPI HELMET DOME (Sesuai 3D FPV Model) */}
+      {/* ========================================================= */}
+      {/* 2. BALING-BALING KIRI & KANAN (Airfoil Rotors)           */}
+      {/* ========================================================= */}
+      {/* Rotor Kiri */}
       <path
-        d="M11.8 15.4 C11.8 12.5 13.6 11.5 16 11.5 C18.4 11.5 20.2 12.5 20.2 15.4 C20.2 17.0 18.5 17.8 16 17.8 C13.5 17.8 11.8 17.0 11.8 15.4 Z"
+        d="M1.2 12.8 C3.0 11.6 8.2 11.6 10.0 12.8 C8.2 13.7 3.0 13.7 1.2 12.8 Z"
         fill="currentColor"
-        fillOpacity="0.3"
-        strokeWidth="1.5"
+        fillOpacity="0.9"
+      />
+      {/* Rotor Kanan */}
+      <path
+        d="M22.0 12.8 C23.8 11.6 29.0 11.6 30.8 12.8 C29.0 13.7 23.8 13.7 22.0 12.8 Z"
+        fill="currentColor"
+        fillOpacity="0.9"
+      />
+
+      {/* ========================================================= */}
+      {/* 3. MOTOR PODS (Brushless Motor Bells)                     */}
+      {/* ========================================================= */}
+      <rect
+        x="4.2"
+        y="13.0"
+        width="2.8"
+        height="2.4"
+        rx="0.7"
+        fill="currentColor"
+      />
+      <rect
+        x="25.0"
+        y="13.0"
+        width="2.8"
+        height="2.4"
+        rx="0.7"
+        fill="currentColor"
+      />
+
+      {/* ========================================================= */}
+      {/* 4. LENGAN X-FRAME KARBON (Menghubungkan Bodi ke Motor)   */}
+      {/* ========================================================= */}
+      <path
+        d="M5.6 14.2 L12.5 15.0"
+        stroke="currentColor"
+        strokeWidth="2.0"
+        strokeLinecap="round"
+      />
+      <path
+        d="M26.4 14.2 L19.5 15.0"
+        stroke="currentColor"
+        strokeWidth="2.0"
+        strokeLinecap="round"
+      />
+
+      {/* ========================================================= */}
+      {/* 5. KAKI SIRIP PENDARATAN VERTIKAL (Di Bawah Setiap Motor) */}
+      {/* ========================================================= */}
+      {/* Kaki Kiri */}
+      <path
+        d="M5.6 15.4 V22.8"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <circle
+        cx="5.6"
+        cy="23.2"
+        r="1.0"
+        fill="currentColor"
+      />
+
+      {/* Kaki Kanan */}
+      <path
+        d="M26.4 15.4 V22.8"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <circle
+        cx="26.4"
+        cy="23.2"
+        r="1.0"
+        fill="currentColor"
+      />
+
+      {/* ========================================================= */}
+      {/* 6. BODI UTAMA KANOPI HELMET DOME (Sesuai Model 3D)        */}
+      {/* ========================================================= */}
+      <path
+        d="M11.6 15.8 C11.6 12.0 13.5 11.0 16 11.0 C18.5 11.0 20.4 12.0 20.4 15.8 C20.4 17.6 18.6 18.5 16 18.5 C13.4 18.5 11.6 17.6 11.6 15.8 Z"
+        fill="currentColor"
+        fillOpacity="0.4"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
       />
       {/* Top Air Intake Vent Seam */}
-      <path d="M14.2 13.2 H17.8" strokeWidth="1.2" />
+      <path
+        d="M14.2 12.8 H17.8"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
 
-      {/* 7. KAMERA FPV NOSE GIMBAL & LENSA SENTRAL */}
-      <rect x="14" y="15.6" width="4" height="3.4" rx="0.9" fill="currentColor" fillOpacity="0.5" strokeWidth="1.2" />
-      <circle cx="16" cy="17.3" r="1.15" fill="currentColor" stroke="none" />
+      {/* ========================================================= */}
+      {/* 7. KAMERA FPV NOSE GIMBAL & LENSA OPTIK                   */}
+      {/* ========================================================= */}
+      <rect
+        x="13.7"
+        y="15.4"
+        width="4.6"
+        height="3.8"
+        rx="1.1"
+        fill="currentColor"
+        fillOpacity="0.85"
+      />
+      <circle
+        cx="16"
+        cy="17.3"
+        r="1.2"
+        fill="#DC2626"
+      />
+      <circle
+        cx="16"
+        cy="17.3"
+        r="0.55"
+        fill="white"
+      />
 
-      {/* 8. LAMPU SENTER BAWAH (Underbelly Tactical Searchlight) */}
-      <path d="M14.8 19.2 H17.2 L16.8 21.2 H15.2 Z" fill="currentColor" strokeWidth="0.8" />
-      <circle cx="16" cy="22.2" r="0.75" fill="currentColor" stroke="none" />
+      {/* ========================================================= */}
+      {/* 8. LAMPU SENTER BAWAH (Underbelly Tactical Searchlight)    */}
+      {/* ========================================================= */}
+      {/* Dudukan senter */}
+      <path
+        d="M14.6 19.2 H17.4 L17.0 21.8 H15.0 Z"
+        fill="currentColor"
+      />
+      {/* Lensa pemancar cahaya senter */}
+      <circle
+        cx="16"
+        cy="22.6"
+        r="0.9"
+        fill="currentColor"
+      />
+      {/* Berkas cahaya senter ke bawah (Subtle beam cone) */}
+      <path
+        d="M14.0 24.2 L16 23.2 L18.0 24.2"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
     </svg>
   );
 };
