@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Home, Bookmark, PlusCircle, User, Settings } from 'lucide-react';
+import { LucideIcon, Home, Bookmark, PlusCircle, User, Settings } from 'lucide-react';
 
 interface NavItemProps {
-  icon: React.ElementType;
+  icon: LucideIcon;
   isActive?: boolean;
   onClick?: () => void;
   indicatorPosition: number;
