@@ -3,7 +3,7 @@ import {
   ShieldAlert, Gamepad2, MapPin, Award, Flame, 
   ChevronRight, ChevronLeft, ArrowUpRight, Navigation,
   Shield, Calendar, Megaphone, Search, Users, BookOpen, Bot,
-  CheckCircle2, X, LocateFixed
+  CheckCircle2, X, LocateFixed, Drone
 } from 'lucide-react';
 import { UserProfile } from '../../core/types';
 import { TabType } from '../../shared/components/BottomNavBar';
@@ -76,7 +76,7 @@ export const BerandaView: React.FC<BerandaViewProps> = ({
     { id: 'belajar', label: 'Kuis Edukasi', sublabel: '+20 Poin', icon: Gamepad2, color: 'bg-blue-50 text-[#0077C0]' },
     { id: 'jalur', label: 'Edukasi SIM', sublabel: 'Teori SIM', icon: BookOpen, color: 'bg-blue-50 text-[#0077C0]' },
     { id: 'peta', label: 'Peta Live', sublabel: 'Traffic GPS', icon: MapPin, color: 'bg-blue-50 text-[#0077C0]' },
-    { id: 'sos', label: 'SOS 110', sublabel: 'Siaga Darurat', icon: ShieldAlert, color: 'bg-rose-50 text-rose-600' },
+    { id: 'sos', label: 'SOS 110', sublabel: 'Drone Siaga', icon: Drone, color: 'bg-rose-50 text-rose-600' },
     { id: 'keluarga', label: 'Keluarga', sublabel: 'UU PDP', icon: Users, color: 'bg-blue-50 text-[#0077C0]' },
     { id: 'robot', label: 'Go Lantas Bot', sublabel: 'Tanya Petugas', icon: Bot, color: 'bg-blue-50 text-[#0077C0]' },
   ];
