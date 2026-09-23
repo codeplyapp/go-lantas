@@ -1,5 +1,6 @@
 import React from 'react';
-import { Home, GraduationCap, MapPin, User, Drone } from 'lucide-react';
+import { Home, GraduationCap, MapPin, User } from 'lucide-react';
+import { DroneAlertIcon } from './DroneAlertIcon';
 import { sound } from '../services/sound';
 
 export type TabType = 'beranda' | 'belajar' | 'sos' | 'peta' | 'profil' | 'keluarga';
@@ -13,7 +14,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeTab, onSelectT
   const navItems = [
     { id: 'beranda' as TabType, label: 'Beranda', icon: Home },
     { id: 'belajar' as TabType, label: 'Belajar', icon: GraduationCap },
-    { id: 'sos' as TabType, label: 'SOS 110', icon: Drone, isEmergency: true },
+    { id: 'sos' as TabType, label: 'SOS 110', icon: DroneAlertIcon, isEmergency: true },
     { id: 'peta' as TabType, label: 'Peta', icon: MapPin },
     { id: 'profil' as TabType, label: 'Profil', icon: User },
   ];
