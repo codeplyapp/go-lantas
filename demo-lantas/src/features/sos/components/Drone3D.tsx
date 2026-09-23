@@ -311,7 +311,61 @@ const DroneMesh: React.FC<DroneMeshProps> = ({ status }) => {
         </group>
 
         {/* ========================================================= */}
-        {/* 3. 4 CARBON FIBER ARMS, MOTOR PODS & VERTICAL FIN FEET    */}
+        {/* 3. UNDERBELLY SEARCHLIGHT / FLASHLIGHT (Lampu Senter)     */}
+        {/* ========================================================= */}
+        <group position={[0, -0.10, 0.04]}>
+          {/* Flashlight Mount Base */}
+          <mesh position={[0, 0.03, 0]}>
+            <cylinderGeometry args={[0.045, 0.045, 0.025, 16]} />
+            <meshStandardMaterial color="#1E293B" metalness={0.92} roughness={0.2} />
+          </mesh>
+
+          {/* Flashlight Casing Pod (Tapered Barrel) */}
+          <mesh position={[0, -0.015, 0]} rotation={[0.18, 0, 0]}>
+            <cylinderGeometry args={[0.052, 0.064, 0.065, 24]} />
+            <meshStandardMaterial color="#0F172A" metalness={0.95} roughness={0.15} />
+          </mesh>
+
+          {/* Titanium Cooling Heat-Sink Ring */}
+          <mesh position={[0, -0.015, 0]} rotation={[0.18, 0, 0]}>
+            <torusGeometry args={[0.06, 0.005, 12, 24]} />
+            <meshStandardMaterial color="#94A3B8" metalness={0.95} roughness={0.1} />
+          </mesh>
+
+          {/* High-Lumen Tactical LED Lens Emitter */}
+          <mesh position={[0, -0.048, 0.008]} rotation={[0.18, 0, 0]}>
+            <cylinderGeometry args={[0.05, 0.05, 0.008, 24]} />
+            <meshStandardMaterial
+              color="#FFFFFF"
+              emissive="#E0F2FE"
+              emissiveIntensity={4.8}
+              roughness={0.05}
+            />
+          </mesh>
+
+          {/* Tactical High-Power Point Light Projector */}
+          <pointLight
+            position={[0, -0.08, 0.01]}
+            color="#E0F2FE"
+            intensity={4.5}
+            distance={5}
+          />
+
+          {/* Volumetric Conical Light Beam (Sorotan Berkas Cahaya Senter ke Bawah) */}
+          <mesh position={[0, -0.26, 0.04]} rotation={[0.18, 0, 0]}>
+            <cylinderGeometry args={[0.055, 0.44, 0.48, 24, 1, true]} />
+            <meshBasicMaterial
+              color="#BAE6FD"
+              transparent
+              opacity={0.18}
+              depthWrite={false}
+              side={2}
+            />
+          </mesh>
+        </group>
+
+        {/* ========================================================= */}
+        {/* 4. 4 CARBON FIBER ARMS, MOTOR PODS & VERTICAL FIN FEET    */}
         {/* ========================================================= */}
         {armConfigs.map((arm, index) => {
           const ledColor = arm.isFront ? '#0077C0' : '#10B981';
@@ -395,8 +449,23 @@ const DroneMesh: React.FC<DroneMeshProps> = ({ status }) => {
       </group>
 
       {/* ========================================================= */}
-      {/* 4. SOFT GROUND SHADOW DISC                                */}
+      {/* 5. SOFT GROUND SHADOW & SEARCHLIGHT SPOTLIGHT POOL        */}
       {/* ========================================================= */}
+      {/* Searchlight Ground Spotlight Pool (Lampu Senter Terang di Tanah) */}
+      <mesh
+        position={[0, -0.375, 0.08]}
+        rotation={[-Math.PI / 2, 0, 0]}
+      >
+        <circleGeometry args={[0.38, 32]} />
+        <meshBasicMaterial
+          color="#38BDF8"
+          transparent
+          opacity={0.32}
+          depthWrite={false}
+        />
+      </mesh>
+
+      {/* Main Ground Ambient Shadow Disc */}
       <mesh
         ref={shadowMeshRef}
         position={[0, -0.38, 0]}
