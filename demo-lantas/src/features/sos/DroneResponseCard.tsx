@@ -66,37 +66,37 @@ export const DroneResponseCard: React.FC<DroneResponseCardProps> = ({
     };
   }, [droneStatus]);
 
-  // Compute status badge labels and styling
+  // Compute status badge labels and styling (Minimal & Elegant, no bulky card)
   const getStatusBadge = () => {
     switch (droneStatus) {
       case 'arming':
         return {
           label: 'MEMARKIR & LUNCUR',
-          bg: 'bg-amber-500/10 text-amber-600 border-amber-500/30',
-          dot: 'bg-amber-500 animate-ping',
-          icon: <Zap className="w-3.5 h-3.5 text-amber-600" />,
+          textColor: 'text-amber-600',
+          dotBg: 'bg-amber-500',
+          ping: true,
         };
       case 'flying':
         return {
           label: 'MENUJU LOKASI (EN ROUTE)',
-          bg: 'bg-rose-500/10 text-rose-600 border-rose-500/30',
-          dot: 'bg-rose-600 animate-pulse',
-          icon: <Navigation className="w-3.5 h-3.5 text-rose-600 animate-spin" />,
+          textColor: 'text-rose-600',
+          dotBg: 'bg-rose-600',
+          ping: true,
         };
       case 'on_scene':
         return {
           label: 'DI TKP (PATROLI UDARA)',
-          bg: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30',
-          dot: 'bg-emerald-600 animate-pulse',
-          icon: <Eye className="w-3.5 h-3.5 text-emerald-600" />,
+          textColor: 'text-emerald-600',
+          dotBg: 'bg-emerald-600',
+          ping: false,
         };
       case 'standby':
       default:
         return {
           label: 'SIAP SIAGA (STANDBY)',
-          bg: 'bg-[#0077C0]/10 text-[#0077C0] border-[#0077C0]/30',
-          dot: 'bg-[#0077C0] animate-pulse',
-          icon: <ShieldCheck className="w-3.5 h-3.5 text-[#0077C0]" />,
+          textColor: 'text-[#0077C0]',
+          dotBg: 'bg-[#0077C0]',
+          ping: false,
         };
     }
   };
@@ -132,44 +132,36 @@ export const DroneResponseCard: React.FC<DroneResponseCardProps> = ({
         <div className="absolute -top-16 -right-16 w-48 h-48 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
       )}
 
-      {/* Header Row: Title, Subtitle, & Status Badge */}
-      <div className="space-y-2.5 pb-3 border-b border-slate-100">
-        <div className="flex items-start justify-between gap-2.5">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-[#0077C0]/10 text-[#0077C0] border border-[#0077C0]/20 flex items-center justify-center shrink-0">
-              <Radio className="w-5 h-5" />
-            </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <h3 className="text-sm sm:text-base font-heading font-extrabold text-[#0F172A] tracking-apple-tight">
-                  Unit Drone SIKAP-01
-                </h3>
-                <span className="text-[9.5px] font-extrabold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 tracking-wider">
-                  DFR KORLANTAS
-                </span>
-              </div>
-              <p className="text-[11.5px] text-slate-500 font-medium truncate sm:whitespace-normal">
-                Respon Cepat Pertama Sebelum Petugas Tiba
-              </p>
-            </div>
+      {/* Header Row: Title, Subtitle, & Minimal Elegant Status Indicator (No card/pill box) */}
+      <div className="flex items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-10 h-10 rounded-xl bg-[#0077C0]/10 text-[#0077C0] border border-[#0077C0]/20 flex items-center justify-center shrink-0">
+            <Radio className="w-5 h-5" />
           </div>
-
-          {/* Desktop / Tablet Status Badge */}
-          <div className="shrink-0 hidden sm:block">
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-extrabold border shadow-2xs ${badge.bg}`}>
-              <span className={`w-2 h-2 rounded-full ${badge.dot}`} />
-              {badge.label}
-            </span>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="text-sm sm:text-base font-heading font-extrabold text-[#0F172A] tracking-apple-tight">
+                Unit Drone SIKAP-01
+              </h3>
+              <span className="text-[9.5px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 tracking-wider uppercase">
+                DFR KORLANTAS
+              </span>
+            </div>
+            <p className="text-[11.5px] text-slate-500 font-medium truncate sm:whitespace-normal mt-0.5">
+              Respon Cepat Pertama Sebelum Petugas Tiba
+            </p>
           </div>
         </div>
 
-        {/* Mobile-Only Status Strip (Cleanly integrated without floating awkwardly) */}
-        <div className={`sm:hidden flex items-center justify-between px-3 py-1.5 rounded-xl border text-xs font-semibold ${badge.bg}`}>
-          <div className="flex items-center gap-1.5">
-            <span className={`w-2 h-2 rounded-full ${badge.dot}`} />
-            <span className="text-[11px] opacity-80">Status Armada:</span>
-          </div>
-          <span className="text-xs font-extrabold tracking-wide">{badge.label}</span>
+        {/* Elegant Live Status Indicator */}
+        <div className="flex items-center gap-1.5 shrink-0 pt-1 sm:pt-0 select-none">
+          <span className="relative flex h-2 w-2">
+            <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${badge.dotBg}`} />
+            <span className={`relative inline-flex rounded-full h-2 w-2 ${badge.dotBg}`} />
+          </span>
+          <span className={`text-[11px] sm:text-xs font-extrabold tracking-wide uppercase ${badge.textColor}`}>
+            {badge.label}
+          </span>
         </div>
       </div>
 
