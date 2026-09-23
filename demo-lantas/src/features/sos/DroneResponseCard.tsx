@@ -66,7 +66,7 @@ export const DroneResponseCard: React.FC<DroneResponseCardProps> = ({
     };
   }, [droneStatus]);
 
-  // Compute status badge labels and styling (Minimal & Elegant, no bulky card)
+  // Compute status badge labels and styling (Minimal & Elegant live indicator)
   const getStatusBadge = () => {
     switch (droneStatus) {
       case 'arming':
@@ -74,21 +74,18 @@ export const DroneResponseCard: React.FC<DroneResponseCardProps> = ({
           label: 'MEMARKIR & LUNCUR',
           textColor: 'text-amber-600',
           dotBg: 'bg-amber-500',
-          ping: true,
         };
       case 'flying':
         return {
-          label: 'MENUJU LOKASI (EN ROUTE)',
+          label: 'MENUJU LOKASI',
           textColor: 'text-rose-600',
           dotBg: 'bg-rose-600',
-          ping: true,
         };
       case 'on_scene':
         return {
-          label: 'DI TKP (PATROLI UDARA)',
+          label: 'PATROLI TKP',
           textColor: 'text-emerald-600',
           dotBg: 'bg-emerald-600',
-          ping: false,
         };
       case 'standby':
       default:
@@ -96,7 +93,6 @@ export const DroneResponseCard: React.FC<DroneResponseCardProps> = ({
           label: 'SIAP SIAGA (STANDBY)',
           textColor: 'text-[#0077C0]',
           dotBg: 'bg-[#0077C0]',
-          ping: false,
         };
     }
   };
@@ -132,37 +128,31 @@ export const DroneResponseCard: React.FC<DroneResponseCardProps> = ({
         <div className="absolute -top-16 -right-16 w-48 h-48 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
       )}
 
-      {/* Header Row: Title, Subtitle, & Minimal Elegant Status Indicator (No card/pill box) */}
-      <div className="flex items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="w-10 h-10 rounded-xl bg-[#0077C0]/10 text-[#0077C0] border border-[#0077C0]/20 flex items-center justify-center shrink-0">
-            <Radio className="w-5 h-5" />
+      {/* Header: Clean, Spacious, No nested card pill boxes */}
+      <div className="space-y-1 pb-3 border-b border-slate-100">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Radio className="w-5 h-5 text-[#0077C0] shrink-0" />
+            <h3 className="text-sm sm:text-base font-heading font-extrabold text-[#0F172A] tracking-apple-tight">
+              Unit Drone SIKAP-01
+            </h3>
           </div>
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-sm sm:text-base font-heading font-extrabold text-[#0F172A] tracking-apple-tight">
-                Unit Drone SIKAP-01
-              </h3>
-              <span className="text-[9.5px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 tracking-wider uppercase">
-                DFR KORLANTAS
-              </span>
-            </div>
-            <p className="text-[11.5px] text-slate-500 font-medium truncate sm:whitespace-normal mt-0.5">
-              Respon Cepat Pertama Sebelum Petugas Tiba
-            </p>
+
+          {/* Minimal Live Status Indicator */}
+          <div className="flex items-center gap-1.5 shrink-0 select-none">
+            <span className="relative flex h-2 w-2">
+              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${badge.dotBg}`} />
+              <span className={`relative inline-flex rounded-full h-2 w-2 ${badge.dotBg}`} />
+            </span>
+            <span className={`text-[11px] sm:text-xs font-extrabold tracking-wide uppercase ${badge.textColor}`}>
+              {badge.label}
+            </span>
           </div>
         </div>
 
-        {/* Elegant Live Status Indicator */}
-        <div className="flex items-center gap-1.5 shrink-0 pt-1 sm:pt-0 select-none">
-          <span className="relative flex h-2 w-2">
-            <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${badge.dotBg}`} />
-            <span className={`relative inline-flex rounded-full h-2 w-2 ${badge.dotBg}`} />
-          </span>
-          <span className={`text-[11px] sm:text-xs font-extrabold tracking-wide uppercase ${badge.textColor}`}>
-            {badge.label}
-          </span>
-        </div>
+        <p className="text-xs text-slate-500 font-medium pl-7">
+          DFR Korlantas Polri • Respon Pertama Sebelum Petugas Tiba
+        </p>
       </div>
 
       {/* 2-Column Responsive Layout: Left 3D Canvas / Right Telemetry */}
@@ -200,86 +190,68 @@ export const DroneResponseCard: React.FC<DroneResponseCardProps> = ({
           </div>
         </div>
 
-        {/* RIGHT: Telemetry & Mission Brief */}
-        <div className="md:col-span-7 space-y-3">
-          {/* Context Mission Banner */}
-          <div className={`p-3 sm:p-3.5 rounded-xl text-xs font-medium border leading-relaxed transition-all ${
-            droneStatus === 'flying'
-              ? 'bg-rose-50 border-rose-200 text-rose-900'
-              : droneStatus === 'on_scene'
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
-              : droneStatus === 'arming'
-              ? 'bg-amber-50 border-amber-200 text-amber-900'
-              : 'bg-slate-50 border-slate-200/80 text-slate-700'
-          }`}>
+        {/* RIGHT: Telemetry & Mission Brief (No nested cards!) */}
+        <div className="md:col-span-7 space-y-3.5">
+          {/* Mission Briefing with Accent Left Border - No nested card box */}
+          <div className="border-l-2 border-[#0077C0] pl-3 py-1 text-xs text-slate-600 leading-relaxed">
             {droneStatus === 'standby' && (
               <p>
-                <strong className="font-extrabold text-slate-900">Moda Siaga:</strong> Drone DFR berpusat di atap Polsek terdekat, siap meluncur secara otonom dalam 5 detik saat tombol SOS ditekan.
+                <strong className="font-bold text-slate-900">Moda Siaga:</strong> Drone DFR berpusat di atap Polsek terdekat, siap meluncur secara otonom dalam 5 detik saat tombol SOS ditekan.
               </p>
             )}
             {droneStatus === 'arming' && (
-              <p className="animate-pulse">
-                <strong className="font-extrabold text-amber-950">Persiapan Lepas Landas:</strong> Motor RPM dipercepat, koordinat GPS laporan dikunci ke sistem navigasi autopilot drone.
+              <p className="text-amber-900">
+                <strong className="font-bold text-amber-950">Persiapan Lepas Landas:</strong> Motor RPM dipercepat, koordinat GPS laporan dikunci ke autopilot navigasi drone.
               </p>
             )}
             {droneStatus === 'flying' && (
-              <p>
-                <strong className="font-extrabold text-rose-950">Meluncur Menuju TKP:</strong> Drone terbang dengan kecepatan 68 km/h menuju titik laporan {targetLocation ? `[${targetLocation.latitude.toFixed(4)}, ${targetLocation.longitude.toFixed(4)}]` : 'Banyuwangi Kota'}. Tiba dalam ±{etaSeconds} detik.
+              <p className="text-rose-900">
+                <strong className="font-bold text-rose-950">Meluncur Menuju TKP:</strong> Drone terbang 68 km/h menuju titik laporan {targetLocation ? `[${targetLocation.latitude.toFixed(4)}, ${targetLocation.longitude.toFixed(4)}]` : 'Banyuwangi Kota'}. Tiba dalam ±{etaSeconds} detik.
               </p>
             )}
             {droneStatus === 'on_scene' && (
-              <p>
-                <strong className="font-extrabold text-emerald-950">Drone Tiba di Atas TKP:</strong> Melakukan asesmen udara visual 360°, mendeteksi keparahan laka, dan menyiarkan feed langsung ke mobil patroli terdekat.
+              <p className="text-emerald-900">
+                <strong className="font-bold text-emerald-950">Drone Tiba di TKP:</strong> Melakukan asesmen udara visual 360°, mendeteksi keparahan laka, dan menyiarkan feed langsung ke mobil patroli terdekat.
               </p>
             )}
           </div>
 
-          {/* 4 Telemetry Inset Chips with Clean Vertical Stacking */}
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            {/* Alt */}
-            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 flex flex-col justify-between space-y-1">
-              <div className="flex items-center gap-1.5 text-slate-500">
-                <Gauge className="w-3.5 h-3.5 text-[#0077C0] shrink-0" />
-                <span className="text-[11px] font-semibold text-slate-600">Ketinggian</span>
+          {/* Divided Telemetry List - Clean & Seamless, No Nested Cards */}
+          <div className="divide-y divide-slate-100 text-xs pt-1">
+            <div className="py-2 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-slate-500 font-medium">
+                <Gauge className="w-3.5 h-3.5 text-[#0077C0]" />
+                <span>Ketinggian</span>
               </div>
-              <div className="font-mono text-xs font-bold text-slate-900 truncate">
-                {getAltitude()}
-              </div>
+              <span className="font-mono font-bold text-slate-900">{getAltitude()}</span>
             </div>
 
-            {/* Speed */}
-            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 flex flex-col justify-between space-y-1">
-              <div className="flex items-center gap-1.5 text-slate-500">
-                <Navigation className="w-3.5 h-3.5 text-[#0077C0] shrink-0" />
-                <span className="text-[11px] font-semibold text-slate-600">Kecepatan</span>
+            <div className="py-2 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-slate-500 font-medium">
+                <Navigation className="w-3.5 h-3.5 text-[#0077C0]" />
+                <span>Kecepatan</span>
               </div>
-              <div className="font-mono text-xs font-bold text-slate-900 truncate">
-                {getSpeed()}
-              </div>
+              <span className="font-mono font-bold text-slate-900">{getSpeed()}</span>
             </div>
 
-            {/* Sensor & Camera */}
-            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 flex flex-col justify-between space-y-1">
-              <div className="flex items-center gap-1.5 text-slate-500">
-                <Video className="w-3.5 h-3.5 text-[#0077C0] shrink-0" />
-                <span className="text-[11px] font-semibold text-slate-600">Sensor Optik</span>
+            <div className="py-2 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-slate-500 font-medium">
+                <Video className="w-3.5 h-3.5 text-[#0077C0]" />
+                <span>Sensor Optik</span>
               </div>
-              <div className="font-mono text-xs font-bold text-slate-900 truncate">
-                4K UHD + FLIR
-              </div>
+              <span className="font-mono font-bold text-slate-900">4K UHD + FLIR</span>
             </div>
 
-            {/* Link & Battery */}
-            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 flex flex-col justify-between space-y-1">
-              <div className="flex items-center gap-1.5 text-slate-500">
-                <Wifi className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                <span className="text-[11px] font-semibold text-slate-600">Sinyal & Daya</span>
+            <div className="py-2 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-slate-500 font-medium">
+                <Wifi className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Sinyal & Daya</span>
               </div>
-              <div className="flex items-center gap-1.5 font-mono text-xs font-bold text-slate-900">
+              <div className="flex items-center gap-1.5 font-mono font-bold text-slate-900">
                 <span className="text-emerald-700">RTK 99%</span>
                 <span className="text-slate-300">•</span>
                 <span className="inline-flex items-center text-slate-800">
-                  <BatteryCharging className="w-3 h-3 text-emerald-600 mr-0.5" />
+                  <BatteryCharging className="w-3.5 h-3.5 text-emerald-600 mr-0.5" />
                   98%
                 </span>
               </div>
