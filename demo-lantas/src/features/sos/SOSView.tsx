@@ -3,12 +3,13 @@ import {
   ShieldAlert, PhoneCall, MapPin, Copy, Check, 
   AlertTriangle, History, Info, Compass, Shield, Clock, BellRing
 } from 'lucide-react';
-import { SOSAlert, GeoPoint } from '../../core/types';
+import { SOSAlert, GeoPoint, DroneStatus } from '../../core/types';
 import { LocationService } from '../../shared/services/location';
 import { firestoreService } from '../../services/firestore';
 import { authService } from '../../services/auth';
 import { sound } from '../../shared/services/sound';
 import { NotificationService } from '../../shared/services/notification';
+import { DroneResponseCard } from './DroneResponseCard';
 
 export const SOSView: React.FC = () => {
   const [holding, setHolding] = useState<boolean>(false);
@@ -17,13 +18,24 @@ export const SOSView: React.FC = () => {
   const [activeEmergencyAlert, setActiveEmergencyAlert] = useState<SOSAlert | null>(null);
   const [copied, setCopied] = useState<boolean>(false);
   const [locating, setLocating] = useState<boolean>(false);
+  const [droneStatus, setDroneStatus] = useState<DroneStatus>('standby');
 
   const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const droneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
+      if (droneTimerRef.current) clearTimeout(droneTimerRef.current);
+    };
+  }, []);
 
   const startHold = () => {
     setHolding(true);
     setProgress(0);
+    setDroneStatus('arming');
     sound.playSOSPulse();
 
     const startTime = Date.now();
@@ -45,6 +57,7 @@ export const SOSView: React.FC = () => {
     if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
     setHolding(false);
     setProgress(0);
+    setDroneStatus((prev) => (prev === 'arming' ? 'standby' : prev));
   };
 
   // NOTE: Firebase Spark limitation: Sinyal darurat disiarkan via Firestore onSnapshot
@@ -53,6 +66,12 @@ export const SOSView: React.FC = () => {
     cancelHold();
     setLocating(true);
     sound.playLevelUp();
+
+    setDroneStatus('flying');
+    if (droneTimerRef.current) clearTimeout(droneTimerRef.current);
+    droneTimerRef.current = setTimeout(() => {
+      setDroneStatus('on_scene');
+    }, 7500);
 
     const location: GeoPoint = await LocationService.getCurrentPosition();
     setLocating(false);
@@ -118,6 +137,12 @@ export const SOSView: React.FC = () => {
         </div>
       </div>
 
+      {/* 2. 3D Drone as First Responder (DFR) Telemetry Card */}
+      <DroneResponseCard 
+        droneStatus={droneStatus} 
+        targetLocation={activeEmergencyAlert?.lokasi} 
+      />
+
       {/* Spark Real-Time Disclaimer */}
       <div className="p-3.5 sm:p-4 rounded-[14px] bg-amber-500/10 border border-amber-500/30 flex items-start gap-2.5 text-xs text-amber-900 shadow-xs">
         <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
@@ -126,7 +151,7 @@ export const SOSView: React.FC = () => {
         </p>
       </div>
 
-      {/* 2. 2-Grid Action Hub: Countdown Radar on Left & Telemetry/Instructions on Right */}
+      {/* 3. 2-Grid Action Hub: Countdown Radar on Left & Telemetry/Instructions on Right */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Left: Circular SOS Countdown Container */}
         <div className="p-6 rounded-[16px] apple-card bg-white border-rose-200 text-center space-y-3.5 flex flex-col items-center justify-center shadow-xs">

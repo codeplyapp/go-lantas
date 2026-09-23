@@ -93,6 +93,18 @@ export interface GeoPoint {
 
 export type SOSStatus = 'terkirim' | 'menunggu_patroli' | 'ditangani' | 'selesai';
 
+export type DroneStatus = 'standby' | 'arming' | 'flying' | 'on_scene';
+
+export interface DroneTelemetry {
+  status: DroneStatus;
+  battery: number; // percentage, e.g., 98
+  altitude: number; // in meters
+  speed: number; // in km/h
+  signalRtk: number; // percentage, e.g., 99.4
+  etaSeconds?: number;
+  distanceMeters?: number;
+}
+
 export interface SOSAlert {
   id: string;
   uid: string;
