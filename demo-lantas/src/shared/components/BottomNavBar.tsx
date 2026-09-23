@@ -74,12 +74,14 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeTab, onSelectT
                   className="relative -top-3 flex flex-col items-center group focus:outline-none min-w-[48px] z-20 btn-press"
                   aria-label="Darurat SOS 110"
                 >
-                  <div className={`w-11.5 h-11.5 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 relative overflow-hidden ${
                     isActive 
-                      ? 'bg-red-600 text-white scale-105 ring-3 ring-red-100 shadow-[0_3px_14px_rgba(220,38,38,0.5)]' 
-                      : 'bg-red-600 text-white hover:bg-red-500 animate-pulse-sos-apple shadow-[0_3px_12px_rgba(220,38,38,0.35)]'
+                      ? 'bg-gradient-to-b from-red-500 via-red-600 to-red-700 text-white scale-105 ring-4 ring-red-100 shadow-[0_4px_16px_rgba(220,38,38,0.55)]' 
+                      : 'bg-gradient-to-b from-red-500 via-red-600 to-red-700 text-white hover:brightness-105 animate-pulse-sos-apple shadow-[0_4px_14px_rgba(220,38,38,0.4)]'
                   }`}>
-                    <Icon className="w-5.5 h-5.5 stroke-[2.5]" />
+                    {/* Convex 3D dome highlight */}
+                    <div className="absolute top-0 inset-x-0 h-1/2 bg-gradient-to-b from-white/30 to-transparent rounded-t-full pointer-events-none" />
+                    <Icon className="w-8.5 h-8.5 relative z-10 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" />
                   </div>
                   <span className="text-[10px] font-extrabold tracking-tight mt-0.5 text-rose-600">
                     SOS 110
