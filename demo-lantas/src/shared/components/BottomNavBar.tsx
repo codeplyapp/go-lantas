@@ -29,20 +29,18 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeTab, onSelectT
 
   return (
     <nav className="relative z-40 w-full glass-bottom-bar border-t border-[#E5EBE8] overflow-visible shrink-0 select-none pb-safe bg-white/95 backdrop-blur-lg shadow-[0_-4px_20px_rgba(0,119,192,0.06)]">
-      {/* Sliding Top Spotlight Indicator Line */}
+      {/* Sliding Top Spotlight Indicator Line (Hidden when on SOS button to avoid visual collision) */}
       <div 
-        className="absolute top-0 h-[2.5px] transition-all duration-300 ease-out pointer-events-none flex items-center justify-center z-30"
+        className={`absolute top-0 h-[2.5px] transition-all duration-300 ease-out pointer-events-none flex items-center justify-center z-30 ${
+          navItems[activeIndex]?.isEmergency ? 'opacity-0' : 'opacity-100'
+        }`}
         style={{
           left: `${activeIndex * 20}%`,
           width: '20%',
           transform: 'translateY(-1px)',
         }}
       >
-        <div className={`w-8 h-[2.5px] rounded-full transition-colors duration-300 ${
-          navItems[activeIndex]?.isEmergency 
-            ? 'bg-red-600 shadow-[0_1px_8px_rgba(220,38,38,0.6)]' 
-            : 'bg-[#0077c0] shadow-[0_1px_8px_rgba(0,119,192,0.6)]'
-        }`} />
+        <div className="w-8 h-[2.5px] rounded-full bg-[#0077c0] shadow-[0_1px_8px_rgba(0,119,192,0.6)]" />
       </div>
 
       <div className="w-full px-1 sm:px-4 py-0.5 flex items-center justify-between relative">
@@ -74,14 +72,16 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeTab, onSelectT
                   className="relative -top-3 flex flex-col items-center group focus:outline-none min-w-[48px] z-20 btn-press"
                   aria-label="Darurat SOS 110"
                 >
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 relative overflow-hidden ${
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 relative overflow-hidden bg-[#DC2626] ${
                     isActive 
-                      ? 'bg-gradient-to-b from-red-500 via-red-600 to-red-700 text-white scale-105 ring-4 ring-red-100 shadow-[0_4px_16px_rgba(220,38,38,0.55)]' 
-                      : 'bg-gradient-to-b from-red-500 via-red-600 to-red-700 text-white hover:brightness-105 animate-pulse-sos-apple shadow-[0_4px_14px_rgba(220,38,38,0.4)]'
+                      ? 'scale-105 ring-4 ring-red-200/80 shadow-[inset_0_2px_4px_rgba(255,255,255,0.45),inset_0_-2px_4px_rgba(0,0,0,0.3),0_4px_16px_rgba(220,38,38,0.55)]' 
+                      : 'hover:brightness-105 animate-pulse-sos-apple shadow-[inset_0_2px_4px_rgba(255,255,255,0.4),inset_0_-2px_4px_rgba(0,0,0,0.3),0_4px_14px_rgba(220,38,38,0.4)]'
                   }`}>
-                    {/* Convex 3D dome highlight */}
-                    <div className="absolute top-0 inset-x-0 h-1/2 bg-gradient-to-b from-white/30 to-transparent rounded-t-full pointer-events-none" />
-                    <Icon className="w-8.5 h-8.5 relative z-10 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" />
+                    {/* Convex 3D Dome Gloss Sheen (Kesan Cembung Bersih) */}
+                    <div className="absolute top-0 inset-x-0 h-[55%] bg-gradient-to-b from-white/35 via-white/10 to-transparent rounded-t-full pointer-events-none" />
+                    
+                    {/* Crisp Solid White Vector Icon */}
+                    <Icon className="w-8 h-8 relative z-10 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.35)]" />
                   </div>
                   <span className="text-[10px] font-extrabold tracking-tight mt-0.5 text-rose-600">
                     SOS 110
