@@ -336,14 +336,8 @@ export const LayananView: React.FC<LayananViewProps> = ({
               <Camera className="w-6 h-6" />
             </div>
             <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-400/30">
-                  ETLE Nasional
-                </span>
-                <span className="text-[11px] text-slate-400">Database Real-Time</span>
-              </div>
               <h3 className="text-base sm:text-lg font-black text-white font-heading">
-                Cek Bukti Pelanggaran Tilang Elektronik
+                Cek Bukti Pelanggaran Tilang Elektronik (ETLE)
               </h3>
               <p className="text-xs text-slate-300 font-medium leading-relaxed max-w-md">
                 Ketik nomor polisi kendaraan Anda untuk memeriksa status pelanggaran, rekaman CCTV, dan kode pembayaran BRIVA.

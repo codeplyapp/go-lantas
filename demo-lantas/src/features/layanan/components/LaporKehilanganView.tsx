@@ -181,9 +181,6 @@ export const LaporKehilanganView: React.FC<LaporKehilanganViewProps> = ({
           <ShieldAlert className="w-6 h-6" />
         </div>
         <div className="space-y-1">
-          <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-orange-50 text-orange-700">
-            Laporan Kehilangan STPLK
-          </span>
           <h1 className="text-base sm:text-lg font-black text-slate-900 font-heading">
             Lapor Kehilangan Dokumen / Kendaraan
           </h1>

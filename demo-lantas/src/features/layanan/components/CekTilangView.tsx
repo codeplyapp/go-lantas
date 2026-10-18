@@ -73,10 +73,6 @@ export const CekTilangView: React.FC<CekTilangViewProps> = ({ onBack }) => {
           <ArrowLeft className="w-4 h-4" />
           <span>Kembali ke Layanan</span>
         </button>
-        <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-[#0077C0] bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200">
-          <Camera className="w-3.5 h-3.5" />
-          <span>ETLE Nasional Presisi</span>
-        </div>
       </div>
 
       {/* Search Bar Card */}
