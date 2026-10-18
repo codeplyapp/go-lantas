@@ -241,7 +241,7 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
         <div className="space-y-1">
           <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400">
             <Clock className="w-3.5 h-3.5 text-[#0077C0]" />
-            <span>Estimasi Proses ± {config?.estimasiHari} Hari</span>
+            <span>Estimasi Proses: ± {config?.estimasiHari} Hari Kerja</span>
           </div>
           <h1 className="text-base sm:text-lg font-black text-slate-900 font-heading">
             {config?.nama}

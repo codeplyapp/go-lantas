@@ -596,9 +596,11 @@ export const BerandaView: React.FC<BerandaViewProps> = ({
                 <Camera className="w-5 h-5" />
               </div>
               <div className="space-y-0.5">
-                <h4 className="text-xs font-black text-slate-900 group-hover:text-[#0077C0] transition-colors">
-                  Cek Tilang ETLE
-                </h4>
+                <div>
+                  <h4 className="text-xs font-black text-slate-900 group-hover:text-[#0077C0] transition-colors">
+                    Cek Tilang ETLE
+                  </h4>
+                </div>
                 <p className="text-[11px] text-slate-500 font-medium line-clamp-1">
                   Periksa denda & nomor BRIVA via plat nomor.
                 </p>

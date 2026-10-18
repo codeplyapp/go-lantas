@@ -131,12 +131,7 @@ export const LayananView: React.FC<LayananViewProps> = ({
           <Shield className="w-full h-full stroke-[1] fill-current" />
         </div>
 
-        <div className="relative z-10 space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-[11px] font-extrabold tracking-wide text-white">
-            <ShieldCheck className="w-3.5 h-3.5 text-sky-200" />
-            <span>Pelayanan Terpadu Korlantas POLRI</span>
-          </div>
-
+        <div className="relative z-10 space-y-2">
           <div className="space-y-1">
             <h1 className="text-xl sm:text-2xl font-black font-heading tracking-tight text-white">
               Layanan Presisi Digital

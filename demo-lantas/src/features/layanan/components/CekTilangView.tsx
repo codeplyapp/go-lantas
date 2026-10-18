@@ -62,7 +62,7 @@ export const CekTilangView: React.FC<CekTilangViewProps> = ({ onBack }) => {
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* Header Bar */}
-      <div className="flex items-center justify-between">
+      <div>
         <button
           onClick={() => {
             sound.playClick();

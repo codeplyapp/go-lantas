@@ -121,10 +121,6 @@ export const EmailVerificationScreen: React.FC<EmailVerificationScreenProps> = (
             </span>
           </div>
           <div className="space-y-1.5">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-[11px] font-bold text-[#0077C0]">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Simulasi Verifikasi Email (Demo Mode)</span>
-            </div>
             <h1 className="text-xl sm:text-2xl font-heading font-black text-[#0F172A] tracking-tight">
               Verifikasi Akun GO Lantas
             </h1>

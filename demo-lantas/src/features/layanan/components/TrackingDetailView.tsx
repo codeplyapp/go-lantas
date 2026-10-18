@@ -99,12 +99,12 @@ export const TrackingDetailView: React.FC<TrackingDetailViewProps> = ({
       <div className="apple-card bg-white p-6 rounded-[24px] border border-[#DDE6E2] shadow-xs space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="space-y-0.5">
-            <p className="text-xs font-bold text-slate-500">
-              {config?.nama || submission.jenis}
-            </p>
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 font-heading">
               {submission.nomor_layanan}
             </h1>
+            <p className="text-xs font-bold text-[#0077C0]">
+              {config?.nama || submission.jenis.toUpperCase()}
+            </p>
           </div>
 
           <div className="text-right">
