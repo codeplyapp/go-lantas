@@ -3,7 +3,7 @@ import { Home, GraduationCap, MapPin, User } from 'lucide-react';
 import { DroneAlertIcon } from './DroneAlertIcon';
 import { sound } from '../services/sound';
 
-export type TabType = 'beranda' | 'belajar' | 'sos' | 'peta' | 'profil' | 'keluarga';
+export type TabType = 'beranda' | 'belajar' | 'sos' | 'peta' | 'profil' | 'keluarga' | 'layanan';
 
 interface BottomNavBarProps {
   activeTab: TabType;
@@ -19,8 +19,10 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeTab, onSelectT
     { id: 'profil' as TabType, label: 'Profil', icon: User },
   ];
 
-  // Calculate active index (fallback to 0 if 'keluarga' or unknown)
-  const activeIndex = Math.max(0, navItems.findIndex(item => item.id === activeTab));
+  // Calculate active index (fallback to 0 if not present in nav bar, e.g. 'keluarga' or 'layanan')
+  const navIndex = navItems.findIndex(item => item.id === activeTab);
+  const isNavTab = navIndex !== -1;
+  const activeIndex = Math.max(0, navIndex);
 
   const handleTabClick = (tab: TabType) => {
     sound.playClick();
@@ -29,10 +31,10 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeTab, onSelectT
 
   return (
     <nav className="relative z-40 w-full glass-bottom-bar border-t border-[#E5EBE8] overflow-visible shrink-0 select-none pb-safe bg-white/95 backdrop-blur-lg shadow-[0_-4px_20px_rgba(0,119,192,0.06)]">
-      {/* Sliding Top Spotlight Indicator Line (Hidden when on SOS button to avoid visual collision) */}
+      {/* Sliding Top Spotlight Indicator Line (Hidden when on SOS button or non-navbar tabs to avoid visual collision) */}
       <div 
         className={`absolute top-0 h-[2.5px] transition-all duration-300 ease-out pointer-events-none flex items-center justify-center z-30 ${
-          navItems[activeIndex]?.isEmergency ? 'opacity-0' : 'opacity-100'
+          !isNavTab || navItems[activeIndex]?.isEmergency ? 'opacity-0' : 'opacity-100'
         }`}
         style={{
           left: `${activeIndex * 20}%`,

@@ -394,4 +394,75 @@ export interface CertificateData {
   qr_data: string;
 }
 
+// ─── Layanan Terpadu Korlantas POLRI (E-SIM, SKCK, STNK, Surat Kehilangan, Cek Tilang) ───
 
+export type LayananJenis = 'e_sim' | 'skck' | 'stnk' | 'surat_kehilangan' | 'surat_keramaian';
+
+export type LayananStatus = 'diajukan' | 'verifikasi' | 'diproses' | 'selesai' | 'diambil';
+
+export interface LayananTimelineStep {
+  status: LayananStatus;
+  label: string;
+  waktu?: string;
+  deskripsi: string;
+  selesai: boolean;
+  aktif?: boolean;
+}
+
+export interface LayananSubmission {
+  id: string;
+  nomor_layanan: string;
+  jenis: LayananJenis;
+  uid: string;
+  nama_pemohon: string;
+  nik: string;
+  no_hp: string;
+  email: string;
+  satpas_tujuan: string;
+  status: LayananStatus;
+  progress_percent: number;
+  estimasi_hari: number;
+  tanggal_pengajuan: string;
+  detail_layanan: Record<string, any>;
+  timeline: LayananTimelineStep[];
+}
+
+export type KehilanganKategori =
+  | 'stnk'
+  | 'sim'
+  | 'bpkb'
+  | 'plat_nomor'
+  | 'ktp_dokumen'
+  | 'barang_berharga';
+
+export interface LaporanKehilangan {
+  id: string;
+  nomor_lpk: string;
+  uid: string;
+  nama_pelapor: string;
+  nik: string;
+  no_hp: string;
+  kategori: KehilanganKategori;
+  judul_barang: string;
+  ciri_ciri: string;
+  lokasi_hilang: string;
+  waktu_hilang: string;
+  foto_bukti_url?: string;
+  status: 'diproses' | 'diterbitkan' | 'ditemukan';
+  tanggal_lapor: string;
+}
+
+export interface TilangEtleRecord {
+  id: string;
+  nomor_referensi: string;
+  plat_nomor: string;
+  jenis_kendaraan: string;
+  pasal_pelanggaran: string;
+  deskripsi_pelanggaran: string;
+  nominal_denda: number;
+  lokasi_kamera: string;
+  waktu_pelanggaran: string;
+  status_pembayaran: 'belum_bayar' | 'terverifikasi_lunas';
+  kode_briva: string;
+  gambar_bukti?: string;
+}

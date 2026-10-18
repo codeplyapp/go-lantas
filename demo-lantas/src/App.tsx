@@ -24,6 +24,7 @@ import { SOSView } from './features/sos/SOSView';
 import { PetaView } from './features/peta/PetaView';
 import { KeluargaView } from './features/keluarga/KeluargaView';
 import { ProfilView } from './features/profil/ProfilView';
+import { LayananView } from './features/layanan/LayananView';
 
 // Robot AI Assistant
 import { FloatingMascotBubble } from './features/robot/FloatingMascotBubble';
@@ -301,6 +302,13 @@ export const App: React.FC = () => {
               {activeTab === 'peta' && <PetaView />}
 
               {activeTab === 'keluarga' && <KeluargaView />}
+
+              {activeTab === 'layanan' && (
+                <LayananView
+                  profile={session?.profile}
+                  onNavigateTab={(tab) => setActiveTab(tab as TabType)}
+                />
+              )}
 
               {activeTab === 'profil' && (
                 <ProfilView

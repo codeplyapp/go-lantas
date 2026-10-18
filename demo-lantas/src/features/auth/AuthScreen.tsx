@@ -234,6 +234,25 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
     }
   };
 
+  const handleUseDemoAccount = async () => {
+    sound.playClick();
+    setEmail('demo@golantas.id');
+    setPassword('demo1234');
+    setIsLoginMode(true);
+    setErrorMessage(null);
+    setIsLoading(true);
+    try {
+      const session = await authService.signIn('demo@golantas.id', 'demo1234');
+      sound.playCorrect();
+      onAuthSuccess(session, false);
+    } catch (err: any) {
+      sound.playWrong();
+      setErrorMessage(getFriendlyErrorMessage(err));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="w-full min-h-screen bg-[#FAFAFA] flex flex-col items-center justify-start py-8 sm:py-14 px-4 sm:px-6 relative overflow-x-hidden">
       {/* Subtle Background Watermark Shield */}
@@ -284,6 +303,29 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
             </div>
           </div>
         )}
+
+        {/* Akun Demo Quick Access Banner for Testing & Judges */}
+        <div className="p-3.5 rounded-2xl bg-gradient-to-r from-blue-50 via-sky-50 to-blue-50 border border-blue-200/80 flex items-center justify-between gap-3 shadow-2xs">
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#0077C0]">
+                Akun Demo Penguji
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-600 font-medium">
+              <code className="font-mono font-bold text-slate-800">demo@golantas.id</code> • <code className="font-mono font-bold text-slate-800">demo1234</code>
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleUseDemoAccount}
+            disabled={isLoading}
+            className="px-3 py-1.5 rounded-xl bg-[#0077C0] hover:bg-[#008be0] text-white text-[11px] font-extrabold tracking-tight transition-all shadow-xs shrink-0 btn-press"
+          >
+            Masuk Cepat
+          </button>
+        </div>
 
         {/* Google Sign In Button */}
         <button

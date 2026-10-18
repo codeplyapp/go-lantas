@@ -1,47 +1,42 @@
-// Firestore Service for SIGAP / GO Lantas — Pure Firebase, No MockDB
-import { db, isFirebaseConfigured } from '../config/firebase';
+// Firestore Service for GO Lantas — Pure MockStore Architecture (Frontend-Only)
+// 100% Identical Public API signatures & live subscriptions without Firebase dependencies
+
+import { mockStore } from './mockStore';
 import {
-  doc, getDoc, setDoc, updateDoc,
-  collection, getDocs, addDoc, query, where, orderBy, limit,
-  onSnapshot, serverTimestamp, Timestamp, Unsubscribe, increment,
-} from 'firebase/firestore';
-import { 
-  UserProfile, UserRole, QuizAttempt, ModuleProgress, 
-  ExamAttempt, CertificateData, SOSAlert, FamilyLink, FamilyAccessLog,
-  ModuleData, QuizQuestion, PointSource, PointHistoryEntry
+  UserProfile,
+  UserRole,
+  QuizAttempt,
+  ModuleProgress,
+  ExamAttempt,
+  CertificateData,
+  SOSAlert,
+  FamilyLink,
+  ModuleData,
+  QuizQuestion,
+  PointSource,
+  PointHistoryEntry,
 } from '../core/types';
 
-const COLLECTION_USERS = 'users';
-const COLLECTION_POINT_HISTORY = 'point_history';
-const COLLECTION_QUIZ_ATTEMPTS = 'quiz_attempts';
-const COLLECTION_EXAM_ATTEMPTS = 'exam_attempts';
-const COLLECTION_CERTIFICATES = 'certificates';
-const COLLECTION_SOS_ALERTS = 'sos_alerts';
-const COLLECTION_FAMILY_LINKS = 'family_links';
-const COLLECTION_FAMILY_LOGS = 'family_logs';
+export type Unsubscribe = () => void;
+
+const KEY_USERS = 'golantas_mock_users';
+const KEY_SOS_ALERTS = 'golantas_sos_alerts';
+const KEY_FAMILY_LINKS = 'golantas_family_links';
 
 export const firestoreService = {
   // ─── User Profile ─────────────────────────────────────────────────────────
 
   /**
-   * Retrieve user profile from Firestore
+   * Retrieve user profile from MockStore
    */
   async getUserProfile(uid: string): Promise<UserProfile | null> {
-    if (!isFirebaseConfigured() || !db) return null;
-    try {
-      const userDocRef = doc(db, COLLECTION_USERS, uid);
-      const snapshot = await getDoc(userDocRef);
-      if (snapshot.exists()) {
-        return snapshot.data() as UserProfile;
-      }
-    } catch (err) {
-      console.warn('[Firestore] Error getting user profile:', err);
-    }
-    return null;
+    const users = mockStore.get<UserProfile[]>(KEY_USERS, []);
+    const user = users.find((u) => u.uid === uid);
+    return user || null;
   },
 
   /**
-   * Create or ensure user profile exists in Firestore
+   * Create or ensure user profile exists
    */
   async ensureUserProfile(
     uid: string,
@@ -74,187 +69,133 @@ export const firestoreService = {
       last_aktivitas: new Date().toISOString().slice(0, 10),
     };
 
-    if (isFirebaseConfigured() && db) {
-      try {
-        const userDocRef = doc(db, COLLECTION_USERS, uid);
-        await setDoc(userDocRef, newProfile, { merge: true });
-        await this.recordPointAward(uid, 'welcome', 'Bonus Selamat Datang', 100, 'Pendaftaran akun baru GO Lantas');
-      } catch (err) {
-        console.warn('[Firestore] Error creating user profile:', err);
-      }
-    }
+    mockStore.upsertItem(KEY_USERS, newProfile, 'uid');
+    await this.recordPointAward(
+      uid,
+      'welcome',
+      'Bonus Selamat Datang',
+      100,
+      'Pendaftaran akun baru GO Lantas'
+    );
 
     return newProfile;
   },
 
   /**
-   * Update profile fields in Firestore
+   * Update profile fields in MockStore
    */
   async updateUserProfile(uid: string, updates: Partial<UserProfile>): Promise<void> {
-    if (!isFirebaseConfigured() || !db) return;
-    try {
-      const userDocRef = doc(db, COLLECTION_USERS, uid);
-      await updateDoc(userDocRef, updates as Record<string, unknown>);
-    } catch (err) {
-      console.warn('[Firestore] Error updating user profile:', err);
+    const users = mockStore.get<UserProfile[]>(KEY_USERS, []);
+    const idx = users.findIndex((u) => u.uid === uid);
+    if (idx >= 0) {
+      users[idx] = { ...users[idx], ...updates };
+      mockStore.set(KEY_USERS, users);
     }
   },
 
   /**
-   * Add points atomically using FieldValue.increment
+   * Add points atomically
    */
   async addPoints(uid: string, delta: number): Promise<void> {
-    if (!isFirebaseConfigured() || !db || delta <= 0) return;
-    try {
-      const userDocRef = doc(db, COLLECTION_USERS, uid);
-      await updateDoc(userDocRef, {
-        poin_total: increment(delta),
-      });
-    } catch (err) {
-      console.warn('[Firestore] Error adding points:', err);
+    if (delta <= 0) return;
+    const users = mockStore.get<UserProfile[]>(KEY_USERS, []);
+    const idx = users.findIndex((u) => u.uid === uid);
+    if (idx >= 0) {
+      users[idx] = {
+        ...users[idx],
+        poin_total: (users[idx].poin_total || 0) + delta,
+      };
+      mockStore.set(KEY_USERS, users);
     }
   },
 
   /**
    * Register user quiz/study activity (updates streak and answer counters)
    */
-  async registerActivity(uid: string, stats?: { isCorrect?: boolean; quizDone?: boolean }): Promise<void> {
-    if (!isFirebaseConfigured() || !db) return;
-    try {
-      const userDocRef = doc(db, COLLECTION_USERS, uid);
-      const snap = await getDoc(userDocRef);
-      if (!snap.exists()) return;
+  async registerActivity(
+    uid: string,
+    stats?: { isCorrect?: boolean; quizDone?: boolean }
+  ): Promise<void> {
+    const users = mockStore.get<UserProfile[]>(KEY_USERS, []);
+    const idx = users.findIndex((u) => u.uid === uid);
+    if (idx < 0) return;
 
-      const current = snap.data() as UserProfile;
-      const today = new Date().toISOString().slice(0, 10);
-      const last = current.last_aktivitas;
+    const current = users[idx];
+    const today = new Date().toISOString().slice(0, 10);
+    const last = current.last_aktivitas;
 
-      let newStreak = current.streak_hari || 1;
-      if (!last) {
-        newStreak = 1;
-      } else if (last === today) {
-        // Same day activity - streak remains
-        newStreak = current.streak_hari || 1;
+    let newStreak = current.streak_hari || 1;
+    if (!last) {
+      newStreak = 1;
+    } else if (last === today) {
+      newStreak = current.streak_hari || 1;
+    } else {
+      const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+      if (last === yesterday) {
+        newStreak = (current.streak_hari || 0) + 1;
       } else {
-        const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-        if (last === yesterday) {
-          newStreak = (current.streak_hari || 0) + 1;
-        } else {
-          newStreak = 1; // Missed day, reset streak
-        }
+        newStreak = 1;
       }
-
-      const updates: Record<string, any> = {
-        last_aktivitas: today,
-        streak_hari: newStreak,
-      };
-
-      if (stats?.quizDone) {
-        updates.kuis_selesai = increment(1);
-      }
-      if (stats?.isCorrect !== undefined) {
-        updates.total_jawaban = increment(1);
-        if (stats.isCorrect) {
-          updates.jawaban_benar = increment(1);
-        }
-      }
-
-      await updateDoc(userDocRef, updates);
-    } catch (err) {
-      console.warn('[Firestore] Error registering activity:', err);
     }
+
+    const updatedUser: UserProfile = {
+      ...current,
+      last_aktivitas: today,
+      streak_hari: newStreak,
+      kuis_selesai: (current.kuis_selesai || 0) + (stats?.quizDone ? 1 : 0),
+      total_jawaban: (current.total_jawaban || 0) + (stats?.isCorrect !== undefined ? 1 : 0),
+      jawaban_benar:
+        (current.jawaban_benar || 0) + (stats?.isCorrect === true ? 1 : 0),
+    };
+
+    users[idx] = updatedUser;
+    mockStore.set(KEY_USERS, users);
   },
 
   /**
    * Realtime listener for a specific user profile
    */
-  subscribeUserProfile(uid: string, callback: (profile: UserProfile | null) => void): Unsubscribe | null {
-    if (!isFirebaseConfigured() || !db) return null;
-    try {
-      const userDocRef = doc(db, COLLECTION_USERS, uid);
-      return onSnapshot(userDocRef, (snap) => {
-        if (snap.exists()) {
-          callback(snap.data() as UserProfile);
-        } else {
-          callback(null);
-        }
-      }, (err) => {
-        console.warn('[Firestore] User profile listener error:', err);
-      });
-    } catch (err) {
-      console.warn('[Firestore] Error setting up user profile listener:', err);
-      return null;
-    }
+  subscribeUserProfile(
+    uid: string,
+    callback: (profile: UserProfile | null) => void
+  ): Unsubscribe | null {
+    return mockStore.subscribe<UserProfile[]>(KEY_USERS, (allUsers) => {
+      const found = (allUsers || []).find((u) => u.uid === uid) || null;
+      callback(found);
+    });
   },
 
   // ─── Quiz Attempts ─────────────────────────────────────────────────────────
 
-  /**
-   * Save a quiz attempt to Firestore
-   * Aligned with firestore.rules: request.auth.uid == request.resource.data.uid
-   */
   async saveQuizAttempt(attempt: Omit<QuizAttempt, 'id'>): Promise<void> {
-    if (!isFirebaseConfigured() || !db) return;
-    try {
-      await addDoc(collection(db, COLLECTION_QUIZ_ATTEMPTS), {
-        ...attempt,
-        timestamp: attempt.timestamp || new Date().toISOString(),
-        createdAt: serverTimestamp(),
-      });
-    } catch (err) {
-      console.warn('[Firestore] Error saving quiz attempt:', err);
-    }
+    const key = `golantas_quiz_attempts_${attempt.uid}`;
+    const newAttempt: QuizAttempt = {
+      ...attempt,
+      id: 'quiz_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+      timestamp: attempt.timestamp || new Date().toISOString(),
+    };
+    mockStore.upsertItem(key, newAttempt, 'id');
   },
 
-  /**
-   * Get quiz attempts for a specific user (one-time fetch)
-   */
   async getQuizAttempts(uid: string, maxItems = 20): Promise<QuizAttempt[]> {
-    if (!isFirebaseConfigured() || !db) return [];
-    try {
-      const q = query(
-        collection(db, COLLECTION_QUIZ_ATTEMPTS),
-        where('uid', '==', uid),
-        orderBy('timestamp', 'desc'),
-        limit(maxItems)
-      );
-      const snap = await getDocs(q);
-      return snap.docs.map((d) => ({ id: d.id, ...d.data() } as QuizAttempt));
-    } catch (err) {
-      console.warn('[Firestore] Error fetching quiz attempts:', err);
-      return [];
-    }
+    const key = `golantas_quiz_attempts_${uid}`;
+    const attempts = mockStore.get<QuizAttempt[]>(key, []);
+    return attempts.slice(0, maxItems);
   },
 
-  /**
-   * Realtime listener for quiz attempts of a user
-   */
-  subscribeQuizAttempts(uid: string, callback: (attempts: QuizAttempt[]) => void, maxLimit = 20): Unsubscribe | null {
-    if (!isFirebaseConfigured() || !db) return null;
-    try {
-      const q = query(
-        collection(db, COLLECTION_QUIZ_ATTEMPTS),
-        where('uid', '==', uid),
-        orderBy('timestamp', 'desc'),
-        limit(maxLimit)
-      );
-      return onSnapshot(q, (snap) => {
-        const attempts = snap.docs.map((d) => ({ id: d.id, ...d.data() } as QuizAttempt));
-        callback(attempts);
-      }, (err) => {
-        console.warn('[Firestore] Quiz attempts listener warning:', err);
-      });
-    } catch (err) {
-      console.warn('[Firestore] Error setting up quiz attempts listener:', err);
-      return null;
-    }
+  subscribeQuizAttempts(
+    uid: string,
+    callback: (attempts: QuizAttempt[]) => void,
+    maxLimit = 20
+  ): Unsubscribe | null {
+    const key = `golantas_quiz_attempts_${uid}`;
+    return mockStore.subscribe<QuizAttempt[]>(key, (list) => {
+      callback((list || []).slice(0, maxLimit));
+    });
   },
 
   // ─── Point History ─────────────────────────────────────────────────────────
 
-  /**
-   * Record point award entry in point_history collection
-   */
   async recordPointAward(
     uid: string,
     source: PointSource,
@@ -262,83 +203,38 @@ export const firestoreService = {
     poin: number,
     detail?: string
   ): Promise<void> {
-    if (!isFirebaseConfigured() || !db || !uid || poin <= 0) return;
-    try {
-      const historyCol = collection(db, COLLECTION_POINT_HISTORY);
-      await addDoc(historyCol, {
-        uid,
-        source,
-        judul,
-        poin,
-        detail: detail || '',
-        timestamp: new Date().toISOString(),
-      });
-    } catch (err) {
-      console.warn('[Firestore] Error recording point award:', err);
-    }
+    if (!uid || poin <= 0) return;
+    const key = `golantas_point_history_${uid}`;
+    const entry: PointHistoryEntry = {
+      id: 'point_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+      uid,
+      source,
+      judul,
+      poin,
+      detail: detail || '',
+      timestamp: new Date().toISOString(),
+    };
+    mockStore.upsertItem(key, entry, 'id');
   },
 
-  /**
-   * Realtime listener for point history of a user
-   */
   subscribePointHistory(
     uid: string,
     callback: (entries: PointHistoryEntry[]) => void,
     maxLimit = 20
   ): Unsubscribe | null {
-    if (!isFirebaseConfigured() || !db || !uid) return null;
-    try {
-      const historyCol = collection(db, COLLECTION_POINT_HISTORY);
-      const q = query(
-        historyCol,
-        where('uid', '==', uid),
-        orderBy('timestamp', 'desc'),
-        limit(maxLimit)
-      );
-
-      return onSnapshot(
-        q,
-        (snap) => {
-          const list = snap.docs.map((d) => ({
-            id: d.id,
-            ...d.data(),
-          })) as PointHistoryEntry[];
-          callback(list);
-        },
-        (err) => {
-          console.warn('[Firestore] Point history listener warning:', err);
-        }
-      );
-    } catch (err) {
-      console.warn('[Firestore] Error subscribing to point history:', err);
-      return null;
-    }
+    const key = `golantas_point_history_${uid}`;
+    return mockStore.subscribe<PointHistoryEntry[]>(key, (list) => {
+      callback((list || []).slice(0, maxLimit));
+    });
   },
 
   // ─── Leaderboard ───────────────────────────────────────────────────────────
 
-  /**
-   * Get leaderboard from Firestore users collection (sorted by poin_total)
-   */
   async getLeaderboard(maxItems = 20): Promise<UserProfile[]> {
-    if (!isFirebaseConfigured() || !db) return [];
-    try {
-      const q = query(
-        collection(db, COLLECTION_USERS),
-        orderBy('poin_total', 'desc'),
-        limit(maxItems)
-      );
-      const snap = await getDocs(q);
-      return snap.docs.map((d) => d.data() as UserProfile);
-    } catch (err) {
-      console.warn('[Firestore] Error fetching leaderboard:', err);
-      return [];
-    }
+    const users = mockStore.get<UserProfile[]>(KEY_USERS, []);
+    return [...users].sort((a, b) => (b.poin_total || 0) - (a.poin_total || 0)).slice(0, maxItems);
   },
 
-  /**
-   * Real-time listener for Leaderboard with scope filter (nasional, sekolah, kampus)
-   */
   subscribeLeaderboard(
     callback: (entries: UserProfile[]) => void,
     options?: {
@@ -348,233 +244,97 @@ export const firestoreService = {
       limit?: number;
     }
   ): Unsubscribe | null {
-    if (!isFirebaseConfigured() || !db) return null;
-    try {
-      const maxLimit = options?.limit || 20;
-      const scope = options?.scope || 'nasional';
+    const maxLimit = options?.limit || 20;
+    const scope = options?.scope || 'nasional';
 
-      let q = query(
-        collection(db, COLLECTION_USERS),
-        orderBy('poin_total', 'desc'),
-        limit(maxLimit)
-      );
+    return mockStore.subscribe<UserProfile[]>(KEY_USERS, (users) => {
+      let filtered = [...(users || [])];
 
       if (scope === 'sekolah') {
-        if (options?.school) {
-          q = query(
-            collection(db, COLLECTION_USERS),
-            where('role', '==', 'pelajar'),
-            where('sekolah_kampus', '==', options.school),
-            orderBy('poin_total', 'desc'),
-            limit(maxLimit)
-          );
-        } else {
-          q = query(
-            collection(db, COLLECTION_USERS),
-            where('role', '==', 'pelajar'),
-            orderBy('poin_total', 'desc'),
-            limit(maxLimit)
-          );
-        }
+        filtered = filtered.filter((u) => {
+          if (options?.school) {
+            return u.role === 'pelajar' && u.sekolah_kampus === options.school;
+          }
+          return u.role === 'pelajar';
+        });
       } else if (scope === 'kampus') {
-        if (options?.school) {
-          q = query(
-            collection(db, COLLECTION_USERS),
-            where('role', '==', 'mahasiswa'),
-            where('sekolah_kampus', '==', options.school),
-            orderBy('poin_total', 'desc'),
-            limit(maxLimit)
-          );
-        } else {
-          q = query(
-            collection(db, COLLECTION_USERS),
-            where('role', '==', 'mahasiswa'),
-            orderBy('poin_total', 'desc'),
-            limit(maxLimit)
-          );
-        }
+        filtered = filtered.filter((u) => {
+          if (options?.school) {
+            return u.role === 'mahasiswa' && u.sekolah_kampus === options.school;
+          }
+          return u.role === 'mahasiswa';
+        });
       }
 
-      return onSnapshot(q, (snap) => {
-        const entries = snap.docs.map((d) => d.data() as UserProfile);
-        callback(entries);
-      }, (err) => {
-        console.warn('[Firestore] Scoped leaderboard listener fallback on error/missing index:', err);
-        // Fallback to national query with client filter if compound index is pending
-        try {
-          if (!db) return;
-          const fallbackQ = query(
-            collection(db, COLLECTION_USERS),
-            orderBy('poin_total', 'desc'),
-            limit(50)
-          );
-          onSnapshot(fallbackQ, (fallbackSnap) => {
-            let items = fallbackSnap.docs.map((d) => d.data() as UserProfile);
-            if (scope === 'sekolah') {
-              items = items.filter(u => u.role === 'pelajar' || (options?.school && u.sekolah_kampus === options.school));
-            } else if (scope === 'kampus') {
-              items = items.filter(u => u.role === 'mahasiswa' || (options?.school && u.sekolah_kampus === options.school));
-            }
-            callback(items.slice(0, maxLimit));
-          });
-        } catch {}
-      });
-    } catch (err) {
-      console.warn('[Firestore] Error setting up leaderboard listener:', err);
-      return null;
-    }
+      filtered.sort((a, b) => (b.poin_total || 0) - (a.poin_total || 0));
+      callback(filtered.slice(0, maxLimit));
+    });
   },
 
   // ─── Module Progress ────────────────────────────────────────────────────────
 
-  /**
-   * Get module progress for a user from subcollection users/{uid}/module_progress
-   */
   async getModuleProgress(uid: string): Promise<ModuleProgress[]> {
-    if (!isFirebaseConfigured() || !db) return [];
-    try {
-      const progressRef = collection(db, COLLECTION_USERS, uid, 'module_progress');
-      const snap = await getDocs(progressRef);
-      return snap.docs.map((d) => ({ moduleId: d.id, ...d.data() } as ModuleProgress));
-    } catch (err) {
-      console.warn('[Firestore] Error fetching module progress:', err);
-      return [];
-    }
+    const key = `golantas_mod_progress_${uid}`;
+    return mockStore.get<ModuleProgress[]>(key, []);
   },
 
-  /**
-   * Update/create module progress for a user
-   */
-  async updateModuleProgress(uid: string, moduleId: string, progress: Partial<ModuleProgress>): Promise<void> {
-    if (!isFirebaseConfigured() || !db) return;
-    try {
-      const progressRef = doc(db, COLLECTION_USERS, uid, 'module_progress', moduleId);
-      await setDoc(progressRef, { ...progress, moduleId, updated_at: serverTimestamp() }, { merge: true });
-    } catch (err) {
-      console.warn('[Firestore] Error updating module progress:', err);
+  async updateModuleProgress(
+    uid: string,
+    moduleId: string,
+    progress: Partial<ModuleProgress>
+  ): Promise<void> {
+    const key = `golantas_mod_progress_${uid}`;
+    const list = mockStore.get<ModuleProgress[]>(key, []);
+    const idx = list.findIndex((m) => m.moduleId === moduleId);
+
+    const updated: ModuleProgress = {
+      moduleId,
+      lessons_done: [],
+      kuis_best: 0,
+      kuis_attempts: 0,
+      kuis_passed: false,
+      flashcards_done: [],
+      cases_done: [],
+      last_study: new Date().toISOString(),
+      total_menit: 0,
+      ...(idx >= 0 ? list[idx] : {}),
+      ...progress,
+    };
+
+    if (idx >= 0) {
+      list[idx] = updated;
+    } else {
+      list.push(updated);
     }
+
+    mockStore.set(key, list);
   },
 
   // ─── Extra / AI-Generated Curriculum Modules ───────────────────────────────
 
-  /**
-   * Save an AI-generated extra module and its corresponding quiz
-   */
-  async saveExtraModule(uid: string, module: ModuleData, quizQuestions: QuizQuestion[]): Promise<void> {
-    // 1. Cache to localStorage
-    if (typeof window !== 'undefined') {
-      try {
-        const modKey = `golantas_extra_modules_${uid}`;
-        const quizKey = `golantas_extra_quizzes_${uid}`;
-        const existingMods: ModuleData[] = JSON.parse(localStorage.getItem(modKey) || '[]');
-        const updatedMods = existingMods.filter(m => m.id !== module.id).concat(module);
-        localStorage.setItem(modKey, JSON.stringify(updatedMods));
+  async saveExtraModule(
+    uid: string,
+    module: ModuleData,
+    quizQuestions: QuizQuestion[]
+  ): Promise<void> {
+    const modKey = `golantas_extra_modules_${uid}`;
+    const quizKey = `golantas_extra_quizzes_${uid}`;
 
-        const existingQuizzes: Record<string, QuizQuestion[]> = JSON.parse(localStorage.getItem(quizKey) || '{}');
-        existingQuizzes[module.id] = quizQuestions;
-        localStorage.setItem(quizKey, JSON.stringify(existingQuizzes));
-      } catch (cacheErr) {
-        console.warn('[Firestore] LocalStorage cache error:', cacheErr);
-      }
-    }
+    mockStore.upsertItem(modKey, module, 'id');
 
-    // 2. Persist to Firestore subcollections
-    if (!isFirebaseConfigured() || !db) return;
-    try {
-      const moduleDocRef = doc(db, COLLECTION_USERS, uid, 'extra_modules', module.id);
-      await setDoc(moduleDocRef, {
-        ...module,
-        created_at: serverTimestamp(),
-        updated_at: serverTimestamp(),
-      }, { merge: true });
-
-      if (quizQuestions && quizQuestions.length > 0) {
-        const quizDocRef = doc(db, COLLECTION_USERS, uid, 'extra_module_quizzes', module.id);
-        await setDoc(quizDocRef, {
-          moduleId: module.id,
-          questions: quizQuestions,
-          updated_at: serverTimestamp(),
-        }, { merge: true });
-      }
-    } catch (err) {
-      console.warn('[Firestore] Error saving extra module to Firestore:', err);
-    }
+    const existingQuizzes = mockStore.get<Record<string, QuizQuestion[]>>(quizKey, {});
+    existingQuizzes[module.id] = quizQuestions;
+    mockStore.set(quizKey, existingQuizzes);
   },
 
-  /**
-   * Retrieve all AI-generated extra modules for a user
-   */
   async getExtraModules(uid: string): Promise<ModuleData[]> {
-    let localMods: ModuleData[] = [];
-    if (typeof window !== 'undefined') {
-      try {
-        localMods = JSON.parse(localStorage.getItem(`golantas_extra_modules_${uid}`) || '[]');
-      } catch {}
-    }
-
-    if (!isFirebaseConfigured() || !db) {
-      return localMods;
-    }
-
-    try {
-      const modulesRef = collection(db, COLLECTION_USERS, uid, 'extra_modules');
-      const snap = await getDocs(modulesRef);
-      if (!snap.empty) {
-        const firestoreMods = snap.docs.map(d => ({ id: d.id, ...d.data() } as ModuleData));
-        // Update local cache
-        if (typeof window !== 'undefined') {
-          localStorage.setItem(`golantas_extra_modules_${uid}`, JSON.stringify(firestoreMods));
-        }
-        return firestoreMods;
-      }
-    } catch (err) {
-      console.warn('[Firestore] Error fetching extra modules from Firestore:', err);
-    }
-
-    return localMods;
+    return mockStore.get<ModuleData[]>(`golantas_extra_modules_${uid}`, []);
   },
 
-  /**
-   * Retrieve all AI-generated module quizzes for a user as a record map
-   */
   async getExtraModuleQuizzes(uid: string): Promise<Record<string, QuizQuestion[]>> {
-    let localQuizzes: Record<string, QuizQuestion[]> = {};
-    if (typeof window !== 'undefined') {
-      try {
-        localQuizzes = JSON.parse(localStorage.getItem(`golantas_extra_quizzes_${uid}`) || '{}');
-      } catch {}
-    }
-
-    if (!isFirebaseConfigured() || !db) {
-      return localQuizzes;
-    }
-
-    try {
-      const quizRef = collection(db, COLLECTION_USERS, uid, 'extra_module_quizzes');
-      const snap = await getDocs(quizRef);
-      if (!snap.empty) {
-        const result: Record<string, QuizQuestion[]> = {};
-        snap.docs.forEach((d) => {
-          const data = d.data();
-          if (data && data.questions) {
-            result[d.id] = data.questions as QuizQuestion[];
-          }
-        });
-        if (typeof window !== 'undefined') {
-          localStorage.setItem(`golantas_extra_quizzes_${uid}`, JSON.stringify(result));
-        }
-        return result;
-      }
-    } catch (err) {
-      console.warn('[Firestore] Error fetching extra module quizzes from Firestore:', err);
-    }
-
-    return localQuizzes;
+    return mockStore.get<Record<string, QuizQuestion[]>>(`golantas_extra_quizzes_${uid}`, {});
   },
 
-  /**
-   * Retrieve a single extra module quiz
-   */
   async getExtraModuleQuiz(uid: string, moduleId: string): Promise<QuizQuestion[] | null> {
     const all = await this.getExtraModuleQuizzes(uid);
     return all[moduleId] || null;
@@ -582,145 +342,58 @@ export const firestoreService = {
 
   // ─── Exam Attempts ─────────────────────────────────────────────────────────
 
-  /**
-   * Save an exam attempt
-   */
   async saveExamAttempt(attempt: Omit<ExamAttempt, 'id'>): Promise<void> {
-    if (!isFirebaseConfigured() || !db) return;
-    try {
-      await addDoc(collection(db, COLLECTION_EXAM_ATTEMPTS), {
-        ...attempt,
-        createdAt: serverTimestamp(),
-      });
-    } catch (err) {
-      console.warn('[Firestore] Error saving exam attempt:', err);
-    }
+    const key = `golantas_exam_attempts_${attempt.uid}`;
+    const newAttempt: ExamAttempt = {
+      ...attempt,
+      id: 'exam_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+    };
+    mockStore.upsertItem(key, newAttempt, 'id');
   },
 
-  /**
-   * Get exam attempts for a user
-   */
   async getExamAttempts(uid: string): Promise<ExamAttempt[]> {
-    if (!isFirebaseConfigured() || !db) return [];
-    try {
-      const q = query(
-        collection(db, COLLECTION_EXAM_ATTEMPTS),
-        where('uid', '==', uid),
-        orderBy('createdAt', 'desc'),
-        limit(10)
-      );
-      const snap = await getDocs(q);
-      return snap.docs.map((d) => ({ id: d.id, ...d.data() } as ExamAttempt));
-    } catch (err) {
-      console.warn('[Firestore] Error fetching exam attempts:', err);
-      return [];
-    }
+    const key = `golantas_exam_attempts_${uid}`;
+    return mockStore.get<ExamAttempt[]>(key, []).slice(0, 10);
   },
 
   // ─── Certificates ──────────────────────────────────────────────────────────
 
-  /**
-   * Get certificates for a user
-   */
   async getCertificates(uid: string): Promise<CertificateData[]> {
-    if (!isFirebaseConfigured() || !db) return [];
-    try {
-      const q = query(
-        collection(db, COLLECTION_CERTIFICATES),
-        where('uid', '==', uid),
-        orderBy('tanggal_terbit', 'desc')
-      );
-      const snap = await getDocs(q);
-      return snap.docs.map((d) => ({ id: d.id, ...d.data() } as CertificateData));
-    } catch (err) {
-      console.warn('[Firestore] Error fetching certificates:', err);
-      return [];
-    }
+    const key = `golantas_certificates_${uid}`;
+    return mockStore.get<CertificateData[]>(key, []);
   },
 
-  /**
-   * Save a new certificate
-   */
   async saveCertificate(cert: Omit<CertificateData, 'id'>): Promise<void> {
-    if (!isFirebaseConfigured() || !db) return;
-    try {
-      await addDoc(collection(db, COLLECTION_CERTIFICATES), {
-        ...cert,
-        createdAt: serverTimestamp(),
-      });
-    } catch (err) {
-      console.warn('[Firestore] Error saving certificate:', err);
-    }
+    const key = `golantas_certificates_${cert.uid}`;
+    const newCert: CertificateData = {
+      ...cert,
+      id: 'cert_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+    };
+    mockStore.upsertItem(key, newCert, 'id');
   },
 
-  // ─── SOS Emergency Alerts (Firebase Spark Real-Time Sync) ───────────────────
-  // NOTE: Pada paket Firebase Spark (tanpa Cloud Functions / FCM push notification),
-  // pengiriman sinyal darurat SOS dan pembaruan lokasi bekerja melalui Firestore
-  // onSnapshot real-time listener ketika aplikasi anggota keluarga sedang aktif/terbuka.
+  // ─── SOS Emergency Alerts ──────────────────────────────────────────────────
 
-  /**
-   * Save and broadcast an SOS Emergency Alert
-   */
   async saveSOSAlert(alert: Omit<SOSAlert, 'id'>): Promise<string | null> {
-    if (!isFirebaseConfigured() || !db) return null;
-    try {
-      const docRef = await addDoc(collection(db, COLLECTION_SOS_ALERTS), {
-        ...alert,
-        createdAt: serverTimestamp(),
-      });
-      return docRef.id;
-    } catch (err) {
-      console.warn('[Firestore] Error saving SOS alert:', err);
-      return null;
-    }
+    const newId = 'sos_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+    const newAlert: SOSAlert = {
+      ...alert,
+      id: newId,
+    };
+    mockStore.upsertItem(KEY_SOS_ALERTS, newAlert, 'id');
+    return newId;
   },
 
-  /**
-   * Listen to active SOS Emergency Alerts in real-time
-   */
   subscribeSOSAlerts(callback: (alerts: SOSAlert[]) => void): Unsubscribe | null {
-    if (!isFirebaseConfigured() || !db) return null;
-    try {
-      const q = query(
-        collection(db, COLLECTION_SOS_ALERTS),
-        where('status', '==', 'terkirim'),
-        orderBy('waktu', 'desc'),
-        limit(10)
-      );
-      return onSnapshot(q, (snapshot) => {
-        const alerts = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as SOSAlert));
-        callback(alerts);
-      }, (err) => {
-        console.warn('[Firestore] SOS real-time listener warning:', err);
-      });
-    } catch (err) {
-      console.warn('[Firestore] Error setting up SOS listener:', err);
-      return null;
-    }
+    return mockStore.subscribe<SOSAlert[]>(KEY_SOS_ALERTS, (alerts) => {
+      callback(alerts || []);
+    });
   },
 
-  // ─── Family Links & PDP Audit Logs (Firebase Spark Real-Time Sync) ──────────
-  // NOTE: Pemantauan keluarga berbasis persetujuan (UU PDP No. 27/2022) mengandalkan
-  // real-time sync Firestore pada aplikasi yang aktif.
+  // ─── Family Links ──────────────────────────────────────────────────────────
 
-  /**
-   * Get family links for a given user (either parent or child)
-   */
   async getFamilyLinks(uid: string): Promise<FamilyLink[]> {
-    if (!isFirebaseConfigured() || !db) return [];
-    try {
-      const qParent = query(collection(db, COLLECTION_FAMILY_LINKS), where('parent_uid', '==', uid));
-      const qChild = query(collection(db, COLLECTION_FAMILY_LINKS), where('child_uid', '==', uid));
-      
-      const [snapP, snapC] = await Promise.all([getDocs(qParent), getDocs(qChild)]);
-      const combined = [
-        ...snapP.docs.map(d => ({ id: d.id, ...d.data() } as FamilyLink)),
-        ...snapC.docs.map(d => ({ id: d.id, ...d.data() } as FamilyLink))
-      ];
-      return combined;
-    } catch (err) {
-      console.warn('[Firestore] Error fetching family links:', err);
-      return [];
-    }
+    const all = mockStore.get<FamilyLink[]>(KEY_FAMILY_LINKS, []);
+    return all.filter((l) => l.parent_uid === uid || l.child_uid === uid);
   },
 };

@@ -3,7 +3,7 @@ import {
   ShieldAlert, Gamepad2, MapPin, Award, Flame, 
   ChevronRight, ChevronLeft, ArrowUpRight, Navigation,
   Shield, Calendar, Megaphone, Search, Users, BookOpen, Bot,
-  CheckCircle2, X, LocateFixed, Drone
+  CheckCircle2, X, LocateFixed, Drone, FileText, CreditCard, Car, FileCheck, Camera, Clock
 } from 'lucide-react';
 import { UserProfile } from '../../core/types';
 import { TabType } from '../../shared/components/BottomNavBar';
@@ -11,6 +11,7 @@ import { DroneAlertIcon } from '../../shared/components/DroneAlertIcon';
 import { sound } from '../../shared/services/sound';
 import { NotificationService } from '../../shared/services/notification';
 import { MASCOT_CONFIG } from '../../core/mascot';
+import { layananService } from '../../services/layanan';
 import { 
   locationService, 
   LocationState, 
@@ -74,6 +75,7 @@ export const BerandaView: React.FC<BerandaViewProps> = ({
   ];
 
   const horizontalMenuItems = [
+    { id: 'layanan', label: 'Layanan Terpadu', sublabel: 'E-SIM/SKCK/STNK', icon: FileText, color: 'bg-blue-50 text-[#0077C0]' },
     { id: 'belajar', label: 'Kuis Edukasi', sublabel: '+20 Poin', icon: Gamepad2, color: 'bg-blue-50 text-[#0077C0]' },
     { id: 'jalur', label: 'Edukasi SIM', sublabel: 'Teori SIM', icon: BookOpen, color: 'bg-blue-50 text-[#0077C0]' },
     { id: 'peta', label: 'Peta Live', sublabel: 'Traffic GPS', icon: MapPin, color: 'bg-blue-50 text-[#0077C0]' },
@@ -81,6 +83,17 @@ export const BerandaView: React.FC<BerandaViewProps> = ({
     { id: 'keluarga', label: 'Keluarga', sublabel: 'UU PDP', icon: Users, color: 'bg-blue-50 text-[#0077C0]' },
     { id: 'robot', label: 'Go Lantas Bot', sublabel: 'Tanya Petugas', icon: Bot, color: 'bg-blue-50 text-[#0077C0]' },
   ];
+
+  const [activeSubmissionCount, setActiveSubmissionCount] = useState<number>(() => {
+    return layananService.listSubmissions().filter(s => s.status !== 'selesai' && s.status !== 'diambil').length;
+  });
+
+  useEffect(() => {
+    const unsub = layananService.subscribeSubmissions((list) => {
+      setActiveSubmissionCount(list.filter(s => s.status !== 'selesai' && s.status !== 'diambil').length);
+    });
+    return () => unsub();
+  }, []);
 
   useEffect(() => {
     if (profile) setUser(profile);
@@ -129,6 +142,8 @@ export const BerandaView: React.FC<BerandaViewProps> = ({
       onOpenRobotChat();
     } else if (id === 'jalur') {
       onNavigateTab('belajar');
+    } else if (id === 'layanan') {
+      onNavigateTab('layanan');
     } else {
       onNavigateTab(id as TabType);
     }
@@ -269,7 +284,7 @@ export const BerandaView: React.FC<BerandaViewProps> = ({
             Menu Layanan Cepat
           </span>
         </div>
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-2.5">
           {horizontalMenuItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -473,6 +488,130 @@ export const BerandaView: React.FC<BerandaViewProps> = ({
           <span>Buka Obrolan</span>
           <ChevronRight className="w-4 h-4" />
         </button>
+      </div>
+
+      {/* Layanan Terpadu Korlantas POLRI Section */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-1.5">
+            <span className="gowapit-section-label">Layanan Terpadu Korlantas</span>
+            <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-blue-50 text-[#0077C0] border border-blue-200">
+              Presisi Digital
+            </span>
+          </div>
+          <button
+            onClick={() => {
+              sound.playClick();
+              onNavigateTab('layanan');
+            }}
+            className="text-xs text-[#0077C0] font-extrabold hover:underline flex items-center gap-1 btn-press"
+          >
+            <span>Semua Layanan</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        {/* 4 Feature Service Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          {[
+            { id: 'e_sim', title: 'E-SIM Presisi', desc: 'SIM Baru & Perpanjangan', icon: CreditCard, color: 'bg-blue-50 text-[#0077C0]', border: 'border-blue-100 hover:border-[#0077C0]' },
+            { id: 'stnk', title: 'STNK & Pajak', desc: 'Pengesahan PKB Online', icon: Car, color: 'bg-sky-50 text-sky-600', border: 'border-sky-100 hover:border-sky-400' },
+            { id: 'skck', title: 'SKCK Online', desc: 'Catatan Kepolisian', icon: FileCheck, color: 'bg-teal-50 text-teal-600', border: 'border-teal-100 hover:border-teal-400' },
+            { id: 'lapor', title: 'Lapor Kehilangan', desc: 'STPLK Bebas Biaya', icon: FileText, color: 'bg-orange-50 text-orange-600', border: 'border-orange-100 hover:border-orange-400' },
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
+              <div
+                key={item.id}
+                onClick={() => {
+                  sound.playClick();
+                  onNavigateTab('layanan');
+                }}
+                className={`p-3.5 rounded-2xl apple-card bg-white border ${item.border} cursor-pointer group transition-all btn-press flex flex-col justify-between space-y-2`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className={`w-9 h-9 rounded-xl ${item.color} flex items-center justify-center group-hover:scale-105 transition-transform`}>
+                    <Icon className="w-4.5 h-4.5" />
+                  </div>
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-[#0077C0] group-hover:translate-x-0.5 transition-all" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-black text-slate-900 group-hover:text-[#0077C0] transition-colors leading-tight">
+                    {item.title}
+                  </h4>
+                  <p className="text-[10px] text-slate-400 font-medium line-clamp-1 mt-0.5">
+                    {item.desc}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* 1 Tracking Card with Badge & 1 Cek Tilang ETLE Card */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* Tracking Card */}
+          <div
+            onClick={() => {
+              sound.playClick();
+              onNavigateTab('layanan');
+            }}
+            className="p-4 rounded-[18px] apple-card bg-white border border-[#DDE6E2] hover:border-[#0077C0] cursor-pointer group transition-all btn-press flex items-center justify-between gap-3 shadow-2xs"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#0077C0] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Clock className="w-5 h-5" />
+              </div>
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-1.5">
+                  <h4 className="text-xs font-black text-slate-900">
+                    Lacak Status Permohonan
+                  </h4>
+                  {activeSubmissionCount > 0 && (
+                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500 text-white">
+                      {activeSubmissionCount} Proses
+                    </span>
+                  )}
+                </div>
+                <p className="text-[11px] text-slate-500 font-medium line-clamp-1">
+                  {activeSubmissionCount > 0
+                    ? `${activeSubmissionCount} pengajuan sedang dalam proses Satpas.`
+                    : 'Pantau kemajuan berkas permohonan SIM/STNK Anda.'}
+                </p>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#0077C0] shrink-0" />
+          </div>
+
+          {/* Cek Tilang ETLE Card */}
+          <div
+            onClick={() => {
+              sound.playClick();
+              onNavigateTab('layanan');
+            }}
+            className="p-4 rounded-[18px] apple-card bg-gradient-to-r from-slate-900 to-slate-800 text-white cursor-pointer group transition-all btn-press flex items-center justify-between gap-3 shadow-xs"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white/10 text-sky-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Camera className="w-5 h-5" />
+              </div>
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-1.5">
+                  <h4 className="text-xs font-black text-white">
+                    Cek Tilang ETLE
+                  </h4>
+                  <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300">
+                    CCTV
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-300 font-medium line-clamp-1">
+                  Periksa denda & nomor BRIVA via plat nomor.
+                </p>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-white shrink-0" />
+          </div>
+        </div>
       </div>
 
       {/* 7. Pemantauan Titik Rawan Lalin (Disesuaikan dengan Lokasi Pengguna) */}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, RefreshCw, ArrowLeft, ShieldAlert } from 'lucide-react';
+import { Mail, RefreshCw, ArrowLeft, ShieldAlert, Sparkles } from 'lucide-react';
 import { authService, getFriendlyErrorMessage } from '../../services/auth';
 import { sound } from '../../shared/services/sound';
 
@@ -31,8 +31,7 @@ export const ReverifyScreen: React.FC<ReverifyScreenProps> = ({
     sound.playClick();
 
     try {
-      // Try to resend email verification to current signed-in user
-      await authService.resendEmailVerification();
+      await authService.resendEmailVerification(email.trim());
       sound.playCorrect();
       onVerificationSent(email.trim());
     } catch (err: any) {
@@ -53,11 +52,15 @@ export const ReverifyScreen: React.FC<ReverifyScreenProps> = ({
           </div>
 
           <div className="space-y-1">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-[11px] font-bold text-amber-700">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Verifikasi Akun (Simulasi Demo)</span>
+            </div>
             <h1 className="text-xl sm:text-2xl font-heading font-black text-[#0F172A] tracking-tight">
-              Verifikasi Ulang Akun
+              Kirim Ulang Kode Verifikasi
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed max-w-xs">
-              Akun Anda belum diverifikasi. Kami akan mengirim ulang tautan verifikasi ke email Anda.
+              Akun Anda belum diverifikasi. Kode verifikasi 6-digit baru akan disimulasikan di layar berikutnya.
             </p>
           </div>
         </div>
@@ -95,10 +98,10 @@ export const ReverifyScreen: React.FC<ReverifyScreenProps> = ({
             {isLoading ? (
               <>
                 <RefreshCw className="w-4 h-4 animate-spin" />
-                <span>Mengirim Email...</span>
+                <span>Memproses...</span>
               </>
             ) : (
-              <span>Kirim Ulang Email Verifikasi</span>
+              <span>Dapatkan Kode Verifikasi Baru</span>
             )}
           </button>
         </form>
