@@ -589,27 +589,27 @@ export const BerandaView: React.FC<BerandaViewProps> = ({
               sound.playClick();
               onNavigateTab('layanan');
             }}
-            className="p-4 rounded-[18px] apple-card bg-gradient-to-r from-slate-900 to-slate-800 text-white cursor-pointer group transition-all btn-press flex items-center justify-between gap-3 shadow-xs"
+            className="p-4 rounded-[18px] apple-card bg-white border border-[#DDE6E2] hover:border-[#0077C0] cursor-pointer group transition-all btn-press flex items-center justify-between gap-3 shadow-2xs"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white/10 text-sky-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                 <Camera className="w-5 h-5" />
               </div>
               <div className="space-y-0.5">
                 <div className="flex items-center gap-1.5">
-                  <h4 className="text-xs font-black text-white">
+                  <h4 className="text-xs font-black text-slate-900 group-hover:text-[#0077C0] transition-colors">
                     Cek Tilang ETLE
                   </h4>
-                  <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300">
+                  <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-sky-100 text-sky-700 border border-sky-200/80">
                     CCTV
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-300 font-medium line-clamp-1">
+                <p className="text-[11px] text-slate-500 font-medium line-clamp-1">
                   Periksa denda & nomor BRIVA via plat nomor.
                 </p>
               </div>
             </div>
-            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-white shrink-0" />
+            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#0077C0] group-hover:translate-x-0.5 transition-all shrink-0" />
           </div>
         </div>
       </div>

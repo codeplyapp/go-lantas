@@ -85,7 +85,7 @@
 
 /* GoWapit Standard Card: Radius 16 + Border #E5EBE8 + Shadow 0 4 16 rgba(0,119,192,.08) */
 .apple-card, .gowapit-card {
-  background: #FFFFFF !important;
+  background: #FFFFFF;
   border: 1px solid #E5EBE8;
   border-radius: 16px;
   box-shadow: 0 4px 16px rgba(0, 119, 192, 0.08);

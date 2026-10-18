@@ -125,7 +125,7 @@ export const LayananView: React.FC<LayananViewProps> = ({
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* 1. Header Banner Hub */}
-      <div className="apple-card bg-gradient-to-br from-[#0077C0] via-[#008BE0] to-[#00609C] text-white p-6 rounded-[28px] shadow-[0_12px_30px_rgba(0,119,192,0.22)] relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#0077C0] via-[#008BE0] to-[#00609C] text-white p-6 rounded-[28px] shadow-[0_12px_30px_rgba(0,119,192,0.22)] relative overflow-hidden">
         {/* Background Emblem Watermark */}
         <div className="absolute -right-8 -bottom-10 w-48 h-48 pointer-events-none opacity-10 text-white select-none">
           <Shield className="w-full h-full stroke-[1] fill-current" />
@@ -328,7 +328,7 @@ export const LayananView: React.FC<LayananViewProps> = ({
           sound.playClick();
           setSubView('cek_tilang');
         }}
-        className="apple-card bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white p-6 rounded-[24px] shadow-sm cursor-pointer group transition-all btn-press relative overflow-hidden"
+        className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white p-6 rounded-[24px] border border-slate-700/60 shadow-md cursor-pointer group transition-all btn-press relative overflow-hidden"
       >
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start gap-3.5">
