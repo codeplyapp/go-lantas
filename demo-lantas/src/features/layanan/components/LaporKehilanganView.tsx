@@ -6,7 +6,6 @@ import {
   MapPin,
   Calendar,
   CheckCircle2,
-  Sparkles,
   Upload,
   X,
   CreditCard,
@@ -337,7 +336,7 @@ export const LaporKehilanganView: React.FC<LaporKehilanganViewProps> = ({
           ) : (
             <>
               <span>Terbitkan STPLK Elektronik</span>
-              <Sparkles className="w-4 h-4" />
+              <CheckCircle2 className="w-4 h-4" />
             </>
           )}
         </button>

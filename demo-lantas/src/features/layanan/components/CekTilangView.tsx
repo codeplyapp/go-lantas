@@ -11,7 +11,6 @@ import {
   ExternalLink,
   MapPin,
   Clock,
-  Sparkles,
 } from 'lucide-react';
 import { TilangEtleRecord } from '../../../core/types';
 import { layananService } from '../../../services/layanan';

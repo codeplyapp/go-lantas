@@ -109,7 +109,7 @@ export const BelajarPage: React.FC<BelajarPageProps> = ({ profile }) => {
       origin: { y: 0.6 },
     });
     NotificationService.sendSystemNotification(
-      `🎉 ${tierName} Baru Terbuka! ✨`,
+      `🎉 ${tierName} Baru Terbuka!`,
       `Selamat! Anda berhasil membuka kurikulum materi ${tierName}.`
     );
   }, []);

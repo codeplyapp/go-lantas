@@ -71,7 +71,7 @@ export const CaseStudy: React.FC<CaseStudyProps> = ({
         origin: { y: 0.8 },
       });
       NotificationService.showInAppToast(
-        'Keputusan Sangat Bijak! 🌟',
+        'Keputusan Sangat Bijak!',
         `Pilihan Anda paling aman. ${!isCaseCompleted ? '(+25 Poin)' : ''}`,
         'success'
       );

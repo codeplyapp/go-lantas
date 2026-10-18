@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   BookOpen, Clock, CheckCircle2, ChevronRight, 
-  Layers, Brain, Lock, Sparkles, Key, RefreshCw, AlertTriangle, 
+  Layers, Brain, Lock, Plus, Key, RefreshCw, AlertTriangle, 
   Zap, ShieldCheck, Check, ArrowRight 
 } from 'lucide-react';
 import { ModuleData, ModuleProgress, CurriculumTier } from '../../../core/types';
@@ -88,7 +88,7 @@ export const ModuleList: React.FC<ModuleListProps> = ({
               ) : tier.id === 'berkelanjutan' ? (
                 <Zap className="w-3.5 h-3.5 text-amber-500" />
               ) : (
-                <Sparkles className="w-3.5 h-3.5 text-[#0077c0]" />
+                <BookOpen className="w-3.5 h-3.5 text-[#0077c0]" />
               )}
               <span>{tier.nama}</span>
               {complete ? (
@@ -244,7 +244,7 @@ export const ModuleList: React.FC<ModuleListProps> = ({
                 disabled={isGeneratingTier}
                 className="px-3.5 py-1.5 rounded-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs transition-all btn-press"
               >
-                <Sparkles className="w-3.5 h-3.5" />
+                <Plus className="w-3.5 h-3.5" />
                 <span>Buat Set Modul Baru</span>
               </button>
             </div>

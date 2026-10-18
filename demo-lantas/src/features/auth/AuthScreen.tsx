@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Shield, Mail, Lock, User, Eye, EyeOff, GraduationCap, 
-  School, Users, BookOpen, ArrowRight, Sparkles, AlertCircle, 
+  School, Users, ArrowRight, AlertCircle, 
   CheckCircle2, X, Check, ShieldAlert, Clock
 } from 'lucide-react';
 import { authService, getFriendlyErrorMessage, AuthSession, SignupDraft } from '../../services/auth';

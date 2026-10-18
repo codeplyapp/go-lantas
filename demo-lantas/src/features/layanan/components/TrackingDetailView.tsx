@@ -3,7 +3,7 @@ import {
   ArrowLeft,
   CheckCircle2,
   Clock,
-  Sparkles,
+  FastForward,
   Building2,
   Calendar,
   User,
@@ -181,8 +181,8 @@ export const TrackingDetailView: React.FC<TrackingDetailViewProps> = ({
             <span>Permohonan Telah Selesai 100% (Tahap Akhir)</span>
           ) : (
             <>
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>⚡ Majukan Status ke Tahap Berikutnya</span>
+              <FastForward className="w-3.5 h-3.5" />
+              <span>Majukan Status ke Tahap Berikutnya</span>
             </>
           )}
         </button>

@@ -11,7 +11,6 @@ import {
   Clock,
   CheckCircle2,
   ChevronRight,
-  Sparkles,
 } from 'lucide-react';
 import { LayananSubmission, LayananStatus } from '../../../core/types';
 import { LAYANAN_CONFIGS } from '../../../data/layanan';

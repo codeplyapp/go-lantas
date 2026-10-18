@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   ChevronLeft, ChevronRight, CheckCircle2, RotateCw, 
-  Layers, Award, Sparkles, Filter 
+  Layers, Award, Filter 
 } from 'lucide-react';
 import { FlashcardItem, ModuleProgress } from '../../../core/types';
 import { firestoreService } from '../../../services/firestore';
@@ -95,7 +95,7 @@ export const Flashcards: React.FC<FlashcardsProps> = ({
 
     onProgressUpdated(updatedProgress);
     NotificationService.showInAppToast(
-      'Rambu Dikuasai! ✨',
+      'Rambu Dikuasai!',
       `Anda menghafal "${currentCard.judul}" (+10 Poin).`,
       'success'
     );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Trophy, Medal, Award, School, Building2, Globe2, 
-  TrendingUp, UserCheck, ChevronRight, Sparkles 
+  TrendingUp, UserCheck, ChevronRight 
 } from 'lucide-react';
 import { UserProfile } from '../../../core/types';
 import { firestoreService } from '../../../services/firestore';

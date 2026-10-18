@@ -8,12 +8,10 @@ import {
   FileCheck,
   Megaphone,
   Building2,
-  Sparkles,
+  ShieldCheck,
   QrCode,
-  Calendar,
   AlertCircle,
   Clock,
-  Shield,
 } from 'lucide-react';
 import { LayananJenis, LayananSubmission, UserProfile } from '../../../core/types';
 import { LAYANAN_CONFIGS, DUMMY_SATPAS_LIST } from '../../../data/layanan';
@@ -202,7 +200,7 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
               className="w-full py-3.5 rounded-2xl bg-[#0077C0] hover:bg-[#008be0] text-white text-xs sm:text-sm font-extrabold transition-all shadow-md flex items-center justify-center gap-2 btn-press"
             >
               <span>Lacak Status Permohonan</span>
-              <Sparkles className="w-4 h-4" />
+              <ShieldCheck className="w-4 h-4" />
             </button>
             <button
               onClick={onBack}
@@ -318,7 +316,7 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
                     : 'border-slate-200 text-slate-600'
                 }`}
               >
-                ✨ Permohonan Baru
+                Permohonan Baru
               </button>
             </div>
           </div>
@@ -367,6 +365,22 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
               value={skckKeperluan}
               onChange={(e) => setSkckKeperluan(e.target.value)}
               placeholder="Contoh: Melamar Pekerjaan / Seleksi Kedinasan"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800 focus:bg-white focus:border-[#0077C0] outline-none"
+            />
+          </div>
+        )}
+
+        {jenis === 'surat_keramaian' && (
+          <div className="apple-card bg-white p-5 rounded-[20px] border border-[#DDE6E2] space-y-3">
+            <h3 className="text-xs font-black uppercase tracking-wider text-slate-800">
+              Nama Kegiatan / Acara
+            </h3>
+            <input
+              type="text"
+              required
+              value={acaraNama}
+              onChange={(e) => setAcaraNama(e.target.value)}
+              placeholder="Contoh: Turnamen Olahraga Pelajar"
               className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800 focus:bg-white focus:border-[#0077C0] outline-none"
             />
           </div>
@@ -497,7 +511,7 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
             ) : (
               <>
                 <span>Kirim Permohonan Online</span>
-                <Sparkles className="w-4 h-4" />
+                <CheckCircle2 className="w-4 h-4" />
               </>
             )}
           </button>

@@ -60,7 +60,6 @@ export const FloatingMascotBubble: React.FC<FloatingMascotBubbleProps> = ({ onCl
         {/* Floating Tooltip Pill on Hover */}
         <div className="absolute right-full mr-2.5 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-slate-900/90 backdrop-blur-sm text-white text-[11px] font-bold rounded-lg shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all pointer-events-none hidden sm:flex items-center gap-1">
           <span>Tanya GO Lantas</span>
-          <span className="text-[10px] text-blue-300">✨</span>
         </div>
       </button>
     </div>

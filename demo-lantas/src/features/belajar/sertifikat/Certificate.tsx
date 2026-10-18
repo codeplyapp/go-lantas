@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { 
   Award, Download, Lock, CheckCircle2, ShieldCheck, 
-  ChevronLeft, Check, Sparkles, Zap, Layers 
+  ChevronLeft, Check, Zap, Layers 
 } from 'lucide-react';
 import { CertificateData, ModuleData, UserProfile, ModuleProgress, CurriculumTier } from '../../../core/types';
 import { ALL_MODULES } from '../../../data/modules';

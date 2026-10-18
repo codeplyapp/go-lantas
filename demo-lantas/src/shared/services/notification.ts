@@ -50,7 +50,7 @@ export const NotificationService = {
         { id: 'notif_01', aktif: true, jam: '06:30', judul: '🎒 Jam Berangkat Sekolah (06:30)', pesan: 'Pastikan tali helm berbunyi KLIK! Periksa kaca spion dan nyalakan lampu utama motor Anda.' },
         { id: 'notif_02', aktif: true, jam: '15:30', judul: '🛵 Jam Pulang Padat (15:30)', pesan: 'Arus jalan sedang ramai. Jaga jarak aman minimal 3 detik dan jangan menyalip dari kiri!' },
         { id: 'notif_03', aktif: true, jam: '13:00', judul: '🌧️ Peringatan Cuaca Siang', pesan: 'Waspadai aspal licin saat hujan. Kurangi kecepatan maksimal 30 km/jam.' },
-        { id: 'notif_04', aktif: true, jam: '19:00', judul: '⭐ Tantangan Kuis Harian GO Lantas', pesan: 'Jawab kuis keselamatan hari ini untuk mempertahankan streak dan raih poin tambahan!' },
+        { id: 'notif_04', aktif: true, jam: '19:00', judul: 'Tantangan Kuis Harian GO Lantas', pesan: 'Jawab kuis keselamatan hari ini untuk mempertahankan streak dan raih poin tambahan!' },
       ];
 
       schedules.forEach((sch) => {

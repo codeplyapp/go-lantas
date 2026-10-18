@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, RefreshCw, ArrowLeft, ShieldAlert, Sparkles } from 'lucide-react';
+import { Mail, RefreshCw, ArrowLeft, ShieldAlert, KeyRound } from 'lucide-react';
 import { authService, getFriendlyErrorMessage } from '../../services/auth';
 import { sound } from '../../shared/services/sound';
 
@@ -53,7 +53,7 @@ export const ReverifyScreen: React.FC<ReverifyScreenProps> = ({
 
           <div className="space-y-1">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-[11px] font-bold text-amber-700">
-              <Sparkles className="w-3.5 h-3.5" />
+              <KeyRound className="w-3.5 h-3.5" />
               <span>Verifikasi Akun (Simulasi Demo)</span>
             </div>
             <h1 className="text-xl sm:text-2xl font-heading font-black text-[#0F172A] tracking-tight">
